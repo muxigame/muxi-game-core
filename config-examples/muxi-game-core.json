@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "features": {
+    "identity": {
+      "enabled": false,
+      "endpoint": "https://account.muxigame.com/api/internal/minecraft/identity/",
+      "serverKey": "",
+      "refreshSeconds": 60
+    }
+  }
+}

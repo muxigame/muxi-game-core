@@ -36,9 +36,12 @@ if (-not $JavaExe) {
     $JavaExe = $candidates | Where-Object { Test-Java21 $_ } | Select-Object -First 1
 }
 if (-not (Test-Java21 $JavaExe)) { throw 'Java 21 is required. Pass -JavaExe with a Java 21 executable.' }
-foreach ($file in @('config\muxi-identity-bridge.json', 'mods\muxi-identity-1.0.0.jar', 'mods\simplenicknames-1.21.1-neoforge-0.8.0.jar', 'libraries\net\neoforged\neoforge\21.1.250\win_args.txt')) {
+foreach ($file in @('config\muxi-game-core.json', 'libraries\net\neoforged\neoforge\21.1.250\win_args.txt')) {
     if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "Required server file missing: $file" }
 }
+$core = @(Get-ChildItem -LiteralPath 'mods' -File -Filter 'muxi-game-core-*.jar')
+if ($core.Count -ne 1) { throw 'Exactly one muxi Game Core jar is required in mods.' }
+if (Get-ChildItem -LiteralPath 'mods' -File -Filter 'muxi-identity-*.jar') { throw 'Retire the legacy muxi-identity jar using install.py before starting.' }
 # Intentionally do not start/kill FRP, change RCON, accept EULA, or move worlds.
 Write-Host "Java 21: $JavaExe"
 & $JavaExe '@user_jvm_args.txt' '@libraries/net/neoforged/neoforge/21.1.250/win_args.txt' nogui

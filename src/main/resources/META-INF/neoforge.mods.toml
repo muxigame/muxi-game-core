@@ -1,0 +1,25 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+[[mods]]
+modId="muxi_game_core"
+version="${mod_version}"
+displayName="muxi Game Core"
+description="Server-side feature integration for muxigame modpacks."
+displayURL="https://github.com/muxigame/muxi-game-core"
+[[dependencies.muxi_game_core]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.250,)"
+side="SERVER"
+[[dependencies.muxi_game_core]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+side="SERVER"
+[[dependencies.muxi_game_core]]
+modId="simplenicknames"
+type="optional"
+versionRange="[0.8.0,0.9)"
+ordering="AFTER"
+side="SERVER"

@@ -1,59 +1,97 @@
-# muxi UID 身份与中文昵称
+# muxi Game Core
 
-## 职责
+muxigame 整合包的**服务端功能集成模组**。昵称同步是第一个模块，不再把整个模组限定为昵称工具。
 
-- 启动器从已登录 muxi 身份的 `muxi_uid` 生成十进制 Minecraft 登录名，例如 `10000`。
-- 离线 UUID 始终等于 Java `UUID.nameUUIDFromBytes("OfflinePlayer:10000".getBytes(UTF_8))`。
-- 用户名和昵称均不参与 UUID 计算。
-- 账户服务提供受服务端专用密钥保护的最小资料接口，只返回 UID、登录名、UUID 和显示昵称。
-- `muxi-identity-1.0.0.jar` 仅安装在游戏服务端，进服后异步读取资料，每 60 秒刷新在线玩家昵称。
-- Simple Nicknames 安装在客户端与服务端，负责名牌、聊天、Tab 和计分板的显示。服务端关闭 MiniMessage 格式解析，允许重复中文昵称。
+- 模组 ID：`muxi_game_core`
+- 当前版本：`1.0.0`
+- 当前目标：Minecraft `1.21.1` / NeoForge `21.1.250` / Java `21`
+- 当前仅装在游戏服务端。客户端仍需要独立的 Simple Nicknames 显示模组。
+- 本地构建、手动安装；没有 CI、GitHub Actions、云端构建或自动发布配置。
 
-## 本机目录
+## 当前实现
 
-客户端源：`pack/source/Better MC Remake [FORGE]/`
+`identity`：固定平台 UID 游戏身份、平台中文昵称同步、定期刷新，以及禁止玩家通过昵称命令覆盖平台昵称。
 
-用户提供的服务端源：`BMC5Server/BMC5Server/`（原始目录保留，不启动、不重建旧世界）。
+Core 负责公共入口、配置和功能生命周期；新增整合包功能实现 `ServerFeature` 并添加独立的 `features.<id>` 配置。
+将来的活动、任务、服务器规则等可放入对应模块，但**这些功能目前尚未实现**。
 
-新增 `start-muxi.ps1` 会选择本机 Java 21，不使用原 `start.bat` 内过时的 `C:\Users\Roc` 路径，也不启动或终止 FRP。准备正式启动时，在服务端目录运行 `powershell -File .\start-muxi.ps1`；支持 `-JavaExe` 显式指定 Java 21。
-
-服务端专用配置：`BMC5Server/BMC5Server/config/muxi-identity-bridge.json`。其中 `serverKey` 与账户服务环境变量 `MUXI_MC_PROFILE_KEY` 一致，**不可放进客户端、公开整合包、Git 或截图**。
-
-## 构建与安装
-
-在仓库根目录，用 JDK 21 或更新版本编译（输出目标 Java 21），不打包任何 Minecraft/第三方类：
-
-```powershell
-..\.ops-venv\Scripts\python.exe game-server\identity\build.py `
-  --java-home 'C:\Program Files\Java\jdk-24' `
-  --nickname-jar artifacts\uid-nickname-qa\simplenicknames-1.21.1-neoforge-0.8.0.jar
-..\.ops-venv\Scripts\python.exe game-server\identity\install.py
+```text
+src/main/java/net/muxigame/core/
+├─ MuxiGameCore.java          # 服务端入口与功能注册
+├─ config/CoreConfig.java    # 按功能分组的配置
+└─ feature/
+   ├─ ServerFeature.java     # 注册、关闭约定
+   └─ identity/              # UID 与昵称同步
 ```
 
-安装器校验 Simple Nicknames 官方 SHA-512；只写明确的 mod/config 文件，以原子替换避开既有 staging 硬链接。原配置备份位于忽略的 `artifacts/uid-nickname-qa/install-backups/`。
+## 工作区布局
 
-Simple Nicknames 使用作者原始 Modrinth 下载地址；其 ARR 二进制不转载到 OSS。清单构建校验固定 SHA-1，发布脚本跳过外部二进制上传。自身桥接模组源码为 MIT（见 LICENSE）。
+```text
+muxigame/
+├─ muxi-game-core/           # 本仓库
+├─ bmc5server/               # 独立的实际服务端包，不进入本仓库
+│  ├─ mods/
+│  ├─ config/
+│  ├─ world/
+│  └─ start-muxi.ps1
+├─ BMC5Server.zip            # 用户原始压缩包，不修改
+├─ better-mc-remake/         # 启动器、官网/API、客户端内容发布
+└─ muxi-auth/                # 统一账户
+```
 
-## 上线顺序
+## 本地构建
 
-1. 账户服务部署新的只读昵称接口，并持久化 `MUXI_MC_PROFILE_KEY`。
-2. 停服备份旧世界，将本目录指定的两个 mod 与配置同步至实际运行服；使用 Java 21。
-3. 与 UID 版启动器、整合包一起切换。不要只推客户端而让运行服仍缺少昵称模组。
-4. 老用户名到数字 UID 的首次切换会改变离线 UUID；旧世界有玩家数据时，应先单独规划 playerdata、advancements、stats 与各 Mod UUID 绑定数据迁移。安装器不迁移或删除任何存档。
+Windows 工作区可直接运行：
 
-## 安全边界
+```powershell
+.\build.ps1 -Test
+```
 
-这不是 Minecraft 进服认证模组。UID 是公开标识，不是密码。`online-mode=false` 下，其他离线客户端仍可能使用同一 UID 冒名；平台登录仅约束官方启动器。公开运营或对接积分、余额前，必须另外接入服务端验证的一次性进服凭证，不能把 UID 本身视作身份凭证。
+跨平台入口：
 
-## 测试隔离
+```sh
+python -m unittest discover -s tests -v
+python build.py --server ../bmc5server --java-home /path/to/jdk-21 --test
+```
 
-测试根目录：`artifacts/uid-nickname-qa/`。测试服使用独立普通副本、回环地址及全新 QA 世界，不与干净包共享可写硬链接。
+构建只读取已安装服务端的依赖。无需 Gradle，不访问网络，不下载 Minecraft/模组，不启动游戏。
+要求服务端目录已有固定版本 NeoForge libraries 与 `dependencies.json` 中固定哈希的 Simple Nicknames。
+编译器可使用 JDK 21 或更新版本，输出固定为 Java 21 字节码。
 
-`client-before.json` 和 `clean-client-audit.json` 对比全部客户端文件 SHA-256；允许变化仅为新增 Simple Nicknames、其配置、以及 Entity Culling 的 `minecraft:player` 兼容项。
+产物：
 
-`native-harness-result.json` 是真实 NeoForge 进程中的 FakePlayer 集成测试记录，覆盖异步 HTTP、原生昵称 API、中文重名、改昵称保持 UUID 和禁止玩家绕过平台改昵称。它不等于真人客户端的头顶名牌/Tab 视觉验收。
+```text
+build/libs/muxi-game-core-1.0.0.jar
+build/release.json
+```
 
-2026-09-22 全整合包隔离副本启动到 `Done`，327 个 Mod 中已加载昵称桥接。停服时触发
-原包已有的 `PackAnalytics 1.0.5 / BCC` 兼容错误：`NoClassDefFoundError: dev/wuffs/bcc/data/BetterStatusServerHolder`。
-同一错误也出现在原包 `2026-09-20` 的崩溃记录中。本次没有为此删除/升级原包中的其他 Mod；
-不能把这次启动检查描述为“全服无错误验收”。
+## 安装到停止状态的服务端
+
+```sh
+python install.py --server ../bmc5server --dry-run
+python install.py --server ../bmc5server
+```
+
+默认服务端即相邻的 `../bmc5server`。安装器检查产物 SHA-256，备份旧 JAR/配置，再原子替换。
+它只更新服务端自己的模组、配置及启动脚本，不写客户端、不读写 muxi-auth 的 `.env`、不修改玩家世界。
+
+`muxi_identity` 的旧配置自动迁到 `config/muxi-game-core.json` 下的 `features.identity`，密钥不轮换。
+旧 `muxi-identity-*.jar` 会移出生效目录，避免新旧模组同时加载。
+私密备份位于 `bmc5server/.muxi-game-core-backups/`，不要公开上传。
+
+## 配置与离线边界
+
+模板见 `config-examples/muxi-game-core.json`。新装没有配置时 Core 默认不启用任何功能，可以离线加载。
+启用 `identity` 后，只有这一模块需要通过 HTTPS 读取账户昵称；这是昵称实时同步必需的请求，
+并非本地构建依赖。旧服务端迁移时保留原先已启用状态。
+
+生产配置含服务端专用密钥，仅保存在游戏服务器的 `config/muxi-game-core.json`。
+仓库只提供空密钥模板，程序的配置字符串和错误输出会隐藏密钥。
+
+## 注意
+
+本模组没有实现服务端 OAuth 进服凭证验证。UID 是公开标识，不是密码，不能仅凭 UID 发放付费权益。
+第一次从旧用户名切为 UID 的玩家存档迁移仍须单独安排。
+
+Simple Nicknames 是独立的上游依赖，不打包或转载到本 JAR/Git 仓库中。
+本仓库代码使用 MIT 许可证。来源与提取历史见 [docs/provenance.md](docs/provenance.md)。
