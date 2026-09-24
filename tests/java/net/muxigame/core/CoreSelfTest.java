@@ -42,6 +42,26 @@ public final class CoreSelfTest {
         invalid(enabled.replace("\"refreshSeconds\":60", "\"refreshSeconds\":\"60\""));
         invalid(enabled.replace(key, "short"));
         check("isolated localhost test allowed", CoreConfig.parse(enabled.replace("https://example.com", "http://127.0.0.1")).identity().enabled());
+
+        // ---- 进服核验（login）----
+        check("login off by default", !CoreConfig.parse("{}").login().enabled());
+        check("identity alone leaves login off", !CoreConfig.parse(enabled).login().enabled());
+        String join = "{\"schema\":1,\"features\":{\"login\":{\"enabled\":true,\"endpoint\":\"https://example.com/join/\",\"serverKey\":\"" + key + "\",\"timeoutSeconds\":6}}}";
+        check("login parse", CoreConfig.parse(join).login().enabled());
+        // 两节独立：只配 login 时 identity 关着，但 login 必须真的生效。
+        // 拆分之前这里是"没有 identity 就整份配置作废"，加功能时最容易踩的就是这条。
+        check("login alone leaves identity off", !CoreConfig.parse(join).identity().enabled());
+        check("login redacted toString", !CoreConfig.parse(join).toString().contains(key));
+        check("login timeout default", CoreConfig.parse(join.replace(",\"timeoutSeconds\":6", "")).login().timeoutSeconds() == 6);
+        invalid(join.replace("https://example.com", "http://example.com"));
+        invalid(join.replace(key, "short"));
+        invalid(join.replace("\"timeoutSeconds\":6", "\"timeoutSeconds\":0"));
+        invalid(join.replace("\"timeoutSeconds\":6", "\"timeoutSeconds\":21"));
+        invalid(join.replace("\"timeoutSeconds\":6", "\"timeoutSeconds\":\"6\""));
+        invalid(join.replace("\"timeoutSeconds\":6", "\"timeoutSeconds\":6.5"));
+        // 两节同时开是生产上的形态。
+        String both = "{\"schema\":1,\"features\":{\"identity\":{\"enabled\":true,\"endpoint\":\"https://example.com/profile/\",\"serverKey\":\"" + key + "\"},\"login\":{\"enabled\":true,\"endpoint\":\"https://example.com/join/\",\"serverKey\":\"" + key + "\"}}}";
+        check("both features together", CoreConfig.parse(both).identity().enabled() && CoreConfig.parse(both).login().enabled());
         System.out.println("Game Core Java self-tests: " + passed + " passed");
     }
 }

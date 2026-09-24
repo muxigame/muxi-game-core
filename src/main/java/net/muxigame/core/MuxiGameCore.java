@@ -3,6 +3,7 @@ package net.muxigame.core;
 import net.muxigame.core.config.CoreConfig;
 import net.muxigame.core.feature.ServerFeature;
 import net.muxigame.core.feature.identity.IdentityFeature;
+import net.muxigame.core.feature.login.LoginGate;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
@@ -23,6 +24,8 @@ public final class MuxiGameCore {
 
     public MuxiGameCore() {
         CoreConfig config = CoreConfig.load(Path.of(CoreConfig.FILE));
+        // 先注册进服核验：它是这台服务器唯一的身份关口，出问题要第一时间在日志里看见。
+        if (config.login().enabled()) register(new LoginGate(config.login()));
         if (config.identity().enabled()) {
             if (!ModList.get().isLoaded("simplenicknames"))
                 throw new IllegalStateException("Game Core identity is enabled but Simple Nicknames 0.8.x is not installed.");

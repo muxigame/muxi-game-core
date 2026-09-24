@@ -3,12 +3,26 @@
 muxigame 整合包的**服务端功能集成模组**。昵称同步是第一个模块，不再把整个模组限定为昵称工具。
 
 - 模组 ID：`muxi_game_core`
-- 当前版本：`1.0.0`
+- 当前版本：`1.1.0`
 - 当前目标：Minecraft `1.21.1` / NeoForge `21.1.250` / Java `21`
 - 当前仅装在游戏服务端。客户端仍需要独立的 Simple Nicknames 显示模组。
 - 本地构建、手动安装；没有 CI、GitHub Actions、云端构建或自动发布配置。
 
 ## 当前实现
+
+`login`：进服凭据核验。**这是这台服务器上唯一的身份关口。**
+
+服务器是 `online-mode=false`，Minecraft 自己不做任何身份校验：客户端在握手里报什么用户名，
+服务端就认什么。我们的用户名是平台 UID，而 UID 是从 10000 开始的顺号——不加这道关口，把
+用户名填成别人的 UID 就是别人。换一个"不好猜"的登录名并不能解决问题：游戏内 `/msg` 的 Tab
+补全本来就会把所有在线玩家的登录名列出来，名字从来不是秘密。
+
+所以这里不问"你叫什么"，而是问平台"这个 UID 刚刚有人拿本人的账号换过票吗"。票由启动器在
+玩家发起连接那一刻用本人的 access token 换走，一次性，180 秒过期。冒名者拿得到 UID，拿不到票。
+
+核验失败**一律拒绝**，包括平台超时、502、连不上。放行等于这个功能在最需要它的时候不存在，
+而且没有人会发现。代价是 muxi-auth 一挂全服进不来，运维上靠 `features.login.enabled=false`
+手动放行。
 
 `identity`：固定平台 UID 游戏身份、平台中文昵称同步、定期刷新，以及禁止玩家通过昵称命令覆盖平台昵称。
 
@@ -21,8 +35,22 @@ src/main/java/net/muxigame/core/
 ├─ config/CoreConfig.java    # 按功能分组的配置
 └─ feature/
    ├─ ServerFeature.java     # 注册、关闭约定
+   ├─ login/                 # 进服凭据核验
    └─ identity/              # UID 与昵称同步
 ```
+
+### 开 `login` 之前必须先做的两件事
+
+顺序错了会把所有玩家关在门外，而且他们看到的只是"进不去"：
+
+1. **muxi-auth 先上线换票 / 核销两个端点**（`/api/launcher/minecraft/join`、
+   `/api/internal/minecraft/join/{uid}`）。服务端开了核验而平台没有这两个端点，
+   等于所有人都没票。
+2. **启动器先发版并强制更新**。票是启动器换的，旧版启动器不会换票。
+   `launcher-release.json` 里把 `minSupportedVersion` 设到带换票功能的那一版，
+   旧版才会被挡下来提示更新，而不是让玩家连上去撞一鼻子灰。
+
+两件事都落地之后，再把 `features.login.enabled` 改成 `true` 并重启服务端。
 
 ## 工作区布局
 
