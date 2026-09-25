@@ -14,3 +14,4 @@
 *.py[cod]
 .idea/
 .vscode/
+/logs/
