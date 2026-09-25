@@ -1,0 +1,28 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "net.muxigame.core.compat.mixin",
+  "plugin": "net.muxigame.core.compat.CompatMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [
+    "jade.AnimalOwnerTooltipMixin",
+    "yigd.GraveTextMixin",
+    "yigd.GraveSelectionTitleMixin",
+    "yigd.PlayerSelectionNameMixin",
+    "ftbteams.FormatNameMixin",
+    "ftbteams.MemberButtonMixin",
+    "ftbteams.InvitedButtonMixin",
+    "ftbteams.CreatePartySelfMixin",
+    "watut.TypingPlayersMixin",
+    "pingwheel.PingLabelMixin",
+    "leaderboards.LeaderboardEntryMixin",
+    "leaderboards.LeaderboardWidthMixin",
+    "refinedstorage.GridLastModifiedMixin",
+    "minecraft.displays.SocialPlayerEntryMixin"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

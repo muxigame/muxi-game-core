@@ -1,0 +1,18 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "net.muxigame.core.compat.mixin",
+  "plugin": "net.muxigame.core.compat.CompatMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "minecraft.commands.SharedSuggestionProviderMixin"
+  ],
+  "client": [
+    "minecraft.commands.CommandSuggestionsMixin",
+    "minecraft.commands.SuggestionsListMixin"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

@@ -44,23 +44,52 @@ def compile_java(compiler: Path, sources: list[Path], output: Path, classpath: s
     subprocess.run([str(compiler), '@' + str(argfile)], check=True)
 
 
-def build(server: Path, java_home: Path | None = None, run_tests: bool = False) -> Path:
+def nested_jars(jar: Path, into: Path) -> list[Path]:
+    """Jar-in-jar libraries (MixinExtras inside NeoForge, PinIn inside JECh) are needed to compile, never to ship."""
+    found = []
+    with zipfile.ZipFile(jar) as archive:
+        for name in archive.namelist():
+            if name.startswith('META-INF/jarjar/') and name.endswith('.jar'):
+                target = into / f'{jar.stem}--{Path(name).name}'
+                target.write_bytes(archive.read(name)); found.append(target)
+    return found
+
+
+def build(server: Path, java_home: Path | None = None, run_tests: bool = False,
+          client_game: Path | None = None, pack_mods: Path | None = None) -> Path:
     meta = json.loads((ROOT / 'mod.json').read_text(encoding='utf-8'))
-    dep = json.loads((ROOT / 'dependencies.json').read_text(encoding='utf-8'))['simpleNicknames']
+    deps = json.loads((ROOT / 'dependencies.json').read_text(encoding='utf-8'))
+    dep = deps['simpleNicknames']
     nickname = server / 'mods' / dep['filename']
     if not nickname.is_file() or hashlib.sha512(nickname.read_bytes()).hexdigest() != dep['sha512']:
         raise ValueError('Pinned Simple Nicknames jar missing or modified. Use the existing server mods directory.')
     all_jars = sorted((server / 'libraries').rglob('*.jar'))
     mapped = [p for p in all_jars if p.name == 'server-1.21.1-20240808.144430-srg.jar']
-    neo = server / f"libraries/net/neoforged/neoforge/{meta['neoforge']}/neoforge-{meta['neoforge']}-universal.jar"
-    if len(mapped) != 1 or not neo.exists():
+    neo_dir = server / f"libraries/net/neoforged/neoforge/{meta['neoforge']}"
+    neo = neo_dir / f"neoforge-{meta['neoforge']}-universal.jar"
+    neo_server = neo_dir / f"neoforge-{meta['neoforge']}-server.jar"
+    if len(mapped) != 1 or not neo.exists() or not neo_server.exists():
         raise ValueError('Installed Minecraft 1.21.1 / NeoForge 21.1.250 server libraries are required.')
-    libraries = mapped + [p for p in all_jars if '/net/minecraft/' not in p.as_posix()] + [nickname]
-    classpath = os.pathsep.join(str(p.resolve()) for p in libraries)
+    # 客户端兼容部分要对着客户端类和目标模组编译；这些只参与编译，一个字节都不进产物。
+    client = deps['client']
+    client_game = client_game or ROOT.parent / '_client_test' / 'game'
+    pack_mods = pack_mods or ROOT.parent / 'better-mc-remake' / 'pack' / 'source' / 'Better MC Remake [FORGE]' / 'mods'
+    client_jars = [client_game / client['neoforgePatched'], client_game / client['minecraft']]
+    compile_only = [pack_mods / name for name in deps['compileOnly']]
+    missing = [str(p) for p in client_jars + compile_only if not p.is_file()]
+    if missing:
+        raise ValueError('Client / compile-only jars missing (use --client-game / --pack-mods): ' + ', '.join(missing))
     compiler, runtime = java_tools(java_home)
     output = ROOT / 'build'; (output / 'libs').mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=output, prefix='compile-') as temp:
         temp = Path(temp); classes = temp / 'classes'
+        nested = temp / 'nested'; nested.mkdir()
+        # NeoForge 打过补丁的类放在原版前面，否则 Entity.hasData 这类补丁方法编译时看不见。
+        libraries = (client_jars + [neo_server] + mapped
+                     + [p for p in all_jars if '/net/minecraft/' not in p.as_posix() and p != neo_server]
+                     + nested_jars(neo, nested) + [nickname] + compile_only
+                     + [j for jar in compile_only for j in nested_jars(jar, nested)])
+        classpath = os.pathsep.join(str(p.resolve()) for p in libraries)
         compile_java(compiler, sorted((ROOT / 'src/main/java').rglob('*.java')), classes, classpath, temp / 'main.args')
         if run_tests:
             test_cp = str(classes) + os.pathsep + classpath
@@ -94,8 +123,10 @@ def main() -> None:
     parser.add_argument('--server', type=Path, default=ROOT.parent / 'bmc5server')
     parser.add_argument('--java-home', type=Path)
     parser.add_argument('--test', action='store_true')
+    parser.add_argument('--client-game', type=Path, help='a game dir with the 1.21.1 client libraries (default ../_client_test/game)')
+    parser.add_argument('--pack-mods', type=Path, help='the pack mods dir holding the compat target mods')
     args = parser.parse_args()
-    try: build(args.server.resolve(), args.java_home, args.test)
+    try: build(args.server.resolve(), args.java_home, args.test, args.client_game, args.pack_mods)
     except (OSError, ValueError, subprocess.SubprocessError) as error: raise SystemExit(str(error)) from None
 
 

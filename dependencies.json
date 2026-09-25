@@ -11,5 +11,24 @@
     "sha512": "02687eb8282c8d46f08fc2344566e9141249902c1d71cf63c4b251aec53e864a0fe3ee96c95b27101c76e0d960ac7085b93445ed9c3f5eeb9b4d9dd1c645cb23",
     "license": "All Rights Reserved",
     "distribution": "Download from the author's original Modrinth URL; do not rehost on OSS."
-  }
+  },
+  "client": {
+    "minecraft": "libraries/net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-srg.jar",
+    "neoforgePatched": "libraries/net/neoforged/neoforge/21.1.250/neoforge-21.1.250-client.jar"
+  },
+  "compileOnly": [
+    "xaerominimap-neoforge-1.21.1-26.4.2.jar",
+    "xaeroworldmap-neoforge-1.21.1-1.45.0.jar",
+    "Jade-1.21.1-NeoForge-15.10.6.jar",
+    "youre-in-grave-danger-neoforge-2.0.13.jar",
+    "ftb-library-neoforge-2101.1.35.jar",
+    "ftb-teams-neoforge-2101.1.11.jar",
+    "watut-neoforge-1.21.0-1.2.7.jar",
+    "Ping-Wheel-1.12.2-neoforge-1.21.1.jar",
+    "leaderboards-1.21.1-NeoForge-2.0.4.jar",
+    "refinedstorage-neoforge-2.0.9.jar",
+    "open-parties-and-claims-neoforge-1.21.1-0.30.3.jar",
+    "jecharacters-1.21.1-neoforge-4.5.29.jar"
+  ],
+  "compileOnlyNote": "Compat mixin targets, resolved in the pack mods dir. Compile-time only; never bundled or rehosted."
 }

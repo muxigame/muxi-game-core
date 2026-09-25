@@ -1,0 +1,23 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "net.muxigame.core.compat.mixin",
+  "plugin": "net.muxigame.core.compat.CompatMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "openpac.ClaimOwnerNameMixin",
+    "openpac.PartyDefaultNameMixin"
+  ],
+  "client": [
+    "xaerominimap.RadarLabelMixin",
+    "xaerominimap.TrackedPlayerLabelMixin",
+    "xaerominimap.WaypointShareNoticeMixin",
+    "xaeroworldmap.TrackedPlayerMarkerMixin",
+    "xaeroworldmap.PlayerTrackerReaderMixin",
+    "xaeroworldmap.MenuEntryNameMixin"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

@@ -3,6 +3,7 @@ package net.muxigame.core;
 import net.muxigame.core.config.CoreConfig;
 import net.muxigame.core.feature.ServerFeature;
 import net.muxigame.core.feature.champions.ChampionsFeature;
+import net.muxigame.core.feature.chat.ChatCompletionFeature;
 import net.muxigame.core.feature.identity.IdentityFeature;
 import net.muxigame.core.feature.login.LoginGate;
 import net.neoforged.api.distmarker.Dist;
@@ -34,6 +35,8 @@ public final class MuxiGameCore {
         }
         // 玩法规则，不需要密钥和网络，装了 Champions 就生效；新生成的拦截在 ChampionSpawnHandlerMixin。
         if (ModList.get().isLoaded("champions")) register(new ChampionsFeature());
+        // 普通聊天按 Tab 也能补在线玩家的昵称（原版只补 UID）；只发原版的补全包，不需要配置。
+        if (ModList.get().isLoaded("simplenicknames")) register(new ChatCompletionFeature());
         // Future integrations implement ServerFeature and get their own config section.
         NeoForge.EVENT_BUS.addListener(this::onStopped);
         LOG.info("muxi Game Core loaded; enabled features: {}", features.stream().map(ServerFeature::id).toList());

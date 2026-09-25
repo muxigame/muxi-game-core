@@ -62,6 +62,8 @@ public final class CoreSelfTest {
         // 两节同时开是生产上的形态。
         String both = "{\"schema\":1,\"features\":{\"identity\":{\"enabled\":true,\"endpoint\":\"https://example.com/profile/\",\"serverKey\":\"" + key + "\"},\"login\":{\"enabled\":true,\"endpoint\":\"https://example.com/join/\",\"serverKey\":\"" + key + "\"}}}";
         check("both features together", CoreConfig.parse(both).identity().enabled() && CoreConfig.parse(both).login().enabled());
+        // 客户端兼容各块的纯逻辑测试各自一个类，互不干扰。
+        passed += MapsSelfTest.run() + CommandsSelfTest.run() + DisplaysSelfTest.run();
         System.out.println("Game Core Java self-tests: " + passed + " passed");
     }
 }

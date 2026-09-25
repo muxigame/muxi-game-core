@@ -5,23 +5,29 @@ license="MIT"
 modId="muxi_game_core"
 version="${mod_version}"
 displayName="muxi Game Core"
-description="Server-side feature integration for muxigame modpacks."
+description="muxigame modpack integration: server features, and client-side display compatibility (nicknames instead of UIDs)."
 displayURL="https://github.com/muxigame/muxi-game-core"
 [[mixins]]
 config="muxi_game_core.mixins.json"
+[[mixins]]
+config="muxi_game_core.compat.maps.mixins.json"
+[[mixins]]
+config="muxi_game_core.compat.commands.mixins.json"
+[[mixins]]
+config="muxi_game_core.compat.displays.mixins.json"
 [[dependencies.muxi_game_core]]
 modId="neoforge"
 type="required"
 versionRange="[21.1.250,)"
-side="SERVER"
+side="BOTH"
 [[dependencies.muxi_game_core]]
 modId="minecraft"
 type="required"
 versionRange="[1.21.1]"
-side="SERVER"
+side="BOTH"
 [[dependencies.muxi_game_core]]
 modId="simplenicknames"
 type="optional"
 versionRange="[0.8.0,0.9)"
 ordering="AFTER"
-side="SERVER"
+side="BOTH"
