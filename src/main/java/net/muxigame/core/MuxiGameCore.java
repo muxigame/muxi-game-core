@@ -2,6 +2,7 @@ package net.muxigame.core;
 
 import net.muxigame.core.config.CoreConfig;
 import net.muxigame.core.feature.ServerFeature;
+import net.muxigame.core.feature.champions.ChampionsFeature;
 import net.muxigame.core.feature.identity.IdentityFeature;
 import net.muxigame.core.feature.login.LoginGate;
 import net.neoforged.api.distmarker.Dist;
@@ -31,6 +32,8 @@ public final class MuxiGameCore {
                 throw new IllegalStateException("Game Core identity is enabled but Simple Nicknames 0.8.x is not installed.");
             register(new IdentityFeature(config.identity()));
         }
+        // 玩法规则，不需要密钥和网络，装了 Champions 就生效；新生成的拦截在 ChampionSpawnHandlerMixin。
+        if (ModList.get().isLoaded("champions")) register(new ChampionsFeature());
         // Future integrations implement ServerFeature and get their own config section.
         NeoForge.EVENT_BUS.addListener(this::onStopped);
         LOG.info("muxi Game Core loaded; enabled features: {}", features.stream().map(ServerFeature::id).toList());

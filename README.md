@@ -3,7 +3,7 @@
 muxigame 整合包的**服务端功能集成模组**。昵称同步是第一个模块，不再把整个模组限定为昵称工具。
 
 - 模组 ID：`muxi_game_core`
-- 当前版本：`1.1.0`
+- 当前版本：`1.2.0`
 - 当前目标：Minecraft `1.21.1` / NeoForge `21.1.250` / Java `21`
 - 当前仅装在游戏服务端。客户端仍需要独立的 Simple Nicknames 显示模组。
 - 本地构建、手动安装；没有 CI、GitHub Actions、云端构建或自动发布配置。
@@ -26,6 +26,8 @@ muxigame 整合包的**服务端功能集成模组**。昵称同步是第一个�
 
 `identity`：固定平台 UID 游戏身份、平台中文昵称同步、定期刷新，以及禁止玩家通过昵称命令覆盖平台昵称。
 
+`champions`：只让敌对生物成为 Champions 强敌。Champions Unofficial 21.1 把任何 Mob 都当候选，鱼、动物、村民都会带词条、死了掉锭，它自己没有任何配置能收窄。新生成的由 mixin 拦在 `ChampionSpawnHandler.isEligible`；修复前已经变成强敌的，在区块加载时摘掉强敌数据和属性。不需要配置，装了 Champions 就生效。
+
 Core 负责公共入口、配置和功能生命周期；新增整合包功能实现 `ServerFeature` 并添加独立的 `features.<id>` 配置。
 将来的活动、任务、服务器规则等可放入对应模块，但**这些功能目前尚未实现**。
 
@@ -36,7 +38,8 @@ src/main/java/net/muxigame/core/
 └─ feature/
    ├─ ServerFeature.java     # 注册、关闭约定
    ├─ login/                 # 进服凭据核验
-   └─ identity/              # UID 与昵称同步
+   ├─ identity/              # UID 与昵称同步
+   └─ champions/             # 强敌只挑敌对生物（配合 mixin/）
 ```
 
 ### 开 `login` 之前必须先做的两件事

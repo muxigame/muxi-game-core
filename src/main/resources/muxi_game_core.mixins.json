@@ -1,0 +1,8 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "net.muxigame.core.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["ChampionSpawnHandlerMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
