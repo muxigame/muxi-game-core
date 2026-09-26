@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:crops",
+    {"id":"#c:crops","required":false},
+    "minecraft:melon", "minecraft:pumpkin", "minecraft:sugar_cane", "minecraft:cactus",
+    "minecraft:sweet_berry_bush", "minecraft:nether_wart", "minecraft:cocoa"
+  ]
+}

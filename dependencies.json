@@ -17,6 +17,9 @@
     "neoforgePatched": "libraries/net/neoforged/neoforge/21.1.250/neoforge-21.1.250-client.jar"
   },
   "compileOnly": [
+    "rightclickharvest-neoforge-4.6.1+1.21.1.jar",
+    "tacz-neoforge-1.21.1-1.1.8-hotfix-r6.jar",
+    "[冠军强敌再续]champions-neoforge-21.1.1.7.jar",
     "xaerominimap-neoforge-1.21.1-26.4.2.jar",
     "xaeroworldmap-neoforge-1.21.1-1.45.0.jar",
     "Jade-1.21.1-NeoForge-15.10.6.jar",

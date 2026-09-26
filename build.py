@@ -95,7 +95,9 @@ def build(server: Path, java_home: Path | None = None, run_tests: bool = False,
             test_cp = str(classes) + os.pathsep + classpath
             test_classes = temp / 'test-classes'
             compile_java(compiler, sorted((ROOT / 'tests/java').rglob('*.java')), test_classes, test_cp, temp / 'test.args')
-            subprocess.run([str(runtime), '-cp', str(test_classes) + os.pathsep + test_cp, 'net.muxigame.core.CoreSelfTest'], check=True)
+            result = subprocess.run([str(runtime), '-cp', str(test_classes) + os.pathsep + str(ROOT / 'src/main/resources') + os.pathsep + test_cp, 'net.muxigame.core.CoreSelfTest'])
+            if result.returncode:
+                raise ValueError(f'Core self-tests failed (exit {result.returncode}); see the assertion above.')
         target = output / 'libs' / f"muxi-game-core-{meta['version']}.jar"
         entries = {'META-INF/LICENSE': (ROOT / 'LICENSE').read_bytes()}
         for base in (classes, ROOT / 'src/main/resources'):

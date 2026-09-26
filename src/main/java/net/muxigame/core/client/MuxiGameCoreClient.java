@@ -2,20 +2,28 @@ package net.muxigame.core.client;
 
 import net.muxigame.core.MuxiGameCore;
 import net.muxigame.core.nickname.Nicknames;
+import net.muxigame.core.client.tasks.DailyTasksClient;
+import net.muxigame.core.feature.tasks.DailyTasksFeature;
+import net.muxigame.core.feature.tasks.TaskNetwork;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 客户端入口。客户端这边目前只有显示层的兼容（把 UID 显示成昵称），全部由 compat 下的 mixin 完成；
- * 服务端功能（登录核验、昵称同步、强敌规则）只在 {@link MuxiGameCore} 里，客户端不加载。
+ * 客户端入口：昵称显示兼容，以及每日任务 HUD。单人游戏只启用本地每日任务服务，
+ * 不启用专用服务器的登录核验、昵称同步和强敌规则。
  */
 @Mod(value = MuxiGameCore.MOD_ID, dist = Dist.CLIENT)
 public final class MuxiGameCoreClient {
     private static final Logger LOG = LoggerFactory.getLogger("muxi-game-core/client");
 
-    public MuxiGameCoreClient() {
+    public MuxiGameCoreClient(IEventBus modBus) {
+        TaskNetwork.register(modBus);
+        new DailyTasksFeature().register(NeoForge.EVENT_BUS);
+        DailyTasksClient.register(modBus,NeoForge.EVENT_BUS);
         LOG.info("muxi Game Core client loaded; nickname display {}",
                  Nicknames.available() ? "enabled" : "disabled (Simple Nicknames not installed)");
     }

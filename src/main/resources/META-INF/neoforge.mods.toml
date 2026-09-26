@@ -10,6 +10,8 @@ displayURL="https://github.com/muxigame/muxi-game-core"
 [[mixins]]
 config="muxi_game_core.mixins.json"
 [[mixins]]
+config="muxi_game_core.tasks.mixins.json"
+[[mixins]]
 config="muxi_game_core.compat.maps.mixins.json"
 [[mixins]]
 config="muxi_game_core.compat.commands.mixins.json"
@@ -29,5 +31,17 @@ side="BOTH"
 modId="simplenicknames"
 type="optional"
 versionRange="[0.8.0,0.9)"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.muxi_game_core]]
+modId="tacz"
+type="optional"
+versionRange="[1.1.8,)"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.muxi_game_core]]
+modId="champions"
+type="optional"
+versionRange="[21.1.1.7,)"
 ordering="AFTER"
 side="BOTH"

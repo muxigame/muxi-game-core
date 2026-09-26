@@ -6,6 +6,9 @@ import net.muxigame.core.feature.champions.ChampionsFeature;
 import net.muxigame.core.feature.chat.ChatCompletionFeature;
 import net.muxigame.core.feature.identity.IdentityFeature;
 import net.muxigame.core.feature.login.LoginGate;
+import net.muxigame.core.feature.tasks.DailyTasksFeature;
+import net.muxigame.core.feature.tasks.TaskNetwork;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
@@ -24,7 +27,8 @@ public final class MuxiGameCore {
     private static final Logger LOG = LoggerFactory.getLogger("muxi-game-core");
     private final List<ServerFeature> features = new ArrayList<>();
 
-    public MuxiGameCore() {
+    public MuxiGameCore(IEventBus modBus) {
+        TaskNetwork.register(modBus);
         CoreConfig config = CoreConfig.load(Path.of(CoreConfig.FILE));
         // 先注册进服核验：它是这台服务器唯一的身份关口，出问题要第一时间在日志里看见。
         if (config.login().enabled()) register(new LoginGate(config.login()));
@@ -37,7 +41,7 @@ public final class MuxiGameCore {
         if (ModList.get().isLoaded("champions")) register(new ChampionsFeature());
         // 普通聊天按 Tab 也能补在线玩家的昵称（原版只补 UID）；只发原版的补全包，不需要配置。
         if (ModList.get().isLoaded("simplenicknames")) register(new ChatCompletionFeature());
-        // Future integrations implement ServerFeature and get their own config section.
+        register(new DailyTasksFeature());
         NeoForge.EVENT_BUS.addListener(this::onStopped);
         LOG.info("muxi Game Core loaded; enabled features: {}", features.stream().map(ServerFeature::id).toList());
     }
