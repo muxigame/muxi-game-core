@@ -21,11 +21,13 @@ import java.util.*;
 
 public final class DailyTasksClient {
     private DailyTasksClient() {}
-    static final int TEXT=0xFFE6EBEF, MUTED=0xFFA1AAB6, READY=0xFFA8D6BA, CLAIMED=0xFF7C8792;
+    static final int TEXT=0xFFE6EBEF, MUTED=0xFFA1AAB6, READY=0xFF8AF0A8, CLAIMED=0xFF6FD08B;
     static final KeyMapping OPEN=new KeyMapping("key.muxi_game_core.daily_tasks",InputConstants.KEY_F8,"key.categories.muxi_game_core");
+    private static final ResourceLocation EXPERIENCE_ORB_TEXTURE=ResourceLocation.withDefaultNamespace("textures/entity/experience_orb.png");
     private static final float HUD_SCALE=0.65f;
-    private static final int HEADER=15, ROW=36, MAINLINE_HEADER=11, MAINLINE_ROW=24;
+    private static final int SECTION_HEADER=15, ROW=36, MAINLINE_ROW=24;
     private static final int ACTION_WIDTH=34, ACTION_HEIGHT=11, ACTION_GAP=3;
+    private static final int TOGGLE_WIDTH=34, TOGGLE_HEIGHT=11;
     static TaskNetwork.Snapshot snapshot;
     static TaskHudSettings settings;
     static long receivedAt;
@@ -117,20 +119,20 @@ public final class DailyTasksClient {
             if(mx>=x && mx<x+16 && my>=y && my<y+16) hovered=reward;
             x+=18;
         }
-        if(row.experienceLevels()>0 && x+16<=right) {
+        String amount="+"+row.experienceLevels();
+        if(row.experienceLevels()>0 && x+18+font.width(amount)<=right) {
             ItemStack xp=experienceIcon(row.experienceLevels());
-            g.renderItem(xp,x,y);
-            String amount="+"+row.experienceLevels();
-            g.drawString(font,amount,x+16-font.width(amount),y+9,0xFF80FF20,true);
-            if(mx>=x && mx<x+16 && my>=y && my<y+16) hovered=xp;
+            g.blit(EXPERIENCE_ORB_TEXTURE,x,y,0,0,16,16,64,64);
+            g.drawString(font,amount,x+18,y+4,0xFF80FF20,true);
+            if(mx>=x && mx<x+18+font.width(amount) && my>=y && my<y+16) hovered=xp;
         }
         return hovered;
     }
 
     private static int logicalHeight() {
         int daily=empty()?0:snapshot.rows().size();
-        int height=HEADER+daily*ROW;
-        if(!MainlineTasks.CURRENT.isEmpty()) height+=MAINLINE_HEADER+MainlineTasks.CURRENT.size()*MAINLINE_ROW;
+        int height=SECTION_HEADER+(settings.dailyExpanded?daily*ROW:0)+SECTION_HEADER;
+        if(settings.mainlineExpanded) height+=MainlineTasks.CURRENT.size()*MAINLINE_ROW;
         return height;
     }
     private static Box box(int screenWidth,int screenHeight,int preferredLeft,int maxWidth) {
@@ -162,19 +164,30 @@ public final class DailyTasksClient {
     }
     private static int refreshX(int width) { return width-ACTION_WIDTH*2-ACTION_GAP; }
     private static int claimX(int width) { return width-ACTION_WIDTH; }
+    private static int toggleX(int width) { return width-TOGGLE_WIDTH; }
     private static void screenClick(ScreenEvent.MouseButtonPressed.Pre event) {
         Screen screen=event.getScreen();
         if(!supportedScreen(screen)) return;
         Box box=screenBox(screen);
         if(box==null || !box.contains(event.getMouseX(),event.getMouseY())) return;
         event.setCanceled(true);
-        if(event.getButton()!=0 || empty()) return;
-        if(screen instanceof InventoryScreen inventory && !inventory.getMenu().getCarried().isEmpty()) return;
+        if(event.getButton()!=0) return;
         double mx=(event.getMouseX()-box.x)/HUD_SCALE, my=(event.getMouseY()-box.y)/HUD_SCALE;
-        int index=(int)Math.floor((my-HEADER)/ROW);
+        int width=box.logicalWidth();
+        if(in(mx,my,toggleX(width),0,TOGGLE_WIDTH,TOGGLE_HEIGHT)) {
+            settings.dailyExpanded=!settings.dailyExpanded; settings.save(); return;
+        }
+        int dailyHeight=settings.dailyExpanded && !empty()?snapshot.rows().size()*ROW:0;
+        int mainHeaderY=SECTION_HEADER+dailyHeight;
+        if(in(mx,my,toggleX(width),mainHeaderY,TOGGLE_WIDTH,TOGGLE_HEIGHT)) {
+            settings.mainlineExpanded=!settings.mainlineExpanded; settings.save(); return;
+        }
+        if(empty() || !settings.dailyExpanded) return;
+        if(screen instanceof InventoryScreen inventory && !inventory.getMenu().getCarried().isEmpty()) return;
+        int index=(int)Math.floor((my-SECTION_HEADER)/ROW);
         if(index<0 || index>=snapshot.rows().size()) return;
         TaskNetwork.Row row=snapshot.rows().get(index);
-        int y=HEADER+index*ROW+ROW-ACTION_HEIGHT-1, width=box.logicalWidth();
+        int y=SECTION_HEADER+index*ROW+ROW-ACTION_HEIGHT-1;
         if(in(mx,my,claimX(width),y,ACTION_WIDTH,ACTION_HEIGHT)) claim(row);
         else if(in(mx,my,refreshX(width),y,ACTION_WIDTH,ACTION_HEIGHT) && rerollable(row)) confirmReroll(screen,row);
     }
@@ -199,6 +212,12 @@ public final class DailyTasksClient {
         g.drawString(font,text,x+ACTION_WIDTH-font.width(text),y+1,shown,true);
         if(hovered) g.hLine(x+ACTION_WIDTH-font.width(text),x+ACTION_WIDTH-1,y+10,shown);
     }
+    private static void toggle(GuiGraphics g,Font font,boolean expanded,int width,int y,boolean hovered) {
+        String text=label(expanded?"hide_section":"show_section");
+        int x=toggleX(width), color=hovered?0xFFFFFFFF:MUTED;
+        g.drawString(font,text,x+TOGGLE_WIDTH-font.width(text),y+1,color,true);
+        if(hovered) g.hLine(x+TOGGLE_WIDTH-font.width(text),x+TOGGLE_WIDTH-1,y+10,color);
+    }
     private static void compact(GuiGraphics g,Box box,int mouseX,int mouseY,boolean interactive) {
         Font font=Minecraft.getInstance().font;
         int width=box.logicalWidth();
@@ -208,17 +227,26 @@ public final class DailyTasksClient {
         g.pose().translate(box.x,box.y,0);
         g.pose().scale(HUD_SCALE,HUD_SCALE,1);
 
-        long claimed=empty()?0:snapshot.rows().stream().filter(TaskNetwork.Row::claimed).count();
-        String heading=label("title")+(empty()?"":"  "+claimed+"/"+snapshot.rows().size());
+        long completed=empty()?0:snapshot.rows().stream().filter(r->r.progress()>=r.goal()).count();
+        String heading=label("title")+(empty()?"":"  "+completed+"/"+snapshot.rows().size());
         g.drawString(font,heading,0,0,MUTED,true);
+        boolean dailyToggleHover=interactive && in(mx,my,toggleX(width),0,TOGGLE_WIDTH,TOGGLE_HEIGHT);
+        toggle(g,font,settings.dailyExpanded,width,0,dailyToggleHover);
         if(!empty()) {
             String countdown=remaining();
-            g.drawString(font,countdown,width-font.width(countdown),0,MUTED,true);
-            for(int i=0;i<snapshot.rows().size();i++) {
-                TaskNetwork.Row row=snapshot.rows().get(i); int y=HEADER+i*ROW; String progress=progress(row);
-                g.drawString(font,trimmed(font,title(row),width-font.width(progress)-8),0,y,color(row),true);
+            int countdownX=toggleX(width)-font.width(countdown)-6;
+            if(countdownX>font.width(heading)+4) g.drawString(font,countdown,countdownX,0,MUTED,true);
+            if(settings.dailyExpanded) for(int i=0;i<snapshot.rows().size();i++) {
+                TaskNetwork.Row row=snapshot.rows().get(i); int y=SECTION_HEADER+i*ROW; String progress=progress(row);
+                boolean complete=row.progress()>=row.goal();
+                if(complete) {
+                    g.fill(-2,y-2,width+2,y+ROW-2,row.claimed()?0x30347643:0x503B8F50);
+                    g.fill(-2,y-2,1,y+ROW-2,row.claimed()?CLAIMED:READY);
+                }
+                String rowTitle=(complete?"✓ ":"")+title(row);
+                g.drawString(font,trimmed(font,rowTitle,width-font.width(progress)-8),3,y,color(row),true);
                 g.drawString(font,progress,width-font.width(progress),y,color(row),true);
-                g.drawString(font,trimmed(font,row.description(),width),0,y+9,MUTED,true);
+                g.drawString(font,trimmed(font,row.description(),width-3),3,y+9,complete?0xFFD5F6DC:MUTED,true);
 
                 int actionY=y+ROW-ACTION_HEIGHT-1;
                 boolean refreshHover=interactive && in(mx,my,refreshX(width),actionY,ACTION_WIDTH,ACTION_HEIGHT);
@@ -226,16 +254,18 @@ public final class DailyTasksClient {
                 action(g,font,label("refresh_button"),refreshX(width),actionY,rerollable(row)?TEXT:MUTED,refreshHover && rerollable(row));
                 String claimText=label(row.claimed()?"claimed":"claim");
                 action(g,font,claimText,claimX(width),actionY,row.claimed()?CLAIMED:row.ready()?READY:MUTED,claimHover && row.ready());
-                ItemStack item=rewardLine(g,row,0,y+18,refreshX(width)-4,(int)mx,(int)my);
+                ItemStack item=rewardLine(g,row,3,y+18,refreshX(width)-4,(int)mx,(int)my);
                 if(item!=null) hoveredItem=item;
                 if(interactive && in(mx,my,0,y,width,ROW) && item==null) hoveredText=row.description();
             }
         }
 
-        int mainY=HEADER+(empty()?0:snapshot.rows().size()*ROW);
-        if(!MainlineTasks.CURRENT.isEmpty()) {
-            g.drawString(font,Component.translatable("muxi.mainline.title"),0,mainY+1,0xFFE1BA7C,true);
-            int y=mainY+MAINLINE_HEADER;
+        int mainY=SECTION_HEADER+(settings.dailyExpanded && !empty()?snapshot.rows().size()*ROW:0);
+        g.drawString(font,Component.translatable("muxi.mainline.title"),0,mainY+1,0xFFE1BA7C,true);
+        boolean mainToggleHover=interactive && in(mx,my,toggleX(width),mainY,TOGGLE_WIDTH,TOGGLE_HEIGHT);
+        toggle(g,font,settings.mainlineExpanded,width,mainY,mainToggleHover);
+        if(settings.mainlineExpanded && !MainlineTasks.CURRENT.isEmpty()) {
+            int y=mainY+SECTION_HEADER;
             for(MainlineTasks.Entry entry:MainlineTasks.CURRENT) {
                 g.drawString(font,trimmed(font,entry.title(),width),0,y,READY,true);
                 g.drawString(font,trimmed(font,entry.description(),width),0,y+10,MUTED,true);

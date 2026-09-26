@@ -3,6 +3,7 @@ package net.muxigame.core;
 import net.muxigame.core.config.CoreConfig;
 import net.muxigame.core.feature.identity.IdentityRules;
 import net.muxigame.core.feature.spawning.SpawnCategoryRules;
+import net.muxigame.core.client.tasks.TaskHudSettingsSelfTest;
 
 public final class CoreSelfTest {
     private static int passed;
@@ -72,7 +73,8 @@ public final class CoreSelfTest {
         check("twilight forest left alone", SpawnCategoryRules.leftAlone("twilightforest"));
         check("nether filtered", !SpawnCategoryRules.leftAlone("minecraft"));
         // 客户端兼容各块的纯逻辑测试各自一个类，互不干扰。
-        passed += MapsSelfTest.run() + CommandsSelfTest.run() + DisplaysSelfTest.run() + TasksSelfTest.run() + MainlineTasksSelfTest.run();
+        passed += MapsSelfTest.run() + CommandsSelfTest.run() + DisplaysSelfTest.run() + TasksSelfTest.run()
+            + MainlineTasksSelfTest.run() + TaskHudSettingsSelfTest.run();
         System.out.println("Game Core Java self-tests: " + passed + " passed");
     }
 }

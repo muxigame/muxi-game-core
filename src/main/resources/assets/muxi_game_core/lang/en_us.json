@@ -18,6 +18,8 @@
   "muxi.tasks.refresh": "Resets in %s",
   "muxi.tasks.hide": "Hide sidebar",
   "muxi.tasks.show": "Show sidebar",
+  "muxi.tasks.hide_section": "Hide",
+  "muxi.tasks.show_section": "Show",
   "muxi.tasks.loading": "Syncing daily tasks…",
   "muxi.tasks.unsupported": "This server does not have muxi daily tasks enabled.",
   "muxi.tasks.scroll": "Scroll to see more tasks",

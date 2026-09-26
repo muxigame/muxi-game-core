@@ -7,6 +7,8 @@ import java.nio.file.*;
 /** Client-local display preferences; never influence progress or rewards. */
 final class TaskHudSettings {
     boolean visible=true;
+    boolean dailyExpanded=true;
+    boolean mainlineExpanded=true;
     int left=12;
     int width=170;
     double topFraction=0.30;
@@ -17,6 +19,8 @@ final class TaskHudSettings {
             if(!Files.isRegularFile(file) || Files.size(file)>8192) return;
             JsonObject o=JsonParser.parseString(Files.readString(file,StandardCharsets.UTF_8)).getAsJsonObject();
             if(o.has("visible")) visible=o.get("visible").getAsBoolean();
+            if(o.has("dailyExpanded")) dailyExpanded=o.get("dailyExpanded").getAsBoolean();
+            if(o.has("mainlineExpanded")) mainlineExpanded=o.get("mainlineExpanded").getAsBoolean();
             if(o.has("left")) left=Math.max(4,Math.min(200,o.get("left").getAsInt()));
             if(o.has("width")) width=Math.max(120,Math.min(240,o.get("width").getAsInt()));
             if(o.has("topFraction")) {
@@ -26,7 +30,9 @@ final class TaskHudSettings {
     }
     void save() {
         try {
-            JsonObject o=new JsonObject(); o.addProperty("visible",visible); o.addProperty("left",left);
+            JsonObject o=new JsonObject(); o.addProperty("visible",visible);
+            o.addProperty("dailyExpanded",dailyExpanded); o.addProperty("mainlineExpanded",mainlineExpanded);
+            o.addProperty("left",left);
             o.addProperty("width",width); o.addProperty("topFraction",topFraction);
             Files.createDirectories(file.getParent());
             Path temp=Files.createTempFile(file.getParent(),"muxi-hud-",".tmp");

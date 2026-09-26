@@ -18,6 +18,8 @@
   "muxi.tasks.refresh": "距刷新 %s",
   "muxi.tasks.hide": "隐藏侧栏",
   "muxi.tasks.show": "显示侧栏",
+  "muxi.tasks.hide_section": "隐藏",
+  "muxi.tasks.show_section": "显示",
   "muxi.tasks.loading": "正在同步每日任务…",
   "muxi.tasks.unsupported": "此服务器未启用 muxi 每日任务。",
   "muxi.tasks.scroll": "滚动查看其余任务",
