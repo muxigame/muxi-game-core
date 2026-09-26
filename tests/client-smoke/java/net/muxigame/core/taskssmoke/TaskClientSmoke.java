@@ -55,6 +55,7 @@ public final class TaskClientSmoke {
         private final Class<?> client;
         private Method compact;
         private Object box;
+        private int boxY;
         private int frames;
         private boolean mainlineShown;
         Preview(Class<?> client) { super(Component.literal("muxi daily tasks native-render QA")); this.client=client; }
@@ -63,7 +64,8 @@ public final class TaskClientSmoke {
                 detail.init(minecraft,width,height);
                 Class<?> boxType=Class.forName("net.muxigame.core.client.tasks.DailyTasksClient$Box");
                 Constructor<?> ctor=boxType.getDeclaredConstructor(int.class,int.class,int.class,int.class,int.class);
-                ctor.setAccessible(true); box=ctor.newInstance(12,Math.max(12,Math.min(height/3,height-216)),190,182,4);
+                boxY=Math.max(12,Math.min(height/3,height-150));
+                ctor.setAccessible(true); box=ctor.newInstance(12,boxY,190,128,4);
                 compact=client.getDeclaredMethod("compact",GuiGraphics.class,boxType,int.class,int.class,boolean.class); compact.setAccessible(true);
             } catch(Exception e) { failure(e); }
         }
@@ -72,7 +74,7 @@ public final class TaskClientSmoke {
         @Override public void render(GuiGraphics g,int mx,int my,float delta) {
             try {
                 g.fillGradient(0,0,width,height,0xFF25313D,0xFF101820);
-                if(frames<40) compact.invoke(null,g,box,-1,-1,false);
+                if(frames<40) compact.invoke(null,g,box,36,boxY+19,true);
                 else {
                     if(!mainlineShown) {
                         Field tab=DailyTaskScreen.class.getDeclaredField("tab"); tab.setAccessible(true);

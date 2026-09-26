@@ -8,7 +8,7 @@ import java.nio.file.*;
 final class TaskHudSettings {
     boolean visible=true;
     int left=12;
-    int width=190;
+    int width=170;
     double topFraction=0.30;
     private final Path file;
     TaskHudSettings(Path game) {
@@ -18,7 +18,7 @@ final class TaskHudSettings {
             JsonObject o=JsonParser.parseString(Files.readString(file,StandardCharsets.UTF_8)).getAsJsonObject();
             if(o.has("visible")) visible=o.get("visible").getAsBoolean();
             if(o.has("left")) left=Math.max(4,Math.min(200,o.get("left").getAsInt()));
-            if(o.has("width")) width=Math.max(120,Math.min(280,o.get("width").getAsInt()));
+            if(o.has("width")) width=Math.max(120,Math.min(240,o.get("width").getAsInt()));
             if(o.has("topFraction")) {
                 double n=o.get("topFraction").getAsDouble(); if(Double.isFinite(n)) topFraction=Math.max(0,Math.min(0.8,n));
             }

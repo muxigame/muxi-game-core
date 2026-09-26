@@ -11,6 +11,7 @@
   "muxi.tasks.levels": "+%s level",
   "muxi.tasks.hard": "Hard · %s",
   "muxi.tasks.reroll": "Reroll",
+  "muxi.tasks.refresh_button": "Refresh",
   "muxi.tasks.rerolls": "Free reroll %s/1",
   "muxi.tasks.reroll_title": "Use today's free reroll?",
   "muxi.tasks.reroll_warning": "Replace %s and reset its progress. One reroll per day; hard tasks stay hard.",

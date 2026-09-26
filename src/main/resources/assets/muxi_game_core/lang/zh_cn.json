@@ -11,6 +11,7 @@
   "muxi.tasks.levels": "等级 +%s",
   "muxi.tasks.hard": "困难 · %s",
   "muxi.tasks.reroll": "换一项",
+  "muxi.tasks.refresh_button": "刷新",
   "muxi.tasks.rerolls": "免费更换 %s/1",
   "muxi.tasks.reroll_title": "使用今日免费更换？",
   "muxi.tasks.reroll_warning": "将替换「%s」，原进度会清空。每天仅一次；困难任务仍换为困难任务。",
