@@ -12,7 +12,7 @@ import java.util.Set;
 
 /**
  * 兼容 mixin 按"目标模组装了才套"。mixin 放在 {@code compat.mixin.<键>.*} 下，键对应下面的模组 id；
- * {@code minecraft} 键是原版，总是套。玩家删了某个模组、或者模组更新换了类名，只会少一处昵称，不会启动崩溃。
+ * {@code minecraft} 键是原版，总是套。玩家删了某个模组时，不加载对应的显示或运行时兼容补丁。
  */
 public final class CompatMixinPlugin implements IMixinConfigPlugin {
     private static final Logger LOG = LoggerFactory.getLogger("muxi-game-core/compat");
@@ -28,6 +28,7 @@ public final class CompatMixinPlugin implements IMixinConfigPlugin {
         Map.entry("pingwheel", "pingwheel"),
         Map.entry("leaderboards", "leaderboards"),
         Map.entry("refinedstorage", "refinedstorage"),
+        Map.entry("customnpcs", "customnpcs"),
         Map.entry("openpac", "openpartiesandclaims"));
 
     @Override public void onLoad(String mixinPackage) {}

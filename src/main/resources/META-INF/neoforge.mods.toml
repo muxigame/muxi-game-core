@@ -17,6 +17,8 @@ config="muxi_game_core.compat.maps.mixins.json"
 config="muxi_game_core.compat.commands.mixins.json"
 [[mixins]]
 config="muxi_game_core.compat.displays.mixins.json"
+[[mixins]]
+config="muxi_game_core.compat.runtime.mixins.json"
 [[dependencies.muxi_game_core]]
 modId="neoforge"
 type="required"

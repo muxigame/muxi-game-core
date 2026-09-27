@@ -23,6 +23,8 @@ FakePlayer/NPC 在入口和定期刷新中均跳过。停服时释放模块网�
 `TaskOwnership` 只沿 Projectile/OwnableEntity 的真实主人链归属；无主铁傀儡不猜附近玩家，也不写离线玩家档案。
 收获以成熟方块收割次数计，花朵以实际采集掉落计。`BlockDropsEvent` 延迟到 tick 末核对取消、掉落和方块实际变化；RightClickHarvest 使用成功后的专用事件。
 `goalMax` / 奖励 `countMax,countStep` 只在分配与更换时抽取，具体数值进入任务快照；领取、重连、死亡不会重抽。
+
+运行时兼容层在安装 CustomNPCs 时把其全局 `MarkData` 缓存替换为 `ConcurrentHashMap`。C2ME 会在多个世界生成线程并行序列化自然生成实体，原版 CustomNPCs 的静态 `HashMap.computeIfAbsent` 会并发修改并令区块任务失败；补丁不改变 NPC NBT 或存档结构。
 奖励用完整 `ItemStack` 编解码，客户端用 `GuiGraphics.renderItem/renderItemDecorations/renderTooltip` 原生渲染。
 任务进度位于 `NeoForgeData.PlayerPersisted.muxi_daily_tasks`，随玩家 UUID 保存；死亡 Clone 事件复制，不依赖昵称。
 领奖先模拟全部奖励装入 36 格主背包，足够才同线程提交；领取位、物品与经验等级一起进入同一玩家 NBT 存档。

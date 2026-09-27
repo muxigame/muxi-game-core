@@ -1,0 +1,13 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "net.muxigame.core.compat.mixin",
+  "plugin": "net.muxigame.core.compat.CompatMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "customnpcs.MarkDataConcurrentMapMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
