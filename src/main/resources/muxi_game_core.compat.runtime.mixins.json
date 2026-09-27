@@ -5,7 +5,8 @@
   "plugin": "net.muxigame.core.compat.CompatMixinPlugin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "customnpcs.MarkDataConcurrentMapMixin"
+    "customnpcs.MarkDataConcurrentMapMixin",
+    "goblintraders.GoblinDespawnMixin"
   ],
   "injectors": {
     "defaultRequire": 1

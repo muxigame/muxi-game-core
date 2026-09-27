@@ -29,6 +29,7 @@ public final class CompatMixinPlugin implements IMixinConfigPlugin {
         Map.entry("leaderboards", "leaderboards"),
         Map.entry("refinedstorage", "refinedstorage"),
         Map.entry("customnpcs", "customnpcs"),
+        Map.entry("goblintraders", "goblintraders"),
         Map.entry("openpac", "openpartiesandclaims"));
 
     @Override public void onLoad(String mixinPackage) {}

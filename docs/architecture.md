@@ -25,6 +25,8 @@ FakePlayer/NPC 在入口和定期刷新中均跳过。停服时释放模块网�
 `goalMax` / 奖励 `countMax,countStep` 只在分配与更换时抽取，具体数值进入任务快照；领取、重连、死亡不会重抽。
 
 运行时兼容层在安装 CustomNPCs 时把其全局 `MarkData` 缓存替换为 `ConcurrentHashMap`。C2ME 会在多个世界生成线程并行序列化自然生成实体，原版 CustomNPCs 的静态 `HashMap.computeIfAbsent` 会并发修改并令区块任务失败；补丁不改变 NPC NBT 或存档结构。
+
+Goblin Traders 的自然商人带正数 `DespawnDelay`；倒计时到零后，原模组只撤销持久化保护，且 Villager Names 自动添加的名字又会令其永久保留。运行时兼容层在倒计时为零、无人交易且未拴绳时主动移除该自然商人；`DespawnDelay=-1` 的刷怪蛋或命令实体不受影响。
 奖励用完整 `ItemStack` 编解码，客户端用 `GuiGraphics.renderItem/renderItemDecorations/renderTooltip` 原生渲染。
 任务进度位于 `NeoForgeData.PlayerPersisted.muxi_daily_tasks`，随玩家 UUID 保存；死亡 Clone 事件复制，不依赖昵称。
 领奖先模拟全部奖励装入 36 格主背包，足够才同线程提交；领取位、物品与经验等级一起进入同一玩家 NBT 存档。
