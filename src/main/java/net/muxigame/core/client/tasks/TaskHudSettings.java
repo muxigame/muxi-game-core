@@ -9,6 +9,7 @@ final class TaskHudSettings {
     boolean visible=true;
     boolean dailyExpanded=true;
     boolean mainlineExpanded=true;
+    boolean challengeExpanded=true;
     int left=12;
     int width=170;
     double topFraction=0.30;
@@ -21,6 +22,7 @@ final class TaskHudSettings {
             if(o.has("visible")) visible=o.get("visible").getAsBoolean();
             if(o.has("dailyExpanded")) dailyExpanded=o.get("dailyExpanded").getAsBoolean();
             if(o.has("mainlineExpanded")) mainlineExpanded=o.get("mainlineExpanded").getAsBoolean();
+            if(o.has("challengeExpanded")) challengeExpanded=o.get("challengeExpanded").getAsBoolean();
             if(o.has("left")) left=Math.max(4,Math.min(200,o.get("left").getAsInt()));
             if(o.has("width")) width=Math.max(120,Math.min(240,o.get("width").getAsInt()));
             if(o.has("topFraction")) {
@@ -32,6 +34,7 @@ final class TaskHudSettings {
         try {
             JsonObject o=new JsonObject(); o.addProperty("visible",visible);
             o.addProperty("dailyExpanded",dailyExpanded); o.addProperty("mainlineExpanded",mainlineExpanded);
+            o.addProperty("challengeExpanded",challengeExpanded);
             o.addProperty("left",left);
             o.addProperty("width",width); o.addProperty("topFraction",topFraction);
             Files.createDirectories(file.getParent());

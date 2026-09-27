@@ -35,6 +35,7 @@ public final class DailyTaskScreen extends Screen {
         TabButton daily=new TabButton(left,18,76,18,Component.translatable("muxi.tasks.tab_daily"),b->{tab=Tab.DAILY; rebuild();},tab==Tab.DAILY);
         TabButton mainline=new TabButton(left+82,18,76,18,Component.translatable("muxi.tasks.tab_mainline"),b->{tab=Tab.MAINLINE; rebuild();},tab==Tab.MAINLINE);
         addRenderableWidget(daily); addRenderableWidget(mainline);
+        addRenderableWidget(new TabButton(left+164,18,82,18,Component.literal("挑战任务"),b->net.muxigame.core.client.challenge.ChallengeClient.open(),false));
         if(tab==Tab.MAINLINE) {
             addRenderableWidget(new TextButton(left+column-40,height-27,40,18,Component.translatable("gui.done"),b->onClose()));
             return;

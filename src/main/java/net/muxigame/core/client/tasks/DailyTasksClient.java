@@ -133,6 +133,7 @@ public final class DailyTasksClient {
         int daily=empty()?0:snapshot.rows().size();
         int height=SECTION_HEADER+(settings.dailyExpanded?daily*ROW:0)+SECTION_HEADER;
         if(settings.mainlineExpanded) height+=MainlineTasks.CURRENT.size()*MAINLINE_ROW;
+        height+=SECTION_HEADER+(settings.challengeExpanded?48:0);
         return height;
     }
     private static Box box(int screenWidth,int screenHeight,int preferredLeft,int maxWidth) {
@@ -181,6 +182,14 @@ public final class DailyTasksClient {
         int mainHeaderY=SECTION_HEADER+dailyHeight;
         if(in(mx,my,toggleX(width),mainHeaderY,TOGGLE_WIDTH,TOGGLE_HEIGHT)) {
             settings.mainlineExpanded=!settings.mainlineExpanded; settings.save(); return;
+        }
+        int challengeY=mainHeaderY+SECTION_HEADER+(settings.mainlineExpanded?MainlineTasks.CURRENT.size()*MAINLINE_ROW:0);
+        if(in(mx,my,toggleX(width),challengeY,TOGGLE_WIDTH,TOGGLE_HEIGHT)) {
+            settings.challengeExpanded=!settings.challengeExpanded;settings.save();return;
+        }
+        if(settings.challengeExpanded && in(mx,my,0,challengeY+SECTION_HEADER,width,48)) {
+            if(screen instanceof InventoryScreen inventory && !inventory.getMenu().getCarried().isEmpty())return;
+            net.muxigame.core.client.challenge.ChallengeClient.open();return;
         }
         if(empty() || !settings.dailyExpanded) return;
         if(screen instanceof InventoryScreen inventory && !inventory.getMenu().getCarried().isEmpty()) return;
@@ -272,6 +281,19 @@ public final class DailyTasksClient {
                 if(interactive && in(mx,my,0,y,width,MAINLINE_ROW)) hoveredText=entry.description();
                 y+=MAINLINE_ROW;
             }
+        }
+        int challengeY=mainY+SECTION_HEADER+(settings.mainlineExpanded?MainlineTasks.CURRENT.size()*MAINLINE_ROW:0);
+        g.drawString(font,"挑战任务",0,challengeY+1,0xFFDF9292,true);
+        toggle(g,font,settings.challengeExpanded,width,challengeY,interactive&&in(mx,my,toggleX(width),challengeY,TOGGLE_WIDTH,TOGGLE_HEIGHT));
+        if(settings.challengeExpanded){
+            var challenge=net.muxigame.core.client.challenge.ChallengeClient.state;
+            int y=challengeY+SECTION_HEADER;
+            g.drawString(font,trimmed(font,net.muxigame.core.client.challenge.ChallengeClient.summary(),width),0,y,TEXT,true);
+            g.drawString(font,"抵御入侵 · 波次 / Boss / 补给 / 传送",0,y+11,MUTED,true);
+            String rewards="待领 "+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"rewards")+" 组奖励";
+            g.drawString(font,rewards,0,y+22,READY,true);
+            g.drawString(font,"[ 房间列表 / 创建 / 邀请 / 挑战任务 ]",0,y+34,READY,true);
+            if(interactive && in(mx,my,0,y,width,48))hoveredText="点击打开挑战大厅，支持单独挑战；通关后领取得分奖励。";
         }
         g.pose().popPose();
         if(interactive) {

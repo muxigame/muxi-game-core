@@ -25,11 +25,12 @@ def run() -> None:
     parser.add_argument('--server', type=Path, default=ROOT.parent / 'bmc5server')
     parser.add_argument('--integrations', action='store_true', help='Exercise the installed TaCZ, Champions and Create mods in a disposable lab')
     parser.add_argument('--extended', action='store_true', help='Also exercise native maid/golem ownership, crops, flowers and mod foods')
+    parser.add_argument('--challenge', action='store_true', help='Exercise challenge rooms, arena, inventory recovery and rewards')
     args = parser.parse_args()
     server = args.server.resolve()
     release = json.loads((ROOT / 'build/release.json').read_text(encoding='utf-8'))
     core = ROOT / 'build/libs' / release['artifact']
-    lab = ROOT / 'build' / ('tasks-smoke-' + datetime.now().strftime('%Y%m%d-%H%M%S'))
+    lab = ROOT / 'build' / ('tasks-smoke-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f'))
     lab.mkdir(parents=True, exist_ok=False)
     (lab / 'mods').mkdir(); (lab / 'config').mkdir()
     shutil.copy2(core, lab / 'mods' / core.name)
@@ -42,6 +43,7 @@ def run() -> None:
             if len(found)!=1: raise SystemExit(f'Expected one existing integration dependency: {pattern}')
             dependencies.append(found[0]); shutil.copy2(found[0],lab/'mods'/found[0].name)
     (lab / 'config/muxi-game-core.json').write_text('{"schema":1,"features":{}}', encoding='utf-8')
+    (lab / 'config/neoforge-server.toml').write_text('advertiseDedicatedServerToLan = false\n', encoding='utf-8')
     if not args.integrations and not args.extended:
         # This fixture specifically exercises the original statistics path; event paths run separately.
         config=json.loads((ROOT/'src/main/resources/muxi/daily-tasks-defaults.json').read_text(encoding='utf-8'))
@@ -66,12 +68,14 @@ def run() -> None:
     extra=[p for jar in dependencies for p in core_build.nested_jars(jar,nested)]
     cp = os.pathsep.join(str(p) for p in [core, neo, mapped, *jars, *dependencies, *extra])
     classes = lab / 'test-classes'
-    sources='tests/extended-smoke/java' if args.extended else 'tests/integration-smoke/java' if args.integrations else 'tests/smoke/java'
-    core_build.compile_java(compiler, sorted((ROOT / sources).rglob('*.java')), classes, cp, lab / 'compile.args')
+    sources='tests/challenge-smoke/java' if args.challenge else 'tests/extended-smoke/java' if args.extended else 'tests/integration-smoke/java' if args.integrations else 'tests/smoke/java'
+    core_build.compile_java(compiler, sorted((ROOT / sources).rglob('*.java')) + sorted((ROOT / 'tests/smoke-common/java').rglob('*.java')), classes, cp, lab / 'compile.args')
     with zipfile.ZipFile(lab / 'mods/muxi-tasks-smoke-only.jar', 'w', zipfile.ZIP_DEFLATED) as z:
         z.writestr('META-INF/neoforge.mods.toml', 'modLoader="javafml"\nloaderVersion="[4,)"\nlicense="MIT"\n'
+                   '[[mixins]]\nconfig="muxi_smoke_only.mixins.json"\n'
                    '[[mods]]\nmodId="muxi_tasks_smoke"\nversion="1.0.0"\ndisplayName="Isolated task smoke tests"\n'
                    '[[dependencies.muxi_tasks_smoke]]\nmodId="muxi_game_core"\ntype="required"\nversionRange="[1.5.0,)"\nordering="AFTER"\nside="SERVER"\n')
+        z.writestr('muxi_smoke_only.mixins.json', json.dumps({'required':True,'minVersion':'0.8','package':'net.muxigame.core.taskssmoke.mixin','compatibilityLevel':'JAVA_21','mixins':['DisableNetworkMixin']}))
         for p in classes.rglob('*.class'): z.write(p, p.relative_to(classes).as_posix())
         if args.extended:
             for registry in ['block','item']:

@@ -3,6 +3,6 @@
   "minVersion": "0.8",
   "package": "net.muxigame.core.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["PlayerListSaveInvoker"],
+  "mixins": ["PlayerListSaveInvoker", "ChallengeContainerMixin"],
   "injectors": {"defaultRequire": 1}
 }

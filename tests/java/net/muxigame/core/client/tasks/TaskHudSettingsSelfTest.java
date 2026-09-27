@@ -11,10 +11,10 @@ public final class TaskHudSettingsSelfTest {
         try {
             root=Files.createTempDirectory("muxi-task-hud-settings-");
             TaskHudSettings first=new TaskHudSettings(root);
-            if(!first.dailyExpanded || !first.mainlineExpanded) throw new AssertionError("HUD sections default expanded");
-            first.dailyExpanded=false; first.mainlineExpanded=false; first.save();
+            if(!first.dailyExpanded || !first.mainlineExpanded || !first.challengeExpanded) throw new AssertionError("HUD sections default expanded");
+            first.dailyExpanded=false; first.mainlineExpanded=false;first.challengeExpanded=false; first.save();
             TaskHudSettings restored=new TaskHudSettings(root);
-            if(restored.dailyExpanded || restored.mainlineExpanded) throw new AssertionError("HUD section state persisted");
+            if(restored.dailyExpanded || restored.mainlineExpanded || restored.challengeExpanded) throw new AssertionError("HUD section state persisted");
             return 2;
         } catch(Exception e) {
             throw new AssertionError("HUD settings round trip",e);

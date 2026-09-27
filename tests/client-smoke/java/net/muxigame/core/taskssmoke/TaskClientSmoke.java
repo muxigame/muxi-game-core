@@ -52,6 +52,7 @@ public final class TaskClientSmoke {
     }
     private static final class Preview extends Screen {
         private final DailyTaskScreen detail=new DailyTaskScreen();
+        private final net.muxigame.core.client.challenge.ChallengeScreen challenge=new net.muxigame.core.client.challenge.ChallengeScreen();
         private final Class<?> client;
         private Method compact;
         private Object box;
@@ -62,6 +63,12 @@ public final class TaskClientSmoke {
         @Override protected void init() {
             try {
                 detail.init(minecraft,width,height);
+                net.muxigame.core.client.challenge.ChallengeClient.state=com.google.gson.JsonParser.parseString("""
+                    {"available":true,"self":"qa","wins":2,"kills":140,"best":6200,"rewards":6,"last":"通关 · 困难 · 6200 分 · B 级",
+                     "rooms":[{"id":"qa-room","host":"other","name":"研究所突击队","difficulty":"HARD","phase":"LOBBY","wave":0,"total":10,"count":2,"mine":false,"invited":true}],
+                     "players":[],"tasks":[{"title":"首次防线：完成一次挑战","ready":true,"claimed":false},{"title":"清剿行动：累计击败 100 只入侵僵尸","ready":true,"claimed":true},{"title":"精英防线：完成困难及以上挑战","ready":true,"claimed":false}]}
+                    """).getAsJsonObject();
+                challenge.init(minecraft,width,height);
                 Class<?> boxType=Class.forName("net.muxigame.core.client.tasks.DailyTasksClient$Box");
                 Constructor<?> ctor=boxType.getDeclaredConstructor(int.class,int.class,int.class,int.class,int.class);
                 boxY=Math.max(12,Math.min(height/3,height-150));
@@ -75,7 +82,7 @@ public final class TaskClientSmoke {
             try {
                 g.fillGradient(0,0,width,height,0xFF25313D,0xFF101820);
                 if(frames<40) compact.invoke(null,g,box,36,boxY+19,true);
-                else {
+                else if(frames<80) {
                     if(!mainlineShown) {
                         Field tab=DailyTaskScreen.class.getDeclaredField("tab"); tab.setAccessible(true);
                         Object mainline=Enum.valueOf((Class<Enum>)tab.getType(),"MAINLINE"); tab.set(detail,mainline);
@@ -84,17 +91,21 @@ public final class TaskClientSmoke {
                     }
                     detail.render(g,16,228,delta);
                 }
+                else {
+                    if(frames==120){Field tab=challenge.getClass().getDeclaredField("tab");tab.setAccessible(true);tab.set(challenge,Enum.valueOf((Class<Enum>)tab.getType(),"TASKS"));Method rebuild=challenge.getClass().getDeclaredMethod("rebuild");rebuild.setAccessible(true);rebuild.invoke(challenge);}
+                    challenge.render(g,16,228,delta);
+                }
                 Component note=Component.literal("本地界面测试 · 示例任务");
                 g.drawString(font,note,width-font.width(note)-12,height-18,0xFF81909C,true);
                 frames++;
-                if(frames==30 || frames==70) {
+                if(frames==30 || frames==70 || frames==110 || frames==150) {
                     g.flush();
                     try(var image=Screenshot.takeScreenshot(minecraft.getMainRenderTarget())) {
-                        image.writeToFile(Path.of(frames==30?"task-hud.png":"task-mainline.png"));
+                        image.writeToFile(Path.of(frames==30?"task-hud.png":frames==70?"task-mainline.png":frames==110?"challenge-lobby.png":"challenge-tasks.png"));
                     }
                 }
-                if(frames==80) {
-                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"nativeFrames\":80,\"screenshots\":[\"task-hud.png\",\"task-mainline.png\"],\"fixture\":\"synthetic daily and mainline tasks through production render methods; no server or player\"}");
+                if(frames==160) {
+                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"nativeFrames\":160,\"screenshots\":[\"task-hud.png\",\"task-mainline.png\",\"challenge-lobby.png\",\"challenge-tasks.png\"],\"fixture\":\"synthetic tasks and challenge lobby through production render methods; no server or player\"}");
                     minecraft.stop();
                 }
             } catch(Throwable e) { failure(e); }

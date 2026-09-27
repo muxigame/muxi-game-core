@@ -15,6 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class ChampionSpawnHandlerMixin {
     @Inject(method = "isEligible", at = @At("HEAD"), cancellable = true)
     private static void muxi$hostileOnly(LivingEntity entity, CallbackInfoReturnable<Boolean> result) {
-        if (!ChampionRules.mayBeChampion(entity)) result.setReturnValue(false);
+        if (net.muxigame.core.feature.challenge.ChallengeFeature.dimension(entity.level()) || !ChampionRules.mayBeChampion(entity)) result.setReturnValue(false);
     }
 }

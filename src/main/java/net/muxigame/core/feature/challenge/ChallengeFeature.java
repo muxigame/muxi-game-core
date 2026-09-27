@@ -1,0 +1,334 @@
+package net.muxigame.core.feature.challenge;
+
+import com.google.gson.*;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.*;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.AABB;
+import net.muxigame.core.feature.ServerFeature;
+import net.muxigame.core.feature.tasks.TaskOwnership;
+import net.neoforged.bus.api.*;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.event.CommandEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
+import net.neoforged.neoforge.event.entity.living.*;
+import net.neoforged.neoforge.event.entity.player.*;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.ExplosionEvent;
+import net.neoforged.neoforge.event.server.*;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import java.util.*;
+
+/** Server-thread-only room state machine. No production commands, reloads or restart operations. */
+public final class ChallengeFeature implements ServerFeature {
+    public static final String MOB="muxi_challenge_room", STATE="muxi_challenge_progress";
+    private static final Map<MinecraftServer,ChallengeFeature> ACTIVE=new java.util.concurrent.ConcurrentHashMap<>();
+    public enum Phase { BUILDING, LOBBY, COUNTDOWN, RUNNING, REST }
+    public static final class Room {
+        public final String id=UUID.randomUUID().toString().substring(0,8);
+        public final UUID host;
+        public final ChallengeArena arena;
+        public final LinkedHashSet<UUID> members=new LinkedHashSet<>();
+        public final Set<UUID> alive=new HashSet<>();
+        public final Map<UUID,Long> invites=new HashMap<>();
+        public final Map<UUID,Integer> kills=new HashMap<>();
+        public final Set<UUID> mobs=new HashSet<>();
+        public final Map<String,Integer> supplies=new HashMap<>();
+        public ChallengeRules.Difficulty difficulty;
+        public Phase phase=Phase.BUILDING;
+        public int wave,timer,started,created,issued,planned;
+        public final net.minecraft.server.level.ServerBossEvent bossBar=new net.minecraft.server.level.ServerBossEvent(Component.literal("感染暴君"),net.minecraft.world.BossEvent.BossBarColor.PURPLE,net.minecraft.world.BossEvent.BossBarOverlay.PROGRESS);
+        public UUID boss;
+        Room(UUID host,int slot,ChallengeRules.Difficulty d,int now) {this.host=host;arena=new ChallengeArena(slot);difficulty=d;members.add(host);created=now;}
+    }
+    private MinecraftServer server;
+    private int ticks;
+    private final List<Room> rooms=new ArrayList<>();
+    private final Map<UUID,Integer> rate=new HashMap<>();
+    private final Map<UUID,LivingDeathEvent> deaths=new HashMap<>();
+    private final Set<UUID> evacuate=new HashSet<>();
+    public static ChallengeFeature active(MinecraftServer server) {return ACTIVE.get(server);}
+    public static boolean locked(ServerPlayer p) {return ChallengeInventory.pending(p);}
+    public static boolean dimension(net.minecraft.world.level.Level level) {return level.dimension().equals(ChallengeArena.DIMENSION);}
+    public Room room(UUID player) {return rooms.stream().filter(r->r.members.contains(player)).findFirst().orElse(null);}
+    public List<Room> rooms() {return List.copyOf(rooms);}
+    public String id(){return "zombie-challenge";}
+    public void register(IEventBus bus) {
+        bus.addListener(this::started);bus.addListener(this::stopping);bus.addListener(this::tick);
+        bus.addListener(this::login);bus.addListener(this::logout);bus.addListener(this::commands);
+        bus.addListener(this::clonePlayer);bus.addListener(this::respawn);
+        bus.addListener(EventPriority.HIGHEST,this::death);bus.addListener(EventPriority.LOWEST,true,this::trackDeath);
+        bus.addListener(this::damage);bus.addListener(this::drops);bus.addListener(this::xp);
+        bus.addListener(this::join);bus.addListener(this::interact);bus.addListener(this::breakBlock);
+        bus.addListener(this::place);bus.addListener(this::explosion);bus.addListener(this::toss);bus.addListener(this::command);
+        bus.addListener(this::entityInteract);
+        bus.addListener(this::travel);
+    }
+    private void started(ServerStartedEvent e) {server=e.getServer();ACTIVE.put(server,this);}
+    private void stopping(ServerStoppingEvent e) {if(e.getServer()==server){for(Room r:List.copyOf(rooms)) finish(r,false,"服务器维护，本局不结算通关奖励");close();}}
+    public void close(){if(server!=null)ACTIVE.remove(server);rooms.clear();deaths.clear();rate.clear();evacuate.clear();server=null;}
+    private void login(PlayerEvent.PlayerLoggedInEvent e) {
+        if(e.getEntity() instanceof ServerPlayer p && p.server==server) {
+            if(locked(p)){ChallengeInventory.restore(p);tell(p,"已恢复挑战前的背包和位置；中断的挑战不重复结算。");}
+            if(dimension(p.level())) {BlockPos s=server.overworld().getSharedSpawnPos();p.teleportTo(server.overworld(),s.getX()+0.5,s.getY()+1,s.getZ()+0.5,0,0);}
+            send(p,"");
+        }
+    }
+    private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
+        if(e.getEntity() instanceof ServerPlayer p && p.server==server){leave(p,"玩家离线");rate.remove(p.getUUID());}
+    }
+    private void clonePlayer(PlayerEvent.Clone e){
+        if(e.getEntity().level().isClientSide())return;
+        for(String key:List.of(STATE,ChallengeInventory.KEY))if(e.getOriginal().getPersistentData().contains(key))
+            e.getEntity().getPersistentData().put(key,e.getOriginal().getPersistentData().get(key).copy());
+    }
+    private void respawn(PlayerEvent.PlayerRespawnEvent e){if(e.getEntity() instanceof ServerPlayer p && p.server==server && locked(p))leave(p,"挑战中断，恢复背包");}
+    private void tell(ServerPlayer p,String text){p.sendSystemMessage(Component.literal("[僵尸挑战] "+text));}
+    private void notice(Room r,String text){for(UUID id:r.members){var p=server.getPlayerList().getPlayer(id);if(p!=null)tell(p,text);}}
+    private void require(boolean pass,String message){if(!pass)throw new IllegalArgumentException(message);}
+    public void handle(ServerPlayer p,String action,String value) {
+        if(p.server!=server || !server.isSameThread())return;
+        int now=server.getTickCount();
+        if(now-rate.getOrDefault(p.getUUID(),-100)<4)return;
+        rate.put(p.getUUID(),now);
+        try {
+            switch(action) {
+                case "list" -> {send(p,"");return;}
+                case "create" -> create(p,ChallengeRules.Difficulty.parse(value));
+                case "join" -> joinRoom(p,value);
+                case "invite" -> invite(p,UUID.fromString(value));
+                case "start" -> start(p);
+                case "leave" -> leave(p,"主动退出");
+                case "difficulty" -> {Room r=host(p);require(r.phase==Phase.LOBBY,"开局后不能更改难度");r.difficulty=ChallengeRules.Difficulty.parse(value);}
+                case "claim" -> claim(p);
+                case "task" -> claimTask(p,Integer.parseInt(value));
+                default -> throw new IllegalArgumentException("未知挑战操作");
+            }
+            send(p,"操作成功");
+        } catch(IllegalArgumentException e){send(p,e.getMessage()==null?"操作无效":e.getMessage());}
+        catch(Exception e){org.slf4j.LoggerFactory.getLogger("muxi-game-core/challenge").error("Challenge action failed: {}",action,e);send(p,"操作未完成，请联系管理员；恢复记录已保留");}
+    }
+    private Room host(ServerPlayer p){Room r=room(p.getUUID());require(r!=null && r.host.equals(p.getUUID()),"只有房主可以操作");return r;}
+    public Room create(ServerPlayer p,ChallengeRules.Difficulty d) {
+        require(room(p.getUUID())==null && !locked(p),"请先离开当前房间");
+        require(server.getLevel(ChallengeArena.DIMENSION)!=null,"挑战维度尚未加载，需要服务端更新后启动");
+        require(rooms.size()<ChallengeRules.MAX_ROOMS,"当前房间已满，请稍后再试");
+        int slot=0;while(slot<ChallengeRules.MAX_ROOMS){int n=slot;if(rooms.stream().noneMatch(r->r.arena.origin()==n*ChallengeArena.SPACING))break;slot++;}
+        Room r=new Room(p.getUUID(),slot,d,server.getTickCount());rooms.add(r);
+        ServerLevel level=server.getLevel(ChallengeArena.DIMENSION);
+        for(var entity:level.getEntitiesOfClass(Entity.class,new AABB(r.arena.origin(),0,0,r.arena.origin()+49,256,49)))if(!(entity instanceof ServerPlayer))entity.discard();
+        return r;
+    }
+    private void joinRoom(ServerPlayer p,String id){
+        require(room(p.getUUID())==null && !locked(p),"请先离开当前房间");
+        Room r=rooms.stream().filter(it->it.id.equals(id)).findFirst().orElseThrow(()->new IllegalArgumentException("房间已结束"));
+        require(r.phase==Phase.LOBBY || r.phase==Phase.BUILDING,"该房间已经开局");
+        require(r.invites.getOrDefault(p.getUUID(),0L)>=server.getTickCount(),"需要房主邀请，邀请有效期五分钟");
+        require(r.members.size()<ChallengeRules.MAX_PLAYERS,"房间人数已满");r.members.add(p.getUUID());r.invites.remove(p.getUUID());notice(r,p.getDisplayName().getString()+" 加入房间");
+    }
+    private void invite(ServerPlayer p,UUID target){
+        Room r=host(p);require(r.phase==Phase.LOBBY || r.phase==Phase.BUILDING,"已经开局");
+        ServerPlayer to=server.getPlayerList().getPlayer(target);require(to!=null && to!=p,"请选择在线玩家");
+        require(room(target)==null && !locked(to),"对方已经在房间中");
+        r.invites.put(target,(long)server.getTickCount()+6000);
+        to.sendSystemMessage(Component.literal("[僵尸挑战] "+p.getDisplayName().getString()+" 邀请你挑战 · "+r.difficulty.title+" [点击加入]")
+            .withStyle(s->s.withColor(0x8AF0A8).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/muxichallenge join "+r.id))));send(to,"收到挑战邀请："+r.id);
+    }
+    public void start(ServerPlayer p) {
+        Room r=host(p);require(r.phase==Phase.LOBBY,"地图还在生成或游戏已开始");
+        for(UUID id:r.members){ServerPlayer member=server.getPlayerList().getPlayer(id);if(member!=null)require(progress(member).getList("rewards",Tag.TAG_COMPOUND).size()<=112,"有成员的待领挑战奖励已满，请先领取");}
+        for(UUID id:r.members){ServerPlayer member=server.getPlayerList().getPlayer(id);require(member!=null,"有成员离线");require(!locked(member),"成员还有未恢复的背包");require(member.gameMode.getGameModeForPlayer()==GameType.SURVIVAL,"成员必须处于生存模式");require(member.containerMenu==member.inventoryMenu && member.containerMenu.getCarried().isEmpty(),"所有成员请先关闭容器、放下手持物品");require(!dimension(member.level()) && !member.isPassenger(),"成员当前无法传送");}
+        try {
+            for(UUID id:r.members){ServerPlayer member=server.getPlayerList().getPlayer(id);ChallengeInventory.enter(member);BlockPos s=r.arena.spawn();member.teleportTo(server.getLevel(ChallengeArena.DIMENSION),s.getX()+0.5,s.getY(),s.getZ()+0.5,0,0);r.alive.add(id);}
+            r.phase=Phase.COUNTDOWN;r.timer=server.getTickCount()+200;r.started=server.getTickCount();
+            notice(r,"10 秒后开始！金块补充弹药，绿宝石块补给，紫珀块上楼，青金石块下楼。右键使用。阵亡退出本局，队友可继续。");
+        }catch(RuntimeException e){finish(r,false,"开局失败，恢复背包");throw e;}
+    }
+    public void leave(ServerPlayer p,String reason){
+        Room r=room(p.getUUID());
+        if(locked(p))ChallengeInventory.restore(p);
+        if(r==null)return;
+        r.members.remove(p.getUUID());r.alive.remove(p.getUUID());
+        r.bossBar.removePlayer(p);
+        if(r.members.isEmpty() || (r.host.equals(p.getUUID()) && (r.phase==Phase.LOBBY || r.phase==Phase.BUILDING)))finish(r,false,reason);
+        else notice(r,p.getDisplayName().getString()+" 已离场："+reason);
+    }
+    private CompoundTag progress(ServerPlayer p){return p.getPersistentData().getCompound(STATE);}
+    private void store(ServerPlayer p,CompoundTag t){p.getPersistentData().put(STATE,t);ChallengeInventory.save(p);}
+    private void addReward(ServerPlayer p,List<ItemStack> stacks,String result) {
+        CompoundTag t=progress(p);ListTag list=t.getList("rewards",Tag.TAG_COMPOUND);
+        require(list.size()+stacks.size()<=128,"待领取奖励已满，请先领取");
+        for(ItemStack stack:stacks)if(!stack.isEmpty())list.add(stack.save(p.registryAccess()));
+        t.put("rewards",list);t.putString("last",result);store(p,t);
+    }
+    private ItemStack item(String id,int count){var key=ResourceLocation.parse(id);return BuiltInRegistries.ITEM.containsKey(key)?new ItemStack(BuiltInRegistries.ITEM.get(key),count):ItemStack.EMPTY;}
+    public void claim(ServerPlayer p){
+        require(!locked(p),"离场后领取奖励");CompoundTag t=progress(p);ListTag rewards=t.getList("rewards",Tag.TAG_COMPOUND);
+        require(!rewards.isEmpty(),"没有待领取奖励");
+        var before=p.getInventory().save(new ListTag());
+        for(Tag tag:rewards){ItemStack stack=ItemStack.parseOptional(p.registryAccess(),(CompoundTag)tag);p.getInventory().add(stack);if(!stack.isEmpty()){p.getInventory().load(before);p.inventoryMenu.broadcastChanges();throw new IllegalArgumentException("背包空间不足，请整理后领取；奖励仍保留");}}
+        t.remove("rewards");store(p,t);p.inventoryMenu.broadcastChanges();
+    }
+    private boolean taskReady(CompoundTag t,int i){return switch(i){case 0->t.getInt("wins")>=1;case 1->t.getInt("kills")>=100;case 2->t.getInt("hardWins")>=1;default->false;};}
+    public void claimTask(ServerPlayer p,int i){
+        require(!locked(p),"离场后领取任务奖励");CompoundTag t=progress(p);require(i>=0&&i<3 && taskReady(t,i) && !t.getBoolean("task"+i),"任务未完成或已领取");
+        require(t.getList("rewards",Tag.TAG_COMPOUND).size()<120,"请先领取积累的挑战奖励");
+        // Record task and reward in one player save, never two separately committed steps.
+        ListTag rewards=t.getList("rewards",Tag.TAG_COMPOUND);
+        List<ItemStack> items=switch(i){case 0->List.of(new ItemStack(Items.EMERALD,8),new ItemStack(Items.DIAMOND,2));case 1->List.of(new ItemStack(Items.GUNPOWDER,32),item("create:brass_ingot",16));default->List.of(new ItemStack(Items.ENCHANTED_GOLDEN_APPLE),new ItemStack(Items.NETHERITE_SCRAP,2));};
+        for(ItemStack s:items)if(!s.isEmpty())rewards.add(s.save(p.registryAccess()));
+        t.put("rewards",rewards);t.putBoolean("task"+i,true);store(p,t);
+    }
+    private void finish(Room r,boolean won,String reason){
+        if(!rooms.remove(r))return;
+        r.bossBar.removeAllPlayers();
+        ServerLevel level=server.getLevel(ChallengeArena.DIMENSION);
+        if(level!=null)for(var entity:level.getEntitiesOfClass(Entity.class,new AABB(r.arena.origin(),0,0,r.arena.origin()+49,256,49)))if(!(entity instanceof ServerPlayer))entity.discard();
+        int elapsed=Math.max(0,(server.getTickCount()-r.started)/20);
+        for(UUID id:r.members){ServerPlayer p=server.getPlayerList().getPlayer(id);if(p==null)continue;
+            ChallengeInventory.restore(p);
+            if(won && r.alive.contains(id)){
+                int kills=r.kills.getOrDefault(id,0),score=ChallengeRules.score(r.difficulty,kills,r.wave,elapsed,true),grade=ChallengeRules.rewardGrade(score,r.difficulty),m=r.difficulty.reward;
+                CompoundTag t=progress(p);t.putInt("wins",t.getInt("wins")+1);if(m>=2)t.putInt("hardWins",t.getInt("hardWins")+1);
+                t.putInt("best",Math.max(t.getInt("best"),score));p.getPersistentData().put(STATE,t);
+                List<ItemStack> rewards=new ArrayList<>(List.of(new ItemStack(Items.EMERALD,4*m+2*grade),new ItemStack(Items.GUNPOWDER,8*m+4*(grade-1)),new ItemStack(Items.DIAMOND,m+grade),item("create:brass_ingot",4*m+4*grade)));
+                if(m>=2)rewards.add(new ItemStack(Items.ENCHANTED_GOLDEN_APPLE,1));if(m>=3)rewards.add(new ItemStack(Items.NETHERITE_SCRAP,m-2));
+                if(ModList.get().isLoaded("tacz") && m>=2 && kills>=r.wave){ItemStack gun=ChallengeGuns.gun(p,m>=3?"tacz:ak47":"tacz:glock_17");if(!gun.isEmpty())rewards.add(gun);}
+                String result="通关 · "+r.difficulty.title+" · "+score+" 分 · "+ChallengeRules.rank(score,r.difficulty)+" 级";
+                addReward(p,rewards,result);tell(p,result+"，奖励已存入挑战奖励栏。");
+            }else tell(p,reason+"；已恢复原背包和位置。");
+            send(p,reason);
+        }
+    }
+    private void wave(Room r){r.wave++;r.phase=Phase.RUNNING;r.issued=0;r.planned=ChallengeRules.count(r.wave,r.alive.size());r.timer=server.getTickCount()+ChallengeRules.WAVE_SECONDS*20;r.supplies.clear();notice(r,"第 "+r.wave+" / "+r.difficulty.waves+" 波："+ChallengeRules.waveName(r.wave,r.difficulty));}
+    private void spawn(Room r,ServerLevel level){
+        ServerPlayer target=r.alive.stream().map(id->server.getPlayerList().getPlayer(id)).filter(Objects::nonNull).findFirst().orElse(null);if(target==null)return;
+        List<BlockPos> points=r.arena.spawns(r.arena.floor(target.getY()));BlockPos pos=points.get(r.issued%points.size());
+        boolean boss=r.issued==0 && ChallengeRules.boss(r.wave,r.difficulty);
+        Zombie z=EntityType.ZOMBIE.create(level);if(z==null)return;
+        z.getPersistentData().putString(MOB,r.id);z.setBaby(false);z.setPersistenceRequired();z.setCanPickUpLoot(false);
+        z.moveTo(pos.getX()+0.5,pos.getY(),pos.getZ()+0.5,0,0);
+        z.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ChallengeRules.health(r.difficulty,r.wave,boss));z.setHealth(z.getMaxHealth());
+        z.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ChallengeRules.damage(r.difficulty,r.wave,boss));
+        z.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(boss?0.27:r.wave%3==0?0.34:0.25);
+        if(boss){z.setCustomName(Component.literal("感染暴君 · 第 "+r.wave+" 波"));z.setCustomNameVisible(true);z.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.8);}
+        if(boss || r.wave%4==0){z.setItemSlot(EquipmentSlot.HEAD,new ItemStack(Items.IRON_HELMET));z.setItemSlot(EquipmentSlot.CHEST,new ItemStack(Items.IRON_CHESTPLATE));}
+        z.setTarget(target);if(level.addFreshEntity(z)){r.mobs.add(z.getUUID());r.issued++;if(boss){r.boss=z.getUUID();r.bossBar.setName(z.getDisplayName());r.bossBar.setProgress(1);for(UUID id:r.alive){ServerPlayer p=server.getPlayerList().getPlayer(id);if(p!=null)r.bossBar.addPlayer(p);}}}
+    }
+    private void tick(ServerTickEvent.Post e){
+        if(e.getServer()!=server)return;ticks++;
+        for(UUID id:Set.copyOf(evacuate)){evacuate.remove(id);ServerPlayer p=server.getPlayerList().getPlayer(id);if(p!=null)leave(p,"本局已淘汰");}
+        for(var entry:List.copyOf(deaths.entrySet())) {
+            LivingDeathEvent death=entry.getValue();if(!death.isCanceled() && death.getEntity().isDeadOrDying()){
+                Room r=rooms.stream().filter(it->it.id.equals(death.getEntity().getPersistentData().getString(MOB))).findFirst().orElse(null);
+                ServerPlayer owner=TaskOwnership.credit(death.getSource());
+                if(r!=null && r.mobs.remove(entry.getKey()) && owner!=null && r.alive.contains(owner.getUUID())){
+                    r.kills.merge(owner.getUUID(),1,Integer::sum);CompoundTag t=progress(owner);t.putInt("kills",Math.min(1000000,t.getInt("kills")+1));owner.getPersistentData().put(STATE,t);
+                }
+            }deaths.remove(entry.getKey());
+        }
+        ServerLevel level=server.getLevel(ChallengeArena.DIMENSION);if(level==null)return;
+        for(Room r:List.copyOf(rooms)){
+            if(r.phase==Phase.BUILDING){r.arena.build(level,512);if(r.arena.ready()){r.arena.labels(level);r.phase=Phase.LOBBY;notice(r,"地图准备完成，房主可开始游戏（支持单人）。");}continue;}
+            int now=server.getTickCount();
+            if(r.phase==Phase.LOBBY){if(now-r.created>24000)finish(r,false,"房间等待超时");continue;}
+            for(UUID id:Set.copyOf(r.alive)){ServerPlayer p=server.getPlayerList().getPlayer(id);if(p==null){r.alive.remove(id);continue;}if(p.containerMenu!=p.inventoryMenu)p.closeContainer();if(!dimension(p.level()) || !r.arena.contains(p.getX(),p.getY(),p.getZ()))leave(p,"离开挑战区域");}
+            if(r.alive.isEmpty()){finish(r,false,"挑战失败：无人存活");continue;}
+            if(r.phase==Phase.COUNTDOWN || r.phase==Phase.REST){if(now>=r.timer)wave(r);continue;}
+            if(now>=r.timer){finish(r,false,"挑战失败：波次超过五分钟");continue;}
+            if(ticks%10==0 && r.issued<r.planned && r.mobs.size()<24)spawn(r,level);
+            if(r.boss!=null && ticks%20==0){
+                Entity boss=level.getEntity(r.boss);
+                if(boss instanceof Zombie z && z.isAlive()){
+                    r.bossBar.setProgress(Math.max(0,Math.min(1,z.getHealth()/z.getMaxHealth())));
+                    if(ticks%160==140)notice(r,"感染暴君正在蓄力，远离它！");
+                    if(ticks%160==0)for(UUID id:r.alive){ServerPlayer p=server.getPlayerList().getPlayer(id);if(p!=null && p.distanceToSqr(z)<16)z.doHurtTarget(p);}
+                }else {r.boss=null;r.bossBar.removeAllPlayers();}
+            }
+            if(ticks%40==0)for(UUID id:Set.copyOf(r.mobs)){
+                Entity entity=level.getEntity(id);if(!(entity instanceof Zombie z)){r.mobs.remove(id);if(r.issued>0)r.issued--;continue;}
+                if(!z.isAlive())continue;
+                ServerPlayer target=r.alive.stream().map(u->server.getPlayerList().getPlayer(u)).filter(Objects::nonNull).min(Comparator.comparingDouble(z::distanceToSqr)).orElse(null);
+                if(target!=null){z.setTarget(target);if(r.arena.floor(z.getY())!=r.arena.floor(target.getY()) || !r.arena.contains(z.getX(),z.getY(),z.getZ())){BlockPos pos=r.arena.spawns(r.arena.floor(target.getY())).get(0);z.teleportTo(pos.getX()+0.5,pos.getY(),pos.getZ()+0.5);}}
+            }
+            if(r.issued>=r.planned && r.mobs.isEmpty()) {if(r.wave>=r.difficulty.waves)finish(r,true,"挑战完成");else{r.phase=Phase.REST;r.timer=now+240;notice(r,"本波完成，12 秒后继续；补给点已刷新。");r.supplies.clear();}}
+        }
+        if(ticks%40==0)for(ServerPlayer p:server.getPlayerList().getPlayers())send(p,"");
+    }
+    private void death(LivingDeathEvent e){if(e.getEntity() instanceof ServerPlayer p && locked(p)){e.setCanceled(true);p.setHealth(Math.max(1,p.getMaxHealth()));p.invulnerableTime=100;evacuate.add(p.getUUID());Room r=room(p.getUUID());if(r!=null)r.alive.remove(p.getUUID());}}
+    private void trackDeath(LivingDeathEvent e){if(e.getEntity().getPersistentData().contains(MOB))deaths.put(e.getEntity().getUUID(),e);}
+    private void damage(LivingIncomingDamageEvent e){
+        if(e.getEntity() instanceof ServerPlayer p && locked(p)){
+            Room r=room(p.getUUID());ServerPlayer owner=TaskOwnership.credit(e.getSource());
+            if(r==null || !r.alive.contains(p.getUUID()) || r.phase!=Phase.RUNNING || owner!=null)e.setCanceled(true);
+        }
+        if(e.getEntity().getPersistentData().contains(MOB)){
+            ServerPlayer p=TaskOwnership.credit(e.getSource());Room r=p==null?null:room(p.getUUID());
+            if(p!=null && (r==null || !r.alive.contains(p.getUUID()) || !r.id.equals(e.getEntity().getPersistentData().getString(MOB))))e.setCanceled(true);
+        }
+    }
+    private void drops(LivingDropsEvent e){if(dimension(e.getEntity().level()))e.setCanceled(true);}
+    private void xp(LivingExperienceDropEvent e){if(dimension(e.getEntity().level()))e.setDroppedExperience(0);}
+    private void join(EntityJoinLevelEvent e){
+        if(e.getLevel().isClientSide() || !dimension(e.getLevel()))return;
+        if(e.getEntity() instanceof Mob && (!e.getEntity().getPersistentData().contains(MOB) || rooms.stream().noneMatch(r->r.id.equals(e.getEntity().getPersistentData().getString(MOB)))))e.setCanceled(true);
+        if(e.getEntity() instanceof net.minecraft.world.entity.item.ItemEntity)e.setCanceled(true);
+    }
+    private void interact(PlayerInteractEvent.RightClickBlock e){
+        if(!(e.getEntity() instanceof ServerPlayer p) || !dimension(p.level()))return;
+        e.setCanceled(true);Room r=room(p.getUUID());if(r==null || !r.alive.contains(p.getUUID()) || p.distanceToSqr(e.getPos().getCenter())>36)return;
+        BlockPos pos=e.getPos();int floor=r.arena.floor(p.getY());
+        String key=p.getUUID()+":";
+        int now=server.getTickCount();
+        if(r.arena.atPad(pos,22,24) || r.arena.atPad(pos,26,24)){
+            if(now-r.supplies.getOrDefault(key+"lift",-100)<30)return;r.supplies.put(key+"lift",now);
+            BlockPos to=r.arena.lift(floor,r.arena.atPad(pos,26,24));p.teleportTo((ServerLevel)p.level(),to.getX()+0.5,to.getY(),to.getZ()+0.5,p.getYRot(),p.getXRot());return;
+        }
+        if(r.arena.atPad(pos,24,20)){
+            if(now-r.supplies.getOrDefault(key+"ammo",-10000)<600){tell(p,"弹药补给冷却 30 秒");return;}r.supplies.put(key+"ammo",now);
+            for(int n=0;n<r.difficulty.reward;n++){supply(p,new ItemStack(Items.ARROW,32));if(ModList.get().isLoaded("tacz"))supply(p,ChallengeGuns.ammo(60));}tell(p,"弹药已补充，30 秒后可再次领取");
+        }else if(r.arena.atPad(pos,24,28)){
+            if(r.supplies.containsKey(key+"health")){tell(p,"每波可使用一次补给");return;}r.supplies.put(key+"health",now);
+            p.setHealth(Math.min(p.getMaxHealth(),p.getHealth()+8));p.getFoodData().eat(8,0.5f);supply(p,new ItemStack(Items.COOKED_BEEF,4));tell(p,"医疗与食物补给完成");
+        }else if(r.arena.atPad(pos,12,24)){
+            if(r.supplies.containsKey(key+"item")){tell(p,"道具将在下一波刷新");return;}r.supplies.put(key+"item",now);
+            supply(p,new ItemStack(Items.GOLDEN_APPLE));supply(p,new ItemStack(Items.ARROW,16));tell(p,"获得本局道具：金苹果与箭矢");
+        }
+    }
+    private void supply(ServerPlayer p,ItemStack stack){p.getInventory().add(stack);p.inventoryMenu.broadcastChanges();}
+    private void entityInteract(PlayerInteractEvent.EntityInteract e){if(e.getEntity() instanceof ServerPlayer p && locked(p))e.setCanceled(true);}
+    private void travel(net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent e){
+        if(e.getDimension().equals(ChallengeArena.DIMENSION) && !(e.getEntity() instanceof ServerPlayer p && locked(p)))e.setCanceled(true);
+    }
+    private void breakBlock(BlockEvent.BreakEvent e){if(dimension(e.getPlayer().level()))e.setCanceled(true);}
+    private void place(BlockEvent.EntityPlaceEvent e){if(e.getEntity()!=null && dimension(e.getEntity().level()))e.setCanceled(true);}
+    private void explosion(ExplosionEvent.Detonate e){if(dimension(e.getLevel())){e.getAffectedBlocks().clear();e.getAffectedEntities().clear();}}
+    private void toss(ItemTossEvent e){if(e.getPlayer() instanceof ServerPlayer p && locked(p)){e.setCanceled(true);p.getInventory().add(e.getEntity().getItem());}}
+    private void command(CommandEvent e){ServerPlayer p=e.getParseResults().getContext().getSource().getPlayer();if(p==null || !locked(p))return;String command=e.getParseResults().getReader().getString().stripLeading();if(command.startsWith("/"))command=command.substring(1);String root=command.split(" ",2)[0];if(!Set.of("muxichallenge","msg","tell","w","r").contains(root)){e.setCanceled(true);tell(p,"挑战中请使用房间界面离场后再执行其他指令");}}
+    private void commands(RegisterCommandsEvent e){
+        e.getDispatcher().register(Commands.literal("muxichallenge").executes(c->{handle(c.getSource().getPlayerOrException(),"list","");return 1;})
+            .then(Commands.argument("action",StringArgumentType.word()).executes(c->{handle(c.getSource().getPlayerOrException(),StringArgumentType.getString(c,"action"),"");return 1;})
+            .then(Commands.argument("value",StringArgumentType.word()).executes(c->{handle(c.getSource().getPlayerOrException(),StringArgumentType.getString(c,"action"),StringArgumentType.getString(c,"value"));return 1;}))));
+    }
+    public String snapshot(ServerPlayer p,String message){
+        JsonObject o=new JsonObject();o.addProperty("notice",message);o.addProperty("self",p.getUUID().toString());o.addProperty("available",server.getLevel(ChallengeArena.DIMENSION)!=null);
+        JsonArray list=new JsonArray();for(Room r:rooms){JsonObject row=new JsonObject();row.addProperty("id",r.id);row.addProperty("host",r.host.toString());ServerPlayer h=server.getPlayerList().getPlayer(r.host);row.addProperty("name",h==null?"队伍":h.getDisplayName().getString());row.addProperty("difficulty",r.difficulty.name());row.addProperty("phase",r.phase.name());row.addProperty("wave",r.wave);row.addProperty("total",r.difficulty.waves);row.addProperty("remaining",r.mobs.size()+r.planned-r.issued);row.addProperty("seconds",Math.max(0,(r.timer-server.getTickCount())/20));row.addProperty("count",r.members.size());row.addProperty("mine",r.members.contains(p.getUUID()));row.addProperty("invited",r.invites.getOrDefault(p.getUUID(),0L)>server.getTickCount());JsonArray names=new JsonArray();for(UUID id:r.members){ServerPlayer member=server.getPlayerList().getPlayer(id);if(member!=null)names.add(member.getDisplayName().getString());}row.add("members",names);list.add(row);}o.add("rooms",list);
+        JsonArray online=new JsonArray();for(ServerPlayer q:server.getPlayerList().getPlayers())if(q!=p && online.size()<64){JsonObject row=new JsonObject();row.addProperty("id",q.getUUID().toString());row.addProperty("name",q.getDisplayName().getString());online.add(row);}o.add("players",online);
+        CompoundTag t=progress(p);o.addProperty("wins",t.getInt("wins"));o.addProperty("kills",t.getInt("kills"));o.addProperty("best",t.getInt("best"));o.addProperty("last",t.getString("last"));o.addProperty("rewards",t.getList("rewards",Tag.TAG_COMPOUND).size());
+        JsonArray tasks=new JsonArray();for(int i=0;i<3;i++){JsonObject task=new JsonObject();task.addProperty("title",ChallengeRules.TASKS.get(i));task.addProperty("ready",taskReady(t,i));task.addProperty("claimed",t.getBoolean("task"+i));tasks.add(task);}o.add("tasks",tasks);return o.toString();
+    }
+    private void send(ServerPlayer p,String message){ChallengeNetwork.send(p,snapshot(p,message));if(!message.isEmpty())tell(p,message);}
+}
