@@ -1,4 +1,4 @@
-"""Render the real task UI in an isolated native Minecraft client with synthetic fixture data.
+"""Render the real task UI in an invisible, isolated native Minecraft client with synthetic fixture data.
 
 Uses existing libraries/assets and an offline QA identity, never the user's account/token or production game directory.
 """
@@ -34,8 +34,9 @@ def main() -> None:
     version='BatterMC5Remake'
     meta=json.loads((game/f'versions/{version}/{version}.json').read_text(encoding='utf-8'))
     lab=ROOT/'build'/('tasks-client-smoke-'+datetime.now().strftime('%Y%m%d-%H%M%S'))
-    lab.mkdir(parents=True,exist_ok=False); (lab/'mods').mkdir(); (lab/'natives').mkdir()
-    (lab/'options.txt').write_text('lang:zh_cn\nguiScale:2\nmaxFps:30\nenableVsync:false\nonboardAccessibility:false\nsoundCategory_master:0.0\n',encoding='utf-8')
+    lab.mkdir(parents=True,exist_ok=False); (lab/'mods').mkdir(); (lab/'natives').mkdir(); (lab/'config').mkdir()
+    (lab/'config/fml.toml').write_text('earlyWindowControl = false\nearlyWindowProvider = ""\nversionCheck = false\n',encoding='utf-8')
+    (lab/'options.txt').write_text('lang:zh_cn\nguiScale:2\nmaxFps:30\nenableVsync:false\nonboardAccessibility:false\nsoundCategory_master:0.0\nfullscreen:false\npauseOnLostFocus:false\n',encoding='utf-8')
     release=json.loads((ROOT/'build/release.json').read_text(encoding='utf-8'))
     core=ROOT/'build/libs'/release['artifact']; shutil.copy2(core,lab/'mods'/core.name)
     libraries=[]
@@ -58,9 +59,11 @@ def main() -> None:
     core_build.compile_java(compiler,sorted((ROOT/'tests/client-smoke/java').rglob('*.java')),classes,cp,lab/'compile.args')
     with zipfile.ZipFile(lab/'mods/muxi-tasks-client-smoke-only.jar','w',zipfile.ZIP_DEFLATED) as z:
         z.writestr('META-INF/neoforge.mods.toml','modLoader="javafml"\nloaderVersion="[4,)"\nlicense="MIT"\n'
+            '[[mixins]]\nconfig="muxi_hidden_render.mixins.json"\n'
             '[[mods]]\nmodId="muxi_tasks_client_smoke"\nversion="1.0.0"\ndisplayName="Isolated native task UI tests"\n'
             '[[dependencies.muxi_tasks_client_smoke]]\nmodId="muxi_game_core"\ntype="required"\nversionRange="[1.5.0,)"\nordering="AFTER"\nside="CLIENT"\n')
         for p in classes.rglob('*.class'): z.write(p,p.relative_to(classes).as_posix())
+        z.writestr('muxi_hidden_render.mixins.json',json.dumps({'required':True,'minVersion':'0.8','package':'net.muxigame.core.taskssmoke.mixin','compatibilityLevel':'JAVA_21','client':['HiddenWindowMixin'],'injectors':{'defaultRequire':1}}))
     old_natives=game/f'versions/{version}/{version}-natives'
     if old_natives.is_dir(): shutil.copytree(old_natives,lab/'natives',dirs_exist_ok=True)
     substitutions={
@@ -83,7 +86,7 @@ def main() -> None:
                 if '${' in value: raise ValueError('Unresolved client launch template')
                 output.append(value)
         return output
-    arguments=['-Xms512M','-Xmx2G','-XX:ActiveProcessorCount=4','-Dfile.encoding=UTF-8',*expand(meta['arguments']['jvm']),meta['mainClass'],*expand(meta['arguments']['game'])]
+    arguments=['-Xms512M','-Xmx2G','-XX:ActiveProcessorCount=4','-Dfile.encoding=UTF-8','-Djava.awt.headless=true',*expand(meta['arguments']['jvm']),meta['mainClass'],*expand(meta['arguments']['game'])]
     argfile=lab/'launch.args'
     argfile.write_text('\n'.join('"'+a.replace('\\','/').replace('"','\\"')+'"' for a in arguments),encoding='utf-8')
     runtime=ROOT.parent/'perf-lab/java21/jdk-21.0.2/bin/java.exe'

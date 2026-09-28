@@ -18,4 +18,17 @@ public final class ChallengeGuns {
             .setFireMode(FireMode.SEMI).build(p.registryAccess());
     }
     public static ItemStack ammo(int count) {return TaczTaskHooks.ammo("tacz:9mm",count);}
+    public static boolean isGun(ItemStack stack){
+        var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(stack);
+        return gun!=null && TimelessAPI.getCommonGunIndex(gun.getGunId(stack)).isPresent();
+    }
+    public static String ammoId(ItemStack stack){
+        var gun=com.tacz.guns.api.item.IGun.getIGunOrNull(stack);
+        return gun==null?"":TimelessAPI.getCommonGunIndex(gun.getGunId(stack)).map(i->i.getGunData().getAmmoId().toString()).orElse("");
+    }
+    public static java.util.List<ItemStack> supplies(ServerPlayer p,int count){
+        var ids=new java.util.LinkedHashSet<String>();
+        for(int slot=0;slot<2;slot++){String id=ammoId(p.getInventory().getItem(slot));if(!id.isEmpty())ids.add(id);}
+        return ids.stream().map(id->TaczTaskHooks.ammo(id,count)).toList();
+    }
 }

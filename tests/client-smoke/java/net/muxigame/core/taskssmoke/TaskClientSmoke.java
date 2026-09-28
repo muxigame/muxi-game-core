@@ -64,7 +64,9 @@ public final class TaskClientSmoke {
             try {
                 detail.init(minecraft,width,height);
                 net.muxigame.core.client.challenge.ChallengeClient.state=com.google.gson.JsonParser.parseString("""
-                    {"available":true,"self":"qa","wins":2,"kills":140,"best":6200,"rewards":6,"last":"通关 · 困难 · 6200 分 · B 级",
+                    {"available":true,"self":"qa","wins":2,"kills":140,"best":6200,"rewards":0,"credits":6200,"earned":300,"primary":5,"secondary":-1,"last":"通关 · 困难 · 6200 分 · B 级",
+                     "shop":[{"id":"diamond","title":"钻石 ×2","cost":400},{"id":"glock","title":"格洛克 17","cost":2500},{"id":"ak47","title":"AK47","cost":6000}],
+                     "weapons":[{"slot":5,"name":"改装 AK47 · 保留瞄具 / 弹匣"},{"slot":8,"name":"改装格洛克 17"}],
                      "rooms":[{"id":"qa-room","host":"other","name":"研究所突击队","difficulty":"HARD","phase":"LOBBY","wave":0,"total":10,"count":2,"mine":false,"invited":true}],
                      "players":[],"tasks":[{"title":"首次防线：完成一次挑战","ready":true,"claimed":false},{"title":"清剿行动：累计击败 100 只入侵僵尸","ready":true,"claimed":true},{"title":"精英防线：完成困难及以上挑战","ready":true,"claimed":false}]}
                     """).getAsJsonObject();
@@ -80,6 +82,8 @@ public final class TaskClientSmoke {
         @Override public void tick() { /* Deliberately do not tick the production screen: this fixture has no world/player. */ }
         @Override public void render(GuiGraphics g,int mx,int my,float delta) {
             try {
+                if(org.lwjgl.glfw.GLFW.glfwGetWindowAttrib(minecraft.getWindow().getWindow(),org.lwjgl.glfw.GLFW.GLFW_VISIBLE)!=org.lwjgl.glfw.GLFW.GLFW_FALSE)
+                    throw new AssertionError("Native render test window must remain invisible");
                 g.fillGradient(0,0,width,height,0xFF25313D,0xFF101820);
                 if(frames<40) compact.invoke(null,g,box,36,boxY+19,true);
                 else if(frames<80) {
@@ -93,19 +97,20 @@ public final class TaskClientSmoke {
                 }
                 else {
                     if(frames==120){Field tab=challenge.getClass().getDeclaredField("tab");tab.setAccessible(true);tab.set(challenge,Enum.valueOf((Class<Enum>)tab.getType(),"TASKS"));Method rebuild=challenge.getClass().getDeclaredMethod("rebuild");rebuild.setAccessible(true);rebuild.invoke(challenge);}
+                    if(frames==160 || frames==200){Field tab=challenge.getClass().getDeclaredField("tab");tab.setAccessible(true);tab.set(challenge,Enum.valueOf((Class<Enum>)tab.getType(),frames==160?"SHOP":"LOADOUT"));Method rebuild=challenge.getClass().getDeclaredMethod("rebuild");rebuild.setAccessible(true);rebuild.invoke(challenge);}
                     challenge.render(g,16,228,delta);
                 }
                 Component note=Component.literal("本地界面测试 · 示例任务");
                 g.drawString(font,note,width-font.width(note)-12,height-18,0xFF81909C,true);
                 frames++;
-                if(frames==30 || frames==70 || frames==110 || frames==150) {
+                if(frames==30 || frames==70 || frames==110 || frames==150 || frames==190 || frames==230) {
                     g.flush();
                     try(var image=Screenshot.takeScreenshot(minecraft.getMainRenderTarget())) {
-                        image.writeToFile(Path.of(frames==30?"task-hud.png":frames==70?"task-mainline.png":frames==110?"challenge-lobby.png":"challenge-tasks.png"));
+                        image.writeToFile(Path.of(frames==30?"task-hud.png":frames==70?"task-mainline.png":frames==110?"challenge-lobby.png":frames==150?"challenge-tasks.png":frames==190?"challenge-shop.png":"challenge-loadout.png"));
                     }
                 }
-                if(frames==160) {
-                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"nativeFrames\":160,\"screenshots\":[\"task-hud.png\",\"task-mainline.png\",\"challenge-lobby.png\",\"challenge-tasks.png\"],\"fixture\":\"synthetic tasks and challenge lobby through production render methods; no server or player\"}");
+                if(frames==240) {
+                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"windowVisible\":false,\"nativeFrames\":240,\"screenshots\":[\"task-hud.png\",\"task-mainline.png\",\"challenge-lobby.png\",\"challenge-tasks.png\",\"challenge-shop.png\",\"challenge-loadout.png\"],\"fixture\":\"hidden native render, early window disabled; synthetic data, no server or player\"}");
                     minecraft.stop();
                 }
             } catch(Throwable e) { failure(e); }

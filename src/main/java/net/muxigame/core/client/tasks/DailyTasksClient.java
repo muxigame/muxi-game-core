@@ -290,10 +290,10 @@ public final class DailyTasksClient {
             int y=challengeY+SECTION_HEADER;
             g.drawString(font,trimmed(font,net.muxigame.core.client.challenge.ChallengeClient.summary(),width),0,y,TEXT,true);
             g.drawString(font,"抵御入侵 · 波次 / Boss / 补给 / 传送",0,y+11,MUTED,true);
-            String rewards="待领 "+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"rewards")+" 组奖励";
+            String rewards="积分 "+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"credits")+" · 本局 +"+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"earned");
             g.drawString(font,rewards,0,y+22,READY,true);
-            g.drawString(font,"[ 房间列表 / 创建 / 邀请 / 挑战任务 ]",0,y+34,READY,true);
-            if(interactive && in(mx,my,0,y,width,48))hoveredText="点击打开挑战大厅，支持单独挑战；通关后领取得分奖励。";
+            g.drawString(font,"[ 房间 / 携带武器 / 任务 / 积分商店 ]",0,y+34,READY,true);
+            if(interactive && in(mx,my,0,y,width,48))hoveredText="点击打开挑战大厅，支持单独挑战；击杀与爆头得积分，离场后到商店购买物品。";
         }
         g.pose().popPose();
         if(interactive) {

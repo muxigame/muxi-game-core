@@ -16,6 +16,10 @@ public final class ChallengeInventory {
     public static void save(ServerPlayer p) { ((PlayerListSaveInvoker)p.server.getPlayerList()).muxi$savePlayer(p); }
     public static boolean pending(ServerPlayer p) { return p.getPersistentData().contains(KEY,Tag.TAG_COMPOUND); }
     public static void enter(ServerPlayer p) {
+        enter(p,ChallengeLoadout.defaults());
+    }
+    public static void enter(ServerPlayer p,ChallengeLoadout loadout) {
+        loadout.validate(p);
         if(pending(p)) throw new IllegalStateException("Return snapshot already exists");
         if(!p.containerMenu.getCarried().isEmpty()) throw new IllegalArgumentException("请先放下鼠标上拿着的物品");
         p.closeContainer();
@@ -40,8 +44,13 @@ public final class ChallengeInventory {
             ItemStack gun=ChallengeGuns.gun(p,"tacz:glock_17");
             if(!gun.isEmpty()) {
                 p.getInventory().setItem(0,gun); p.getInventory().setItem(3,new ItemStack(Items.IRON_SWORD));
-                p.getInventory().setItem(10,ChallengeGuns.ammo(60));p.getInventory().setItem(11,ChallengeGuns.ammo(60));
             }
+        }
+        if(loadout.primary()>=0)p.getInventory().setItem(0,loadout.first().copyWithCount(1));
+        if(loadout.secondary()>=0)p.getInventory().setItem(1,loadout.second().copyWithCount(1));
+        if(ModList.get().isLoaded("tacz")) {
+            int slot=10;
+            for(ItemStack ammo:ChallengeGuns.supplies(p,60)){p.getInventory().setItem(slot++,ammo.copy());p.getInventory().setItem(slot++,ammo.copy());}
         }
         p.getInventory().selected=0;p.setGameMode(GameType.ADVENTURE);p.setHealth(p.getMaxHealth());
         p.getFoodData().setFoodLevel(20);p.getFoodData().setSaturation(10);p.inventoryMenu.broadcastChanges();
