@@ -79,7 +79,11 @@ public final class ChallengeScreen extends Screen {
             JsonObject r=mine();
             if(r==null){g.drawString(font,"封锁研究所 · 三层 / "+ChallengeArena.ROOMS.size()+" 间房 · 每队 1–4 人",left,top,0xFFE6EBEF);g.drawString(font,"房间列表（由房主邀请后加入）",left,top+48,0xFFA1AAB6);int y=top+67;for(JsonElement e:array("rooms")){JsonObject q=e.getAsJsonObject();g.drawString(font,font.plainSubstrByWidth(text(q,"name")+" · "+ChallengeRules.Difficulty.parse(text(q,"difficulty")).title+" · "+number(q,"count")+"/4",265),left,y,0xFFE6EBEF);g.drawString(font,phase(text(q,"phase")),left,y+11,0xFFA1AAB6);y+=30;}}
             else {g.drawString(font,"房间 "+text(r,"id")+" · "+phase(text(r,"phase")),left,top,0xFF8AF0A8);g.drawString(font,"队伍 "+number(r,"count")+"/4 · "+ChallengeRules.Difficulty.parse(text(r,"difficulty")).title,left,top+23,0xFFE6EBEF);
-                if(!text(r,"phase").equals("LOBBY")&&!text(r,"phase").equals("BUILDING")){g.drawString(font,"波次 "+number(r,"wave")+"/"+number(r,"total")+" · 敌人 "+number(r,"remaining")+" · "+number(r,"seconds")+" 秒",left,top+55,0xFFE6EBEF);g.drawWordWrap(font,Component.literal("全部队员加载完成后，首波准备 30 秒。用数字键切换武器，弹药柜 5 格内按换弹键 R 补满弹匣和备弹。上下楼走南北楼梯。"),left,top+80,360,0xFFA1AAB6);}
+                if(!text(r,"phase").equals("LOBBY")&&!text(r,"phase").equals("BUILDING")){
+                    g.drawString(font,"波次 "+number(r,"wave")+"/"+number(r,"total")+" · 本波剩余 "+number(r,"remaining")+" · "+number(r,"seconds")+" 秒",left,top+55,0xFFE6EBEF);
+                    g.drawString(font,ChallengeClient.batchStatus(r),left,top+68,0xFFE1BA7C);
+                    g.drawWordWrap(font,Component.literal(text(r,"phase").equals("RUNNING")?"本批清完或25秒后续批，旧怪保留。\n整波全部投放并清空，才开始下一波倒计时。":"全员加载完成后，首波准备30秒。弹药柜附近按R补弹；红灯预告激活入口，可提前布防。"),left,top+84,360,0xFFA1AAB6);
+                }
                 else g.drawString(font,"房主邀请在线玩家：",left,top+78,0xFFA1AAB6);
             }
         }else if(tab==Tab.TASKS){

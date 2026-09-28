@@ -31,6 +31,8 @@ public final class ChallengeSmoke {
     private int ticks;
     private ServerPlayer p,q;
     private ChallengeFeature.Room room;
+    private ChallengeFeature.Room batchRoom;
+    private Set<UUID> firstBatch=Set.of();
     private ListTag original;
     private Zombie scoredVictim;
     private int balanceBeforeKill;
@@ -41,6 +43,7 @@ public final class ChallengeSmoke {
     private net.minecraft.world.phys.Vec3 pursuitStart,stuckPosition;
     public ChallengeSmoke(){NeoForge.EVENT_BUS.addListener(this::tick);}
     private void check(String name,boolean pass){if(!pass)throw new AssertionError(name);passed.add(name);}
+    private void killBatch(MinecraftServer server,Set<UUID> ids){for(UUID id:Set.copyOf(ids)){var entity=server.getLevel(ChallengeArena.DIMENSION).getEntity(id);check("batch fixture entity is present",entity instanceof Zombie);((Zombie)entity).hurt(entity.damageSources().generic(),100000);}}
     @SuppressWarnings("unchecked")
     private ServerPlayer player(MinecraftServer server,String name) throws Exception {
         var profile=new GameProfile(UUID.randomUUID(),name);ServerPlayer p=new ServerPlayer(server,server.overworld(),profile,ClientInformation.createDefault());
@@ -80,6 +83,43 @@ public final class ChallengeSmoke {
             if(ticks==40){feature.handle(p,"invite",q.getUUID().toString());check("invite stored",room.invites.containsKey(q.getUUID()));}
             if(ticks==50){feature.handle(q,"join",room.id);check("invited player joins",room.members.contains(q.getUUID()));}
             if(ticks==60){feature.leave(q,"test");check("guest can leave without ending lobby",feature.rooms().size()==1);}
+            if(ticks==70){batchRoom=feature.create(q,ChallengeRules.Difficulty.NORMAL);batchRoom.arena.build(server.getLevel(ChallengeArena.DIMENSION),300000);}
+            if(ticks==80){
+                feature.start(q);q.setInvulnerable(true);feature.clientReady(q);
+                var startWave=ChallengeFeature.class.getDeclaredMethod("wave",ChallengeFeature.Room.class);startWave.setAccessible(true);startWave.invoke(feature,batchRoom);
+                check("normal first wave splits into three batches",batchRoom.planned==20&&batchRoom.batchSize==8&&batchRoom.batchCount==3&&batchRoom.batchNumber==1&&batchRoom.batchLimit==8);
+                check("batch deadline starts at twenty five seconds",batchRoom.batchDeadline-server.getTickCount()==500);
+            }
+            if(ticks==121){
+                check("first batch stops releasing at its quota",batchRoom.issued==8&&batchRoom.batchMobs.size()==8&&batchRoom.batchNumber==1);
+                firstBatch=Set.copyOf(batchRoom.batchMobs);batchRoom.batchDeadline=server.getTickCount();
+            }
+            if(ticks==123){
+                check("timer releases next batch without deleting old enemies",batchRoom.batchNumber==2&&batchRoom.wave==1&&batchRoom.mobs.containsAll(firstBatch));
+                batchRoom.batchDeadline=server.getTickCount();
+            }
+            if(ticks==124){
+                check("expired timer cannot skip undelivered members of a batch",batchRoom.batchNumber==2&&batchRoom.issued<batchRoom.batchLimit);
+                batchRoom.batchDeadline=server.getTickCount()+2000;
+            }
+            if(ticks==161){check("second batch is fully released before clear test",batchRoom.batchNumber==2&&batchRoom.issued==16&&batchRoom.batchMobs.size()==8);killBatch(server,batchRoom.batchMobs);}
+            if(ticks==163){check("clearing current batch releases next even with older survivors",batchRoom.batchNumber==3&&batchRoom.batchLimit==20&&batchRoom.mobs.containsAll(firstBatch)&&batchRoom.wave==1);}
+            if(ticks==181){check("final partial batch uses exact remaining quota",batchRoom.issued==20&&batchRoom.batchMobs.size()==4&&batchRoom.batchNumber==3);batchRoom.batchDeadline=server.getTickCount();}
+            if(ticks==183){
+                check("final batch timer never skips to next big wave",batchRoom.phase==ChallengeFeature.Phase.RUNNING&&batchRoom.wave==1);
+                var json=com.google.gson.JsonParser.parseString(feature.snapshot(q,"")).getAsJsonObject();
+                var row=java.util.stream.StreamSupport.stream(json.getAsJsonArray("rooms").spliterator(),false).map(com.google.gson.JsonElement::getAsJsonObject).filter(it->it.get("mine").getAsBoolean()).findFirst().orElseThrow();
+                check("snapshot exposes batch number and all surviving enemies",row.get("batch").getAsInt()==3&&row.get("batchCount").getAsInt()==3&&row.get("aliveCount").getAsInt()==12);
+                killBatch(server,batchRoom.batchMobs);
+            }
+            if(ticks==185){
+                check("cleared last batch still waits for older batch survivors",batchRoom.phase==ChallengeFeature.Phase.RUNNING&&batchRoom.wave==1&&batchRoom.mobs.equals(firstBatch));
+                killBatch(server,firstBatch);
+            }
+            if(ticks==187){
+                check("only full-wave clear starts next-wave countdown",batchRoom.phase==ChallengeFeature.Phase.REST&&batchRoom.wave==1&&batchRoom.preparedWave==2&&batchRoom.mobs.isEmpty());
+                q.setInvulnerable(false);feature.leave(q,"batch checks complete");
+            }
             if(ticks==170||ticks==340||ticks==480)room.arena.build(server.getLevel(ChallengeArena.DIMENSION),ChallengeArena.SIZE*ChallengeArena.SIZE*ChallengeArena.HEIGHT);
             if(ticks==180){
                 check("incremental map completes",room.phase==ChallengeFeature.Phase.LOBBY);

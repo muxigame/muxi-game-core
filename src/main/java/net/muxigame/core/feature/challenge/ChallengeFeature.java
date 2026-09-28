@@ -54,10 +54,13 @@ public final class ChallengeFeature implements ServerFeature {
         public final Map<UUID,net.minecraft.world.phys.Vec3> lastPositions=new HashMap<>();
         public final Map<UUID,Integer> stalled=new HashMap<>();
         public final Set<UUID> mobs=new HashSet<>();
+        /** Only the latest small batch; mobs retains survivors from every batch in the big wave. */
+        public final Set<UUID> batchMobs=new HashSet<>();
         public final Map<String,Integer> supplies=new HashMap<>();
         public ChallengeRules.Difficulty difficulty;
         public Phase phase=Phase.BUILDING;
         public int wave,timer,started,created,issued,planned;
+        public int batchNumber,batchCount,batchSize,batchLimit,batchDeadline;
         public final net.minecraft.server.level.ServerBossEvent bossBar=new net.minecraft.server.level.ServerBossEvent(Component.literal("感染暴君"),net.minecraft.world.BossEvent.BossBarColor.PURPLE,net.minecraft.world.BossEvent.BossBarOverlay.PROGRESS);
         public UUID boss;
         Room(UUID host,int slot,ChallengeRules.Difficulty d,int now) {this.host=host;arena=new ChallengeArena(slot);difficulty=d;members.add(host);created=now;}
@@ -264,7 +267,18 @@ public final class ChallengeFeature implements ServerFeature {
         r.activeSites=List.copyOf(active);r.preparedWave=wave;r.arena.lamps(server.getLevel(ChallengeArena.DIMENSION),r.activeSites,false);r.flash=false;
         notice(r,"第 "+wave+" 波启用："+String.join("、",r.activeSites.stream().map(ChallengeArena.SpawnSite::name).toList()));
     }
-    private void wave(Room r){if(r.preparedWave!=r.wave+1)planWave(r,r.wave+1);if(r.wave==0)r.started=server.getTickCount();r.wave++;r.phase=Phase.RUNNING;r.issued=0;r.planned=ChallengeRules.count(r.wave,r.alive.size());r.timer=server.getTickCount()+ChallengeRules.WAVE_SECONDS*20;r.supplies.clear();notice(r,"第 "+r.wave+" / "+r.difficulty.waves+" 波："+ChallengeRules.waveName(r.wave,r.difficulty));}
+    private void wave(Room r){
+        if(r.preparedWave!=r.wave+1)planWave(r,r.wave+1);if(r.wave==0)r.started=server.getTickCount();
+        r.wave++;r.phase=Phase.RUNNING;r.issued=0;r.planned=ChallengeRules.count(r.wave,r.alive.size());
+        r.batchSize=ChallengeRules.batchSize(r.wave,r.alive.size());r.batchCount=(r.planned+r.batchSize-1)/r.batchSize;r.batchNumber=0;r.batchLimit=0;
+        r.timer=server.getTickCount()+ChallengeRules.WAVE_SECONDS*20;r.supplies.clear();
+        notice(r,"第 "+r.wave+" / "+r.difficulty.waves+" 波："+ChallengeRules.waveName(r.wave,r.difficulty));nextBatch(r);
+    }
+    private void nextBatch(Room r){
+        r.batchNumber++;r.batchLimit=Math.min(r.planned,r.batchNumber*r.batchSize);r.batchMobs.clear();
+        r.batchDeadline=server.getTickCount()+ChallengeRules.BATCH_SECONDS*20;
+        notice(r,"第 "+r.wave+" 波 · 第 "+r.batchNumber+"/"+r.batchCount+" 批，投放 "+Math.max(0,r.batchLimit-r.issued)+" 只"+(r.batchNumber<r.batchCount?"；本批清完或 25 秒后续批":"；清空整波敌人后才进入下一波"));
+    }
     private void spawn(Room r,ServerLevel level){
         ServerPlayer target=r.alive.stream().map(id->server.getPlayerList().getPlayer(id)).filter(Objects::nonNull).findFirst().orElse(null);if(target==null)return;
         if(r.activeSites.isEmpty())planWave(r,Math.max(1,r.wave));BlockPos pos=r.activeSites.get(r.issued%r.activeSites.size()).position();
@@ -281,7 +295,7 @@ public final class ChallengeFeature implements ServerFeature {
         z.goalSelector.removeAllGoals(g->true);z.targetSelector.removeAllGoals(g->true);z.goalSelector.addGoal(0,new ChallengePursuitGoal(z,r.arena));
         if(boss){z.setCustomName(Component.literal("感染暴君 · 第 "+r.wave+" 波"));z.setCustomNameVisible(true);z.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.8);}
         if(boss || r.wave%4==0){z.setItemSlot(EquipmentSlot.HEAD,new ItemStack(Items.IRON_HELMET));z.setItemSlot(EquipmentSlot.CHEST,new ItemStack(Items.IRON_CHESTPLATE));}
-        z.setTarget(target);if(level.addFreshEntity(z)){r.mobs.add(z.getUUID());r.damageRemaining.put(z.getUUID(),(double)z.getMaxHealth());r.issued++;if(boss){r.boss=z.getUUID();r.bossBar.setName(z.getDisplayName());r.bossBar.setProgress(1);for(UUID id:r.alive){ServerPlayer p=server.getPlayerList().getPlayer(id);if(p!=null)r.bossBar.addPlayer(p);}}}
+        z.setTarget(target);if(level.addFreshEntity(z)){r.mobs.add(z.getUUID());r.batchMobs.add(z.getUUID());r.damageRemaining.put(z.getUUID(),(double)z.getMaxHealth());r.issued++;if(boss){r.boss=z.getUUID();r.bossBar.setName(z.getDisplayName());r.bossBar.setProgress(1);for(UUID id:r.alive){ServerPlayer p=server.getPlayerList().getPlayer(id);if(p!=null)r.bossBar.addPlayer(p);}}}
     }
     private void tick(ServerTickEvent.Post e){
         if(e.getServer()!=server)return;ticks++;
@@ -292,6 +306,7 @@ public final class ChallengeFeature implements ServerFeature {
             LivingDeathEvent death=entry.getValue();if(!death.isCanceled() && death.getEntity().isDeadOrDying()){
                 Room r=rooms.stream().filter(it->it.id.equals(death.getEntity().getPersistentData().getString(MOB))).findFirst().orElse(null);
                 ServerPlayer owner=TaskOwnership.credit(death.getSource());
+                if(r!=null)r.batchMobs.remove(entry.getKey());
                 if(r!=null && r.mobs.remove(entry.getKey()) && owner!=null && r.alive.contains(owner.getUUID())){
                     Headshot head=headshots.get(entry.getKey());boolean headshot=head!=null && head.player.equals(owner.getUUID()) && server.getTickCount()-head.tick<=2;
                     int points=((entry.getKey().equals(r.boss)?100:10)+(headshot?10:0))*r.difficulty.reward;
@@ -313,7 +328,7 @@ public final class ChallengeFeature implements ServerFeature {
             if(r.phase==Phase.LOADING){if(r.ready.containsAll(r.alive)){r.phase=Phase.COUNTDOWN;r.timer=now+600;planWave(r,1);}else if(now>=r.timer)finish(r,false,"地图加载超时，请更新客户端后重试");continue;}
             if(r.phase==Phase.COUNTDOWN || r.phase==Phase.REST){if(now>=r.timer)wave(r);continue;}
             if(now>=r.timer){finish(r,false,"挑战失败：波次超过五分钟");continue;}
-            if(ticks%10==0)for(int batch=0;batch<2&&r.issued<r.planned&&r.mobs.size()<48;batch++)spawn(r,level);
+            if(ticks%10==0)for(int pulse=0;pulse<2&&r.issued<r.batchLimit&&r.issued<r.planned&&r.mobs.size()<ChallengeRules.MAX_LIVING;pulse++)spawn(r,level);
             if(r.boss!=null && ticks%20==0){
                 Entity boss=level.getEntity(r.boss);
                 if(boss instanceof Zombie z && z.isAlive()){
@@ -323,7 +338,7 @@ public final class ChallengeFeature implements ServerFeature {
                 }else {r.boss=null;r.bossBar.removeAllPlayers();}
             }
             if(ticks%20==0)for(UUID id:Set.copyOf(r.mobs)){
-                Entity entity=level.getEntity(id);if(!(entity instanceof Zombie z)){r.mobs.remove(id);if(r.issued>0)r.issued--;continue;}
+                Entity entity=level.getEntity(id);if(!(entity instanceof Zombie z)){r.mobs.remove(id);r.batchMobs.remove(id);if(r.issued>0)r.issued--;continue;}
                 if(!z.isAlive())continue;
                 ServerPlayer target=r.alive.stream().map(u->server.getPlayerList().getPlayer(u)).filter(Objects::nonNull).min(Comparator.comparingDouble(z::distanceToSqr)).orElse(null);
                 if(target!=null){
@@ -334,6 +349,9 @@ public final class ChallengeFeature implements ServerFeature {
                     if(stalled>=160){BlockPos waypoint=r.arena.recoveryWaypoint(z.getX(),z.getY(),z.getZ(),target.getY());z.goalSelector.getAvailableGoals().forEach(goal->{if(goal.getGoal() instanceof ChallengePursuitGoal pursuit)pursuit.recoverTo(waypoint);});r.stalled.put(id,0);}
                 }
             }
+            // Never skip unspawned members, including while the global living cap blocks delivery.
+            if(r.batchNumber<r.batchCount&&r.issued>=r.batchLimit&&(r.batchMobs.isEmpty()||now>=r.batchDeadline))nextBatch(r);
+            // A batch timer only releases reinforcements. The big wave still requires EVERY survivor dead.
             if(r.issued>=r.planned && r.mobs.isEmpty()) {if(r.wave>=r.difficulty.waves)finish(r,true,"挑战完成");else{r.phase=Phase.REST;r.timer=now+240;planWave(r,r.wave+1);notice(r,"12 秒后下一波；注意爆闪红灯，提前布置火力点。");r.supplies.clear();}}
         }
         if(ticks%20==0)for(ServerPlayer p:server.getPlayerList().getPlayers())send(p,"");
@@ -412,7 +430,7 @@ public final class ChallengeFeature implements ServerFeature {
     }
     public String snapshot(ServerPlayer p,String message){
         JsonObject o=new JsonObject();o.addProperty("notice",message);o.addProperty("self",p.getUUID().toString());o.addProperty("available",server.getLevel(ChallengeArena.DIMENSION)!=null);
-        JsonArray list=new JsonArray();for(Room r:rooms){JsonObject row=new JsonObject();row.addProperty("id",r.id);row.addProperty("host",r.host.toString());ServerPlayer h=server.getPlayerList().getPlayer(r.host);row.addProperty("name",h==null?"队伍":h.getDisplayName().getString());row.addProperty("difficulty",r.difficulty.name());row.addProperty("phase",r.phase.name());JsonArray sites=new JsonArray();for(var site:r.activeSites)sites.add(site.name());row.add("sites",sites);row.addProperty("incomingWave",r.preparedWave);row.addProperty("wave",r.wave);row.addProperty("total",r.difficulty.waves);row.addProperty("remaining",r.mobs.size()+r.planned-r.issued);row.addProperty("seconds",Math.max(0,(r.timer-server.getTickCount())/20));row.addProperty("count",r.members.size());row.addProperty("mine",r.members.contains(p.getUUID()));row.addProperty("invited",r.invites.getOrDefault(p.getUUID(),0L)>server.getTickCount());JsonArray names=new JsonArray();for(UUID id:r.members){ServerPlayer member=server.getPlayerList().getPlayer(id);if(member!=null)names.add(member.getDisplayName().getString());}row.add("members",names);list.add(row);}o.add("rooms",list);
+        JsonArray list=new JsonArray();for(Room r:rooms){JsonObject row=new JsonObject();row.addProperty("id",r.id);row.addProperty("host",r.host.toString());ServerPlayer h=server.getPlayerList().getPlayer(r.host);row.addProperty("name",h==null?"队伍":h.getDisplayName().getString());row.addProperty("difficulty",r.difficulty.name());row.addProperty("phase",r.phase.name());JsonArray sites=new JsonArray();for(var site:r.activeSites)sites.add(site.name());row.add("sites",sites);row.addProperty("incomingWave",r.preparedWave);row.addProperty("wave",r.wave);row.addProperty("total",r.difficulty.waves);row.addProperty("remaining",r.mobs.size()+r.planned-r.issued);row.addProperty("aliveCount",r.mobs.size());row.addProperty("batch",r.batchNumber);row.addProperty("batchCount",r.batchCount);row.addProperty("batchAlive",r.batchMobs.size());row.addProperty("batchUnspawned",Math.max(0,r.batchLimit-r.issued));row.addProperty("batchSeconds",r.batchNumber<r.batchCount?Math.max(0,(r.batchDeadline-server.getTickCount()+19)/20):0);row.addProperty("batchBlocked",r.mobs.size()>=ChallengeRules.MAX_LIVING&&r.issued<r.batchLimit);row.addProperty("seconds",Math.max(0,(r.timer-server.getTickCount())/20));row.addProperty("count",r.members.size());row.addProperty("mine",r.members.contains(p.getUUID()));row.addProperty("invited",r.invites.getOrDefault(p.getUUID(),0L)>server.getTickCount());JsonArray names=new JsonArray();for(UUID id:r.members){ServerPlayer member=server.getPlayerList().getPlayer(id);if(member!=null)names.add(member.getDisplayName().getString());}row.add("members",names);list.add(row);}o.add("rooms",list);
         JsonArray online=new JsonArray();for(ServerPlayer q:server.getPlayerList().getPlayers())if(q!=p && online.size()<64){JsonObject row=new JsonObject();row.addProperty("id",q.getUUID().toString());row.addProperty("name",q.getDisplayName().getString());online.add(row);}o.add("players",online);
         CompoundTag t=progress(p);o.addProperty("wins",t.getInt("wins"));o.addProperty("kills",t.getInt("kills"));o.addProperty("best",t.getInt("best"));o.addProperty("last",t.getString("last"));o.addProperty("rewards",t.getList("rewards",Tag.TAG_COMPOUND).size());
         o.addProperty("credits",t.getInt("credits"));o.addProperty("coins",t.getInt("credits"));o.addProperty("exchangeRate",100);o.addProperty("exchangePreview",(t.getInt("pendingScore")+t.getInt("exchangeRemainder"))/100);o.addProperty("headshots",t.getInt("headshots"));o.addProperty("shopRevision",t.getInt("shopRevision"));

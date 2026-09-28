@@ -6,6 +6,7 @@ import java.util.*;
 public final class ChallengeRules {
     private ChallengeRules() {}
     public static final int MAX_ROOMS=4, MAX_PLAYERS=4, WAVE_SECONDS=300;
+    public static final int BATCH_SECONDS=25, MAX_LIVING=48;
     public enum Difficulty {
         NORMAL("普通",5,1.0,1.0,1), HARD("困难",10,1.5,1.3,2),
         EXPERT("专家",15,2.1,1.7,3), NIGHTMARE("噩梦",20,2.8,2.1,4);
@@ -22,6 +23,7 @@ public final class ChallengeRules {
         return boss(wave,d)?"特殊波次 · 感染暴君":wave%3==0?"特殊波次 · 疾行尸群":wave%4==0?"特殊波次 · 装甲突袭":"僵尸入侵";
     }
     public static int count(int wave,int players) { return Math.min(120,16+wave*4+Math.max(0,Math.min(4,players)-1)*8); }
+    public static int batchSize(int wave,int players){return Math.min(20,8+Math.max(0,wave-1)/4*2+Math.max(0,Math.min(4,players)-1)*2);}
     public static double health(Difficulty d,int wave,boolean boss) { return (boss?180:20)*d.health*(1+0.07*(wave-1)); }
     public static double damage(Difficulty d,int wave,boolean boss) { return (boss?7:3)*d.damage*(1+0.025*(wave-1)); }
     public static int score(Difficulty d,int kills,int waves,int seconds,boolean won) {

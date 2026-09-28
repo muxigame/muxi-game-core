@@ -40,6 +40,14 @@ public final class ChallengeClient {
     public static JsonArray array(String key){return state.has(key)?state.getAsJsonArray(key):new JsonArray();}
     public static JsonObject mine(){for(JsonElement e:array("rooms"))if(flag(e.getAsJsonObject(),"mine"))return e.getAsJsonObject();return null;}
     public static String activeSites(){var room=mine();if(room==null||!room.has("sites"))return "注意爆闪红灯，提前布防";return "激活："+java.util.stream.StreamSupport.stream(room.getAsJsonArray("sites").spliterator(),false).map(JsonElement::getAsString).collect(java.util.stream.Collectors.joining("、"));}
-    public static String summary(){var r=mine();if(r==null)return "封锁研究所 · 单人 / 1–4 人合作";String s=text(r,"phase");if(s.equals("LOADING"))return "等待队员加载地图…";if(s.equals("COUNTDOWN")||s.equals("REST"))return (s.equals("COUNTDOWN")?"首波准备":"下一波")+" · "+number(r,"seconds")+" 秒";return phase(s)+" · "+number(r,"wave")+"/"+number(r,"total")+" 波 · 剩余 "+number(r,"remaining");}
+    public static String batchStatus(JsonObject r){
+        if(!text(r,"phase").equals("RUNNING")||number(r,"batchCount")==0)return "";
+        String prefix=number(r,"batch")+"/"+number(r,"batchCount")+" 批 · ";
+        if(flag(r,"batchBlocked"))return prefix+"先清怪，再继续投放";
+        if(number(r,"batchUnspawned")>0)return prefix+"投放中，待出 "+number(r,"batchUnspawned");
+        if(number(r,"batch")>=number(r,"batchCount"))return prefix+"清理整波剩余 "+number(r,"aliveCount");
+        return prefix+"本批剩 "+number(r,"batchAlive")+" · 下批 ≤"+number(r,"batchSeconds")+"秒";
+    }
+    public static String summary(){var r=mine();if(r==null)return "封锁研究所 · 单人 / 1–4 人合作";String s=text(r,"phase");if(s.equals("LOADING"))return "等待队员加载地图…";if(s.equals("COUNTDOWN")||s.equals("REST"))return (s.equals("COUNTDOWN")?"首波准备":"下一波")+" · "+number(r,"seconds")+" 秒";if(s.equals("RUNNING")&&number(r,"batchCount")>0)return number(r,"wave")+"/"+number(r,"total")+" 波 · "+batchStatus(r);return phase(s)+" · "+number(r,"wave")+"/"+number(r,"total")+" 波 · 剩余 "+number(r,"remaining");}
     private static String phase(String s){return switch(s){case "BUILDING"->"地图生成";case "LOBBY"->"等待开局";case "LOADING"->"加载地图";case "COUNTDOWN"->"准备倒计时";case "REST"->"波间休整";case "RUNNING"->"战斗中";default->s;};}
 }
