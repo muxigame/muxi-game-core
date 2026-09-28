@@ -20,4 +20,8 @@ public abstract class ChallengeContainerMixin {
             ci.cancel();player.containerMenu.sendAllDataToRemote();
         }
     }
+    @Inject(method="handlePlayerAction",at=@At(value="INVOKE",target="Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/server/level/ServerLevel;)V",shift=At.Shift.AFTER),cancellable=true)
+    private void muxi$reservedGunSlots(net.minecraft.network.protocol.game.ServerboundPlayerActionPacket packet,CallbackInfo ci){
+        if(ChallengeInventory.pending(player)&&switch(packet.getAction()){case SWAP_ITEM_WITH_OFFHAND,DROP_ITEM,DROP_ALL_ITEMS->true;default->false;}){ci.cancel();player.containerMenu.sendAllDataToRemote();}
+    }
 }

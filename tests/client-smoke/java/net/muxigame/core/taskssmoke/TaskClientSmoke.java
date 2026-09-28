@@ -63,6 +63,7 @@ public final class TaskClientSmoke {
         private int boxY;
         private int frames;
         private boolean mainlineShown;
+        private final net.muxigame.core.client.challenge.ChallengeWheelScreen wheel=new net.muxigame.core.client.challenge.ChallengeWheelScreen();
         Preview(Class<?> client) { super(Component.literal("muxi daily tasks native-render QA")); this.client=client; }
         @Override protected void init() {
             try {
@@ -105,7 +106,7 @@ public final class TaskClientSmoke {
                     challenge.render(g,16,228,delta);
                 }
                 else if(frames<270)renderArena(g,frames>=260?2:frames>=250?1:0);
-                else {
+                else if(frames<300){
                     if(frames==270){
                         var state=net.muxigame.core.client.challenge.ChallengeClient.state;
                         state.add("rooms",com.google.gson.JsonParser.parseString("""
@@ -116,6 +117,13 @@ public final class TaskClientSmoke {
                     }
                     if(frames<280)challenge.render(g,16,228,delta);else compact.invoke(null,g,box,-1,-1,false);
                 }
+                else{
+                    if(frames==300){var state=net.muxigame.core.client.challenge.ChallengeClient.state;state.addProperty("locked",true);state.addProperty("earned",720);state.addProperty("tactical",1800);state.addProperty("coins",24);state.addProperty("battleRevision",2);state.add("battleShop",com.google.gson.JsonParser.parseString("""
+                        [{"id":"glock_17","title":"格洛克17","category":"手枪","gun":"tacz:glock_17","cost":350,"coins":0,"burstDps":40,"sustainedDps":24,"magazine":17},{"id":"deagle","title":"沙漠之鹰","category":"手枪","gun":"tacz:deagle","cost":850,"coins":0,"burstDps":60,"sustainedDps":30,"magazine":7},{"id":"heal","title":"治疗药剂II","category":"补给","gun":"","cost":250,"coins":2}]
+                        """).getAsJsonArray());wheel.init(minecraft,width,height);}
+                    if(frames==320){var category=wheel.getClass().getDeclaredField("category");category.setAccessible(true);category.set(wheel,"手枪");var slot=wheel.getClass().getDeclaredField("slot");slot.setAccessible(true);slot.set(wheel,2);var rebuild=wheel.getClass().getDeclaredMethod("rebuild");rebuild.setAccessible(true);rebuild.invoke(wheel);}
+                    if(frames<340)wheel.render(g,width/2,height/2,delta);else{var state=net.muxigame.core.client.challenge.ChallengeClient.state;state.addProperty("ammoHolding",true);state.addProperty("ammoProgress",30);net.muxigame.core.client.challenge.ChallengeClient.renderCombat(g);}
+                }
                 Component note=Component.literal("本地界面测试 · 示例任务");
                 g.drawString(font,note,width-font.width(note)-12,height-18,0xFF81909C,true);
                 frames++;
@@ -125,8 +133,9 @@ public final class TaskClientSmoke {
                         image.writeToFile(Path.of(frames==30?"task-hud.png":frames==70?"task-mainline.png":frames==110?"challenge-lobby.png":frames==150?"challenge-tasks.png":frames==190?"challenge-shop.png":frames==230?"challenge-loadout.png":frames==248?"research-floor-1.png":frames==258?"research-floor-2.png":frames==268?"research-floor-3.png":frames==278?"challenge-batches.png":"challenge-batch-hud.png"));
                     }
                 }
-                if(frames==300) {
-                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"windowVisible\":false,\"nativeFrames\":300,\"taczReloadHook\":"+net.neoforged.fml.ModList.get().isLoaded("tacz")+",\"screenshots\":[\"task-hud.png\",\"task-mainline.png\",\"challenge-lobby.png\",\"challenge-tasks.png\",\"challenge-shop.png\",\"challenge-loadout.png\",\"research-floor-1.png\",\"research-floor-2.png\",\"research-floor-3.png\",\"challenge-batches.png\",\"challenge-batch-hud.png\"],\"fixture\":\"hidden native render, early window disabled; synthetic UI and production map geometry, no real players\"}");
+                if(frames==318||frames==338||frames==358){g.flush();try(var shot=Screenshot.takeScreenshot(minecraft.getMainRenderTarget())){shot.writeToFile(Path.of(frames==318?"challenge-wheel.png":frames==338?"challenge-pistol-wheel.png":"challenge-ammo-hold.png"));}}
+                if(frames==360) {
+                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"windowVisible\":false,\"nativeFrames\":360,\"taczReloadHook\":"+net.neoforged.fml.ModList.get().isLoaded("tacz")+",\"screenshots\":[\"task-hud.png\",\"task-mainline.png\",\"challenge-lobby.png\",\"challenge-tasks.png\",\"challenge-shop.png\",\"challenge-loadout.png\",\"research-floor-1.png\",\"research-floor-2.png\",\"research-floor-3.png\",\"challenge-batches.png\",\"challenge-batch-hud.png\",\"challenge-wheel.png\",\"challenge-pistol-wheel.png\",\"challenge-ammo-hold.png\"],\"fixture\":\"hidden native render, early window disabled; synthetic UI and production map geometry, no real players\"}");
                     minecraft.stop();
                 }
             } catch(Throwable e) { failure(e); }

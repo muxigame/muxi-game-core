@@ -77,6 +77,8 @@ public final class ChallengeArena {
         }
         if(f==0&&x>=39&&x<=41&&z==36&&h<=2)return (x==40&&h==1?Blocks.BARREL:h==2?Blocks.YELLOW_CONCRETE:Blocks.IRON_BLOCK).defaultBlockState();
         if(room!=null&&room.wall(x,z)){
+            // Connect the L3 cushion directly to the L2 down-hole: no detour through a locked wall.
+            if(f==1&&z==52&&x>=7&&x<=9&&h<=4)return Blocks.AIR.defaultBlockState();
             if(room.door(x,z)&&h<=4)return Blocks.AIR.defaultBlockState();
             if(room.kind().equals("nest")&&x==44&&z>=40&&z<=46&&h<=5)return Blocks.AIR.defaultBlockState();
             return (h>=3&&h<=5?room.kind().equals("containment")?Blocks.LIME_STAINED_GLASS:Blocks.LIGHT_BLUE_STAINED_GLASS:h==8?Blocks.CYAN_CONCRETE:Blocks.SMOOTH_QUARTZ).defaultBlockState();
@@ -123,9 +125,9 @@ public final class ChallengeArena {
     public void labels(ServerLevel level){
         for(int f=0;f<3;f++){
             for(var room:ResearchLayout.rooms(f))label(level,pos(room.doorX(),4+f*10,room.doorZ()),"L"+(f+1)+" "+room.name());
-            if(f==0)label(level,pos(40,4,36),"唯一弹药柜 · R补弹 · 每人冷却10秒");
+            if(f==0)label(level,pos(40,4,36),"唯一弹药柜 · 按住R 3秒 · 冷却10秒");
             if(f<2){var entry=stairEntrance(f,f+1);label(level,entry.above(3),f==0?"上行① · 北侧楼梯 → L2":"上行② · 西侧楼梯 → L3");}
-            if(f>0)label(level,pos(8,3+f*10,f==1?54:49),"破损地板 · 下方缓冲区 · 单层下落捷径");
+            if(f>0)label(level,pos(8,3+f*10,f==1?54:49),f==2?"下落缓冲 → 二层连廊 → 一层弹药柜":"下落捷径 → 一层唯一弹药柜");
         }
         for(var s:sites)label(level,s.lamp.above(2),"刷怪口 · "+s.name);
     }

@@ -46,6 +46,7 @@ public final class ChallengeSmoke {
     public ChallengeSmoke(){NeoForge.EVENT_BUS.addListener(this::tick);}
     private void check(String name,boolean pass){if(!pass)throw new AssertionError(name);passed.add(name);}
     private void killBatch(MinecraftServer server,Set<UUID> ids){for(UUID id:Set.copyOf(ids)){var entity=server.getLevel(ChallengeArena.DIMENSION).getEntity(id);check("batch fixture entity is present",entity instanceof Zombie);((Zombie)entity).hurt(entity.damageSources().generic(),100000);}}
+    private void matureHold(ChallengeFeature feature,ServerPlayer player,MinecraftServer server)throws Exception{feature.ammoHold(player);var constructor=ChallengeFeature.AmmoHold.class.getDeclaredConstructor(int.class);constructor.setAccessible(true);var hold=constructor.newInstance(server.getTickCount()-60);hold.heartbeat=server.getTickCount();feature.room(player.getUUID()).holds.put(player.getUUID(),hold);}
     @SuppressWarnings("unchecked")
     private ServerPlayer player(MinecraftServer server,String name) throws Exception {
         var profile=new GameProfile(UUID.randomUUID(),name);ServerPlayer p=new ServerPlayer(server,server.overworld(),profile,ClientInformation.createDefault());
@@ -71,6 +72,7 @@ public final class ChallengeSmoke {
                 }
                 check("mob count capped",ChallengeRules.count(500,100)==120);
                 p=player(server,"ChallengeQA");q=player(server,"ChallengeGuest");
+                p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,1200));
                 CompoundTag legacy=new CompoundTag();legacy.putInt("credits",12345);q.getPersistentData().put(ChallengeFeature.STATE,legacy);feature.snapshot(q,"");
                 check("legacy points migrate to coins with remainder",q.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits")==123&&q.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("exchangeRemainder")==45);
                 feature.snapshot(q,"");check("currency migration is idempotent",q.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits")==123);
@@ -89,13 +91,21 @@ public final class ChallengeSmoke {
             if(ticks==80){
                 feature.start(q);q.setInvulnerable(true);feature.clientReady(q);
                 var startWave=ChallengeFeature.class.getDeclaredMethod("wave",ChallengeFeature.Room.class);startWave.setAccessible(true);startWave.invoke(feature,batchRoom);
-                check("no special solo first wave split",batchRoom.planned==20&&batchRoom.batchSize==20&&batchRoom.batchCount==1&&ChallengeRules.batchSize(1,4)==20);
-                // Explicit small-quota fixture exercises batching; this is not the production solo rule.
-                batchRoom.batchSize=8;batchRoom.batchCount=3;batchRoom.batchLimit=8;
-                check("batch deadline starts at twenty five seconds",batchRoom.batchDeadline-server.getTickCount()==500);
+                check("dynamic production batches begin with ten enemies",batchRoom.planned==20&&batchRoom.batchSize==10&&batchRoom.batchCount==2);
+                // Three equal batches exercise carry-over and full-wave clear.
+                batchRoom.planned=30;batchRoom.batchSize=10;batchRoom.batchCount=3;batchRoom.batchLimit=10;
+                check("ten enemy batch starts at five seconds",batchRoom.batchDeadline-server.getTickCount()==100);
+                batchRoom.batchDeadline=server.getTickCount()+1000;
             }
+            if(ticks==90){var station=batchRoom.arena.ammoStation(0);q.setPos(station.getX()+0.5,station.getY(),station.getZ()+3.5);com.tacz.guns.api.item.IGun.getIGunOrNull(q.getInventory().getItem(0)).setCurrentAmmoCount(q.getInventory().getItem(0),0);feature.ammoHold(q);}
+            if(ticks>=90&&ticks<=110&&ticks%5==0)feature.ammoHold(q);
+            if(ticks==110){feature.handle(q,"ammoCancel","");check("release cancels server hold immediately",!batchRoom.holds.containsKey(q.getUUID()));}
+            if(ticks==111)feature.ammoHold(q);
+            if(ticks>=111&&ticks<=172&&ticks%5==0)feature.ammoHold(q);
+            if(ticks==120){feature.handle(q,"ammoFinish","");check("early finish cannot grant ammunition",com.tacz.guns.api.item.IGun.getIGunOrNull(q.getInventory().getItem(0)).getCurrentAmmoCount(q.getInventory().getItem(0))==0);}
+            if(ticks==172){feature.handle(q,"ammoFinish","");check("real continuous three second hold grants native ammo",com.tacz.guns.api.item.IGun.getIGunOrNull(q.getInventory().getItem(0)).getCurrentAmmoCount(q.getInventory().getItem(0))==ChallengeGuns.capacity(q.getInventory().getItem(0)));}
             if(ticks==121){
-                check("first batch stops releasing at its quota",batchRoom.issued==8&&batchRoom.batchMobs.size()==8&&batchRoom.batchNumber==1);
+                check("first batch stops releasing at its quota",batchRoom.issued==10&&batchRoom.batchMobs.size()==10&&batchRoom.batchNumber==1);
                 firstBatch=Set.copyOf(batchRoom.batchMobs);batchRoom.batchDeadline=server.getTickCount();
             }
             if(ticks==123){
@@ -106,21 +116,21 @@ public final class ChallengeSmoke {
                 check("expired timer cannot skip undelivered members of a batch",batchRoom.batchNumber==2&&batchRoom.issued<batchRoom.batchLimit);
                 batchRoom.batchDeadline=server.getTickCount()+2000;
             }
-            if(ticks==161){check("second batch is fully released before clear test",batchRoom.batchNumber==2&&batchRoom.issued==16&&batchRoom.batchMobs.size()==8);killBatch(server,batchRoom.batchMobs);}
-            if(ticks==163){check("clearing current batch releases next even with older survivors",batchRoom.batchNumber==3&&batchRoom.batchLimit==20&&batchRoom.mobs.containsAll(firstBatch)&&batchRoom.wave==1);}
-            if(ticks==181){check("final partial batch uses exact remaining quota",batchRoom.issued==20&&batchRoom.batchMobs.size()==4&&batchRoom.batchNumber==3);batchRoom.batchDeadline=server.getTickCount();}
-            if(ticks==183){
+            if(ticks==161){check("second batch is fully released before clear test",batchRoom.batchNumber==2&&batchRoom.issued==20&&batchRoom.batchMobs.size()==10);killBatch(server,batchRoom.batchMobs);}
+            if(ticks==163){check("clearing current batch releases next even with older survivors",batchRoom.batchNumber==3&&batchRoom.batchLimit==30&&batchRoom.mobs.containsAll(firstBatch)&&batchRoom.wave==1);}
+            if(ticks==193){check("final batch uses exact remaining quota",batchRoom.issued==30&&batchRoom.batchMobs.size()==10&&batchRoom.batchNumber==3);batchRoom.batchDeadline=server.getTickCount();}
+            if(ticks==203){
                 check("final batch timer never skips to next big wave",batchRoom.phase==ChallengeFeature.Phase.RUNNING&&batchRoom.wave==1);
                 var json=com.google.gson.JsonParser.parseString(feature.snapshot(q,"")).getAsJsonObject();
                 var row=java.util.stream.StreamSupport.stream(json.getAsJsonArray("rooms").spliterator(),false).map(com.google.gson.JsonElement::getAsJsonObject).filter(it->it.get("mine").getAsBoolean()).findFirst().orElseThrow();
-                check("snapshot exposes batch number and all surviving enemies",row.get("batch").getAsInt()==3&&row.get("batchCount").getAsInt()==3&&row.get("aliveCount").getAsInt()==12);
+                check("snapshot exposes batch number and all surviving enemies",row.get("batch").getAsInt()==3&&row.get("batchCount").getAsInt()==3&&row.get("aliveCount").getAsInt()>=10);
                 killBatch(server,batchRoom.batchMobs);
             }
-            if(ticks==185){
+            if(ticks==205){
                 check("cleared last batch still waits for older batch survivors",batchRoom.phase==ChallengeFeature.Phase.RUNNING&&batchRoom.wave==1&&batchRoom.mobs.equals(firstBatch));
                 killBatch(server,firstBatch);
             }
-            if(ticks==187){
+            if(ticks==207){
                 check("only full-wave clear starts next-wave countdown",batchRoom.phase==ChallengeFeature.Phase.REST&&batchRoom.wave==1&&batchRoom.preparedWave==2&&batchRoom.mobs.isEmpty());
                 q.setInvulnerable(false);feature.leave(q,"batch checks complete");
             }
@@ -161,15 +171,20 @@ public final class ChallengeSmoke {
                 room.arena.lamps(level,room.activeSites,false);
                 check("player enters isolated dimension",ChallengeFeature.dimension(p.level()));
                 check("original inventory persisted",ChallengeInventory.pending(p));
+                check("preexisting effects isolated in temporary challenge",!p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION));
                 check("original diamonds not in kit",p.getInventory().items.stream().noneMatch(s->s.is(Items.DIAMOND)));
                 check("adventure mode active",p.gameMode.getGameModeForPlayer()==GameType.ADVENTURE);
                 if(net.neoforged.fml.ModList.get().isLoaded("tacz")){
                     check("native TaCZ starting gun present",net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(p.getInventory().getItem(0).getItem()).toString().equals("tacz:modern_kinetic_gun"));
-                    check("default 9mm primary and secondary",ChallengeGuns.ammoId(p.getInventory().getItem(0)).equals("tacz:9mm")&&ChallengeGuns.ammoId(p.getInventory().getItem(1)).equals("tacz:9mm"));
+                    check("default 9mm primary and secondary",ChallengeGuns.ammoId(p.getInventory().getItem(0)).equals("tacz:9mm")&&ChallengeGuns.ammoId(p.getInventory().getItem(2)).equals("tacz:9mm"));
+                    check("three weapon slots with empty second primary",p.getInventory().getItem(1).isEmpty()&&ChallengeGuns.pistol(p.getInventory().getItem(2)));
+                    check("meat replaced by exactly two healing potions",p.getInventory().items.stream().filter(s->s.is(Items.POTION)).mapToInt(ItemStack::getCount).sum()==2&&p.getInventory().items.stream().noneMatch(s->s.is(Items.COOKED_BEEF)));
+                    p.setHealth(14);p.getFoodData().setFoodLevel(1);p.getFoodData().setExhaustion(20);for(int step=0;step<100;step++)p.getFoodData().tick(p);
+                    check("native hunger locked without automatic regeneration",p.getFoodData().getFoodLevel()==20&&p.getHealth()==14);p.setHealth(p.getMaxHealth());
                     Class<?> gunApi=Class.forName("com.tacz.guns.api.item.IGun");Object mainGun=gunApi.getMethod("getIGunOrNull",ItemStack.class).invoke(null,p.getInventory().getItem(0));
                     check("default primary is MP5A5",gunApi.getMethod("getGunId",ItemStack.class).invoke(mainGun,p.getInventory().getItem(0)).toString().equals("tacz:hk_mp5a5"));
-                    Object sideGun=gunApi.getMethod("getIGunOrNull",ItemStack.class).invoke(null,p.getInventory().getItem(1));
-                    check("default secondary is Glock17",gunApi.getMethod("getGunId",ItemStack.class).invoke(sideGun,p.getInventory().getItem(1)).toString().equals("tacz:glock_17"));
+                    Object sideGun=gunApi.getMethod("getIGunOrNull",ItemStack.class).invoke(null,p.getInventory().getItem(2));
+                    check("default secondary is Glock17",gunApi.getMethod("getGunId",ItemStack.class).invoke(sideGun,p.getInventory().getItem(2)).toString().equals("tacz:glock_17"));
                     check("MP5 starts in automatic mode",gunApi.getMethod("getFireMode",ItemStack.class).invoke(mainGun,p.getInventory().getItem(0)).toString().equals("AUTO"));
                     check("native TaCZ ammunition present",p.getInventory().items.stream().anyMatch(s->net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(s.getItem()).toString().equals("tacz:ammo")));
                     check("no melee or bow kit",p.getInventory().items.stream().noneMatch(s->s.getItem() instanceof SwordItem||s.is(Items.BOW)||s.is(Items.ARROW)));
@@ -254,23 +269,51 @@ public final class ChallengeSmoke {
                 Class<?> gunApi=Class.forName("com.tacz.guns.api.item.IGun");Object gunItem=gunApi.getMethod("getIGunOrNull",ItemStack.class).invoke(null,p.getInventory().getItem(0));
                 gunApi.getMethod("setCurrentAmmoCount",ItemStack.class,int.class).invoke(gunItem,p.getInventory().getItem(0),0);
                 NeoForge.EVENT_BUS.post(click);
-                check("real ammo cabinet fills magazine",(int)gunApi.getMethod("getCurrentAmmoCount",ItemStack.class).invoke(gunItem,p.getInventory().getItem(0))==ChallengeGuns.capacity(p.getInventory().getItem(0)));
+                check("right click cannot bypass hold channel",(int)gunApi.getMethod("getCurrentAmmoCount",ItemStack.class).invoke(gunItem,p.getInventory().getItem(0))==0);
+                matureHold(feature,p,server);feature.resupply(p);
+                check("mature server verified hold fills native magazine",(int)gunApi.getMethod("getCurrentAmmoCount",ItemStack.class).invoke(gunItem,p.getInventory().getItem(0))==ChallengeGuns.capacity(p.getInventory().getItem(0)));
                 var after=p.getInventory().save(new ListTag());
                 NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(p,net.minecraft.world.InteractionHand.MAIN_HAND,pad,new net.minecraft.world.phys.BlockHitResult(pad.getCenter(),net.minecraft.core.Direction.UP,pad,false)));
                 check("resupply cannot inflate ammo on repeat",p.getInventory().save(new ListTag()).equals(after));
                 check("cooldown reports ten seconds",com.google.gson.JsonParser.parseString(feature.snapshot(p,"")).getAsJsonObject().get("ammoCooldown").getAsInt()==10);
                 room.supplies.put(p.getUUID()+":ammo",server.getTickCount()-199);
                 try{feature.resupply(p);throw new AssertionError("early resupply accepted");}catch(IllegalArgumentException expected){check("resupply rejects 199 ticks",true);}
-                room.supplies.put(p.getUUID()+":ammo",server.getTickCount()-200);feature.resupply(p);check("resupply permits 200 ticks",room.supplies.get(p.getUUID()+":ammo")==server.getTickCount());
+                room.supplies.put(p.getUUID()+":ammo",server.getTickCount()-200);matureHold(feature,p,server);feature.resupply(p);check("resupply permits 200 ticks",room.supplies.get(p.getUUID()+":ammo")==server.getTickCount());
                 p.setPos(8.5,65,54.5);
                 var safeFall=new net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent(p,new net.neoforged.neoforge.common.damagesource.DamageContainer(p.damageSources().fall(),7));NeoForge.EVENT_BUS.post(safeFall);
                 check("designated downward shortcut cancels fall injury",safeFall.isCanceled());
                 p.setPos(40.5,65,40.5);
                 var ordinaryFall=new net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent(p,new net.neoforged.neoforge.common.damagesource.DamageContainer(p.damageSources().fall(),7));NeoForge.EVENT_BUS.post(ordinaryFall);
                 check("fall protection is not global",!ordinaryFall.isCanceled());
+                room.wallet.put(p.getUUID(),50000);int settlement=room.earned.getOrDefault(p.getUUID(),0),pending=p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("pendingScore");
+                var battleOffers=ChallengeBattleShop.offers(p);check("native RPG available in combat power shop",battleOffers.stream().anyMatch(o->o.id().equals("rpg7")));
+                var augOffer=battleOffers.stream().filter(o->o.id().equals("aug")).findFirst().orElseThrow();
+                feature.battleBuy(p,"aug",1,0,false);
+                check("second primary bought into reserved slot",ChallengeGuns.gunId(p.getInventory().getItem(1)).equals("tacz:aug")&&p.getInventory().items.stream().filter(ChallengeGuns::isGun).count()==3);
+                var gunsBeforeAction=p.getInventory().save(new ListTag());p.connection.handlePlayerAction(new net.minecraft.network.protocol.game.ServerboundPlayerActionPacket(net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND,net.minecraft.core.BlockPos.ZERO,net.minecraft.core.Direction.UP,0));p.connection.handlePlayerAction(new net.minecraft.network.protocol.game.ServerboundPlayerActionPacket(net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.DROP_ITEM,net.minecraft.core.BlockPos.ZERO,net.minecraft.core.Direction.UP,0));
+                check("F swap and Q drop cannot bypass three reserved gun slots",p.getInventory().save(new ListTag()).equals(gunsBeforeAction));
+                check("combat purchase debits only tactical wallet",room.wallet.get(p.getUUID())==50000-augOffer.cost()&&room.earned.get(p.getUUID())==settlement&&p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("pendingScore")==pending);
+                try{feature.battleBuy(p,"deagle",2,0,false);throw new AssertionError("duplicate tactical order accepted");}catch(IllegalArgumentException expected){check("replayed tactical order rejected",true);}
+                int walletBefore=room.wallet.get(p.getUUID());try{feature.battleBuy(p,"deagle",0,1,false);throw new AssertionError("pistol inserted into primary");}catch(IllegalArgumentException expected){check("invalid gun category leaves wallet unchanged",room.wallet.get(p.getUUID())==walletBefore);}
+                feature.battleBuy(p,"deagle",2,1,false);feature.battleBuy(p,"diamond_armor",0,2,false);
+                check("native pistol upgrade and armor upgrade applied",ChallengeGuns.gunId(p.getInventory().getItem(2)).equals("tacz:deagle")&&p.getInventory().getItem(38).is(Items.DIAMOND_CHESTPLATE));
+                var coinTag=p.getPersistentData().getCompound(ChallengeFeature.STATE);coinTag.putInt("credits",5);p.getPersistentData().put(ChallengeFeature.STATE,coinTag);walletBefore=room.wallet.get(p.getUUID());feature.battleBuy(p,"heal",0,3,true);
+                check("coin supply debits permanent coins not score or tactical points",p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits")==3&&room.wallet.get(p.getUUID())==walletBefore&&p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("pendingScore")==pending);
+                var kitBefore=p.getInventory().save(new ListTag());for(int slot=3;slot<36;slot++)p.getInventory().setItem(slot,new ItemStack(Items.COBBLESTONE,64));walletBefore=room.wallet.get(p.getUUID());try{feature.battleBuy(p,"speed",0,4,false);throw new AssertionError("full inventory supply accepted");}catch(IllegalArgumentException expected){check("full inventory tactical purchase does not debit",room.wallet.get(p.getUUID())==walletBefore&&room.orders.get(p.getUUID())==4);}p.getInventory().load(kitBefore);
+                var base=ChallengeGuns.gun(p,"tacz:ak47");double powerBase=ChallengeGunPower.estimate(base).power();check("native power estimate finite with real gun data",Double.isFinite(powerBase)&&powerBase>0);
+                // Physical player collision/fall through the two staggered shortcuts, then native walking paths.
+                p.setPos(8.5,85,49.5);for(int step=0;step<30;step++)p.move(MoverType.SELF,new net.minecraft.world.phys.Vec3(0,-1,0));
+                check("real player falls from level three onto level two cushion",Math.abs(p.getY()-75)<0.1);
+                var dropProbe=EntityType.ZOMBIE.create(level);dropProbe.setPos(p.getX(),p.getY(),p.getZ());dropProbe.setOnGround(true);dropProbe.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE).setBaseValue(192);
+                var downPath=dropProbe.getNavigation().createPath(room.arena.pos(8,11,52),0);check("upper cushion connects to next down hole without wall detour",downPath!=null&&downPath.canReach());
+                p.setPos(8.5,75,54.5);for(int step=0;step<30;step++)p.move(MoverType.SELF,new net.minecraft.world.phys.Vec3(0,-1,0));
+                check("real player falls onto level one cushion",Math.abs(p.getY()-65)<0.1);
+                dropProbe.setPos(p.getX(),p.getY(),p.getZ());dropProbe.setOnGround(true);dropProbe.getNavigation().stop();var ammoPath=dropProbe.getNavigation().createPath(room.arena.pos(40,1,39),0);check("lowest landing has native walk route to the only ammo cabinet",ammoPath!=null&&ammoPath.canReach());
+                p.setPos(40.5,65,39.5);
                 var advance=ChallengeFeature.class.getDeclaredMethod("wave",ChallengeFeature.Room.class);advance.setAccessible(true);advance.invoke(feature,room);
                 try{feature.resupply(p);throw new AssertionError("wave transition bypassed cooldown");}catch(IllegalArgumentException expected){check("wave transition never resets ammo cooldown",true);}
-                feature.leave(p,"退出测试");
+                p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED,1000));feature.leave(p,"退出测试");
+                check("temporary potion effects removed and original unexpired effects restored",!p.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED)&&p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION));
                 check("subthreshold score carries to next settlement",p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("pendingScore")==0&&p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("exchangeRemainder")==40);
                 check("leave restores original inventory components",p.getInventory().save(new ListTag()).equals(original));
                 check("leave restores selected slot",p.getInventory().selected==4);
@@ -283,6 +326,7 @@ public final class ChallengeSmoke {
                 check("reconnect recovers saved inventory",p.getInventory().save(new ListTag()).equals(original)&&!ChallengeInventory.pending(p));
                 if(net.neoforged.fml.ModList.get().isLoaded("tacz")){
                     ItemStack own=ChallengeGuns.gun(p,"tacz:ak47");own.set(DataComponents.CUSTOM_NAME,Component.literal("自带改装 AK"));
+                    double unmodifiedPower=ChallengeGunPower.estimate(own).power();
                     Class<?> api=Class.forName("com.tacz.guns.api.item.IGun");Object gun=api.getMethod("getIGunOrNull",ItemStack.class).invoke(null,own);
                     Class<?> attachment=Class.forName("com.tacz.guns.api.item.attachment.AttachmentType");Object scope=Enum.valueOf((Class<Enum>)attachment,"SCOPE");
                     Class<?> builderType=Class.forName("com.tacz.guns.api.item.builder.AttachmentItemBuilder");
@@ -292,6 +336,7 @@ public final class ChallengeSmoke {
                         api.getMethod("installAttachment",net.minecraft.core.HolderLookup.Provider.class,ItemStack.class,ItemStack.class).invoke(gun,p.registryAccess(),own,attachmentStack);
                     }
                     check("extended magazine fixture increases capacity",ChallengeGuns.capacity(own)>30);
+                    check("real extended magazine raises combat power estimate",ChallengeGunPower.estimate(own).power()>unmodifiedPower);
                     p.getInventory().setItem(5,own);var loadout=ChallengeLoadout.defaults().select(p,true,5);
                     try{loadout.select(p,false,5);throw new AssertionError("same gun twice accepted");}catch(IllegalArgumentException expected){check("same slot primary and secondary rejected",true);}
                     own.set(DataComponents.CUSTOM_NAME,Component.literal("改装发生改变"));
@@ -346,9 +391,14 @@ public final class ChallengeSmoke {
                 var spawn=ChallengeFeature.class.getDeclaredMethod("spawnEnemy",ChallengeFeature.Room.class,ServerLevel.class,ChallengeRules.Enemy.class,boolean.class,boolean.class);spawn.setAccessible(true);spawn.invoke(feature,batchRoom,server.getLevel(ChallengeArena.DIMENSION),ChallengeRules.Enemy.MODULAR,false,false);
                 modularBoss=batchRoom.bosses.entrySet().stream().filter(entry->entry.getValue()==ChallengeRules.Enemy.MODULAR).findFirst().orElseThrow().getKey();
             }
+            if(ticks==270){
+                var spawn=ChallengeFeature.class.getDeclaredMethod("spawnEnemy",ChallengeFeature.Room.class,ServerLevel.class,ChallengeRules.Enemy.class,boolean.class,boolean.class);spawn.setAccessible(true);
+                while(batchRoom.mobs.size()<ChallengeRules.MAX_LIVING)spawn.invoke(feature,batchRoom,server.getLevel(ChallengeArena.DIMENSION),ChallengeRules.Enemy.ZOMBIE,true,false);
+                check("real native living cohort reaches increased cap",batchRoom.mobs.size()==96);
+            }
             if(ticks==290){
                 check("boss survives ordinary wave timeout",feature.room(q.getUUID())==batchRoom&&batchRoom.phase==ChallengeFeature.Phase.RUNNING);
-                check("boss produces continuous bounded reinforcements",batchRoom.reinforcementIssued>0&&batchRoom.issued==3&&batchRoom.mobs.size()<=ChallengeRules.MAX_LIVING);
+                check("boss produces continuous bounded reinforcements",batchRoom.reinforcementIssued>0&&batchRoom.issued==3&&batchRoom.mobs.size()==ChallengeRules.MAX_LIVING);
                 var modular=(Mob)server.getLevel(ChallengeArena.DIMENSION).getEntity(modularBoss);
                 check("native modular boss remains alive and scaled after ticking",modular!=null&&modular.isAlive()&&modular.getMaxHealth()==1024&&(boolean)modular.getClass().getMethod("isHostile").invoke(modular));
                 var snapshot=com.google.gson.JsonParser.parseString(feature.snapshot(q,"")).getAsJsonObject();
@@ -374,7 +424,10 @@ public final class ChallengeSmoke {
                 feature.leave(q,"siege checks complete");q.setInvulnerable(false);
             }
             if(ticks==350){
-                feature.start(p);room.phase=ChallengeFeature.Phase.RUNNING;room.wave=10;room.issued=room.planned=0;room.kills.put(p.getUUID(),100);room.timer=server.getTickCount()+1000;
+                ItemStack paid=ChallengeGuns.gun(p,"tacz:ak47");p.getInventory().setItem(5,paid);feature.selectWeapon(p,0,5);int fee=ChallengeBattleShop.carryFee(p,paid);var tag=p.getPersistentData().getCompound(ChallengeFeature.STATE);tag.putInt("credits",fee-1);p.getPersistentData().put(ChallengeFeature.STATE,tag);
+                try{feature.start(p);throw new AssertionError("unfunded carry accepted");}catch(IllegalArgumentException expected){check("insufficient carry coins reject before inventory swap",!ChallengeInventory.pending(p)&&room.phase==ChallengeFeature.Phase.LOBBY);}
+                tag.putInt("credits",fee+20);p.getPersistentData().put(ChallengeFeature.STATE,tag);feature.start(p);check("carry fee uses actual combat power and is charged once",p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits")==20&&ChallengeGuns.gunId(p.getInventory().getItem(0)).equals("tacz:ak47"));
+                room.phase=ChallengeFeature.Phase.RUNNING;room.wave=10;room.issued=room.planned=0;room.kills.put(p.getUUID(),100);room.timer=server.getTickCount()+1000;
             }
             if(ticks==352){
                 check("final wave completion closes room",feature.rooms().isEmpty());
@@ -383,7 +436,7 @@ public final class ChallengeSmoke {
                 check("completion credits replace automatic loot",t.getInt("credits")>0 && t.getList("rewards",Tag.TAG_COMPOUND).isEmpty());
                 check("lowered score exchange rate is server authoritative",com.google.gson.JsonParser.parseString(feature.snapshot(p,"")).getAsJsonObject().get("exchangeRate").getAsInt()==500);
                 // Seed an already-earned wallet for purchase transaction tests, independent of completion balance.
-                t.putInt("credits",100);p.getPersistentData().put(ChallengeFeature.STATE,t);
+                t.putInt("credits",100);t.putInt("shopRevision",0);p.getPersistentData().put(ChallengeFeature.STATE,t);feature.selectWeapon(p,0,-1);
                 int base=t.getInt("credits");feature.claimTask(p,0);
                 int balance=p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits");check("milestone awards shop credits",balance==base+4);
                 try{feature.claimTask(p,0);throw new AssertionError("duplicate task accepted");}catch(IllegalArgumentException expected){check("duplicate task rejected",true);}

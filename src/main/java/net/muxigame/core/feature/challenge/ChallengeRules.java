@@ -6,7 +6,7 @@ import java.util.*;
 public final class ChallengeRules {
     private ChallengeRules() {}
     public static final int MAX_ROOMS=4, MAX_PLAYERS=4, WAVE_SECONDS=300;
-    public static final int BATCH_SECONDS=25, MAX_LIVING=48, AMMO_COOLDOWN=200, EXCHANGE_RATE=500;
+    public static final int BATCH_SECONDS=20, MAX_LIVING=96, AMMO_COOLDOWN=200, AMMO_HOLD=60, EXCHANGE_RATE=500;
     public enum Difficulty {
         NORMAL("普通",5,1.0,1.0,1), HARD("困难",10,1.5,1.3,2),
         EXPERT("专家",15,2.1,1.7,3), NIGHTMARE("噩梦",20,2.8,2.1,4), EXTREME("极限",25,3.4,2.5,5);
@@ -24,7 +24,9 @@ public final class ChallengeRules {
     }
     public static int count(int wave,int players) { return Math.min(120,16+wave*4+Math.max(0,Math.min(4,players)-1)*8); }
     // No solo-first-wave accommodation: the same team-oriented quota applies to every party.
-    public static int batchSize(int wave,int players){return Math.min(24,20+Math.max(0,wave-1)/5*2);}
+    public static int batchSize(int wave,int players){return Math.min(20,10+Math.max(0,wave-1)/3*2+Math.max(0,players-1)*2);}
+    public static int batchSeconds(int count,double tempo){return Math.max(3,Math.min(22,(int)Math.round((5+Math.max(0,Math.min(10,count-10))*1.5)*tempo)));}
+    public static double adaptTempo(double previous,int elapsed,int expected,boolean cleared){double ratio=(double)elapsed/Math.max(1,expected);double desired=previous*(cleared?(ratio<0.75?0.8:0.95):1.1);return Math.max(0.55,Math.min(1.1,previous*0.6+desired*0.4));}
     public static int spawnFloor(int wave,int ordinal){int roll=Math.floorMod(ordinal*37,100);return wave>=15&&roll>=95?2:wave>=8&&roll>=75?1:0;}
     public enum Enemy {
         ZOMBIE("感染尸群",20,3,0.12,false), RUNNER("疾行幼尸",14,3,0.23,false),

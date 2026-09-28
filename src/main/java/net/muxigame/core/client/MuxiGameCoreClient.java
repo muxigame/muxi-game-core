@@ -24,7 +24,7 @@ public final class MuxiGameCoreClient {
         TaskNetwork.register(modBus);
         net.muxigame.core.feature.challenge.ChallengeNetwork.register(modBus);
         new net.muxigame.core.feature.challenge.ChallengeFeature().register(NeoForge.EVENT_BUS);
-        net.muxigame.core.client.challenge.ChallengeClient.register(NeoForge.EVENT_BUS);
+        net.muxigame.core.client.challenge.ChallengeClient.register(modBus,NeoForge.EVENT_BUS);
         new DailyTasksFeature().register(NeoForge.EVENT_BUS);
         DailyTasksClient.register(modBus,NeoForge.EVENT_BUS);
         LOG.info("muxi Game Core client loaded; nickname display {}",
