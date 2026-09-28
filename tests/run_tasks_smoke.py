@@ -38,7 +38,8 @@ def run() -> None:
     dependencies=[]
     if args.integrations or args.extended:
         patterns=['tacz-neoforge*.jar','*champions*.jar','architectury-*.jar','*create-1.21*.jar']
-        if args.extended: patterns+=['*touhoulittlemaid-*.jar','*modulargolems-*.jar','*l2library-*.jar','FarmersDelight*.jar','rightclickharvest*.jar','jamlib-*.jar']
+        if args.extended: patterns+=['*touhoulittlemaid-*.jar','FarmersDelight*.jar','rightclickharvest*.jar','jamlib-*.jar']
+        if args.extended or args.challenge: patterns+=['*modulargolems-*.jar','*l2library-*.jar']
         for pattern in patterns:
             found=list((server/'mods').glob(pattern))
             if len(found)!=1: raise SystemExit(f'Expected one existing integration dependency: {pattern}')

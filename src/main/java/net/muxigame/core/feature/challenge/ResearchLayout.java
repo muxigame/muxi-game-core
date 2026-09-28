@@ -30,30 +30,25 @@ public final class ResearchLayout {
             r("入口安检大厅","lobby",34,74,46,79,Side.N,39),
             r("配电间","utilities",48,2,60,14,Side.E,8),r("值班办公室","office",64,2,78,14,Side.W,8),
             r("访客接待室","office",48,19,60,30,Side.N,53),r("物资收发大厅","store",64,19,78,38,Side.W,27),
-            r("隔离检疫大厅","containment",44,35,60,51,Side.W,42),r("冷藏样本库","cold",64,42,78,54,Side.W,47),
+            r("零号封锁门 · 核心感染巢穴","nest",44,35,60,51,Side.W,42),r("冷藏样本库","cold",64,42,78,54,Side.W,47),
             r("洗消作业间","utilities",48,57,60,69,Side.E,62),r("设备货仓","store",64,58,78,77,Side.W,65),
             r("卫生间","utilities",48,73,60,78,Side.N,53)
         ),
         List.of(
-            r("生化实验室 A","lab",2,2,18,20,Side.E,13),r("实验准备室 A","utilities",22,2,32,11,Side.S,25),
-            r("消毒准备间","utilities",22,15,32,24,Side.E,18),r("分析实验室","lab",2,25,18,43,Side.E,32),
-            r("样本登记室","office",22,28,36,40,Side.E,33),r("药剂储藏库","cold",2,48,12,63,Side.E,54),
-            r("生化实验室 B","lab",16,45,32,57,Side.E,50),r("临床试验室 C","lab",16,61,32,77,Side.E,67),
-            r("清洁准备间","utilities",2,67,12,78,Side.E,71),
-            r("能源控制室","utilities",48,2,61,18,Side.E,10),r("低温冷冻库","cold",65,2,78,18,Side.W,10),
-            r("组织培养室","lab",48,23,61,37,Side.W,29),r("显微分析室","lab",65,23,78,37,Side.W,29),
-            r("医疗救护站","ward",44,42,61,57,Side.W,47),r("观察病房","ward",65,42,78,58,Side.W,49),
-            r("手术准备室","ward",48,62,61,78,Side.E,68),r("废物暂存间","utilities",65,63,78,78,Side.W,69)
+            r("西北准备间","utilities",2,2,16,17,Side.S,6),r("标本档案室","office",20,2,32,17,Side.S,25),
+            r("东侧能源站","utilities",48,2,62,17,Side.S,53),r("低温样本库","cold",66,2,78,17,Side.S,70),
+            r("西侧分析室","lab",2,26,16,48,Side.E,35),r("中央生化实验大厅","lab",22,28,60,49,Side.N,38),
+            r("组织培养翼","lab",22,54,60,76,Side.W,64),r("临床观察室","ward",66,28,78,44,Side.W,34),
+            r("手术准备间","ward",66,49,78,62,Side.W,54),r("废物隔离间","utilities",66,67,78,78,Side.W,71),
+            r("西侧清洁库","store",2,73,16,78,Side.N,6),r("西侧破损观察室","office",2,52,16,56,Side.E,53)
         ),
         List.of(
-            r("数据备份室","server",2,2,12,17,Side.E,10),r("服务器机房 A","server",16,2,32,17,Side.E,10),
-            r("高性能计算中心","server",2,21,32,36,Side.E,27),r("通风维护作业厅","maintenance",2,42,32,65,Side.E,50),
-            r("备件库","store",2,69,14,78,Side.N,7),r("机房值班室","office",18,69,32,78,Side.N,24),
-            r("中央指挥室","office",48,2,62,19,Side.E,11),r("通信设备室","server",66,2,78,19,Side.W,11),
-            r("监控值班室","office",48,24,62,36,Side.W,28),r("应急办公室","office",66,24,78,36,Side.W,28),
-            r("高危隔离大厅","containment",44,41,62,61,Side.W,48),r("独立隔离室 A","containment",66,41,78,51,Side.W,45),
-            r("独立隔离室 B","containment",66,55,78,65,Side.W,59),r("处置准备间","utilities",48,65,62,78,Side.E,70),
-            r("缓冲更衣间","utilities",66,69,78,78,Side.W,72)
+            r("中央计算机房","server",18,28,48,49,Side.W,36),r("高危隔离翼","containment",52,28,78,49,Side.N,63),
+            r("南侧维护作业厅","maintenance",22,54,60,76,Side.N,37),r("应急通信室","server",66,54,78,66,Side.W,58),
+            r("处置缓冲间","utilities",66,70,78,78,Side.N,71),r("西侧设备档案库","store",2,2,16,16,Side.S,6),
+            r("北侧指挥大厅","office",22,2,48,16,Side.S,32),r("独立隔离室 A","containment",52,2,64,16,Side.S,57),
+            r("独立隔离室 B","containment",68,2,78,16,Side.S,71),r("西侧检修小室","utilities",2,24,12,42,Side.E,32),
+            r("西侧破损机房","server",2,46,12,52,Side.S,6),r("备件装卸室","store",2,73,16,78,Side.N,6)
         )
     );
     public static List<Room> rooms(int floor){return FLOORS.get(Math.max(0,Math.min(2,floor)));}

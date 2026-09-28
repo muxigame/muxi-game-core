@@ -68,7 +68,7 @@ public final class TaskClientSmoke {
             try {
                 detail.init(minecraft,width,height);
                 net.muxigame.core.client.challenge.ChallengeClient.state=com.google.gson.JsonParser.parseString("""
-                    {"available":true,"self":"qa","wins":2,"kills":140,"best":6200,"rewards":0,"credits":62,"coins":62,"earned":300,"exchangePreview":3,"primary":5,"secondary":-1,"last":"通关 · 困难 · 6200 分 → 62 兑换币",
+                    {"available":true,"self":"qa","wins":2,"kills":140,"best":6200,"rewards":0,"credits":62,"coins":62,"earned":300,"exchangeRate":500,"exchangePreview":0,"primary":5,"secondary":-1,"last":"通关 · 困难 · 6200 分 → 12 兑换币",
                      "shop":[{"id":"diamond","title":"钻石 ×1","cost":40},{"id":"glock","title":"格洛克 17","cost":40},{"id":"mp5","title":"MP5A5","cost":105}],
                      "weapons":[{"slot":5,"name":"弩（渲染示例）"},{"slot":8,"name":"弓（渲染示例）"}],
                      "rooms":[{"id":"qa-room","host":"other","name":"研究所突击队","difficulty":"HARD","phase":"LOBBY","wave":0,"total":10,"count":2,"mine":false,"invited":true}],
@@ -104,9 +104,9 @@ public final class TaskClientSmoke {
                     if(frames==160 || frames==200){Field tab=challenge.getClass().getDeclaredField("tab");tab.setAccessible(true);tab.set(challenge,Enum.valueOf((Class<Enum>)tab.getType(),frames==160?"SHOP":"LOADOUT"));Method rebuild=challenge.getClass().getDeclaredMethod("rebuild");rebuild.setAccessible(true);rebuild.invoke(challenge);}
                     challenge.render(g,16,228,delta);
                 }
-                else if(frames<260)renderArena(g,frames>=250?1:0);
+                else if(frames<270)renderArena(g,frames>=260?2:frames>=250?1:0);
                 else {
-                    if(frames==260){
+                    if(frames==270){
                         var state=net.muxigame.core.client.challenge.ChallengeClient.state;
                         state.add("rooms",com.google.gson.JsonParser.parseString("""
                             [{"id":"batch-qa","host":"other","name":"示例小队","difficulty":"HARD","phase":"RUNNING","wave":2,"total":10,"remaining":16,"seconds":245,"count":1,"mine":true,"sites":["L1 北端走廊","L1 洗消更衣室"],"batch":2,"batchCount":3,"batchAlive":8,"batchUnspawned":0,"batchSeconds":18,"aliveCount":12}]
@@ -119,14 +119,14 @@ public final class TaskClientSmoke {
                 Component note=Component.literal("本地界面测试 · 示例任务");
                 g.drawString(font,note,width-font.width(note)-12,height-18,0xFF81909C,true);
                 frames++;
-                if(frames==30 || frames==70 || frames==110 || frames==150 || frames==190 || frames==230 || frames==248 || frames==258 || frames==270 || frames==290) {
+                if(frames==30 || frames==70 || frames==110 || frames==150 || frames==190 || frames==230 || frames==248 || frames==258 || frames==268 || frames==278 || frames==290) {
                     g.flush();
                     try(var image=Screenshot.takeScreenshot(minecraft.getMainRenderTarget())) {
-                        image.writeToFile(Path.of(frames==30?"task-hud.png":frames==70?"task-mainline.png":frames==110?"challenge-lobby.png":frames==150?"challenge-tasks.png":frames==190?"challenge-shop.png":frames==230?"challenge-loadout.png":frames==248?"research-floor-1.png":frames==258?"research-floor-2.png":frames==270?"challenge-batches.png":"challenge-batch-hud.png"));
+                        image.writeToFile(Path.of(frames==30?"task-hud.png":frames==70?"task-mainline.png":frames==110?"challenge-lobby.png":frames==150?"challenge-tasks.png":frames==190?"challenge-shop.png":frames==230?"challenge-loadout.png":frames==248?"research-floor-1.png":frames==258?"research-floor-2.png":frames==268?"research-floor-3.png":frames==278?"challenge-batches.png":"challenge-batch-hud.png"));
                     }
                 }
                 if(frames==300) {
-                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"windowVisible\":false,\"nativeFrames\":300,\"taczReloadHook\":"+net.neoforged.fml.ModList.get().isLoaded("tacz")+",\"screenshots\":[\"task-hud.png\",\"task-mainline.png\",\"challenge-lobby.png\",\"challenge-tasks.png\",\"challenge-shop.png\",\"challenge-loadout.png\",\"research-floor-1.png\",\"research-floor-2.png\",\"challenge-batches.png\",\"challenge-batch-hud.png\"],\"fixture\":\"hidden native render, early window disabled; synthetic UI and production map geometry, no real players\"}");
+                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"windowVisible\":false,\"nativeFrames\":300,\"taczReloadHook\":"+net.neoforged.fml.ModList.get().isLoaded("tacz")+",\"screenshots\":[\"task-hud.png\",\"task-mainline.png\",\"challenge-lobby.png\",\"challenge-tasks.png\",\"challenge-shop.png\",\"challenge-loadout.png\",\"research-floor-1.png\",\"research-floor-2.png\",\"research-floor-3.png\",\"challenge-batches.png\",\"challenge-batch-hud.png\"],\"fixture\":\"hidden native render, early window disabled; synthetic UI and production map geometry, no real players\"}");
                     minecraft.stop();
                 }
             } catch(Throwable e) { failure(e); }

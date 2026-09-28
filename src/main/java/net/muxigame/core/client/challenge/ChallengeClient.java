@@ -18,10 +18,9 @@ public final class ChallengeClient {
         var r=mine();if(r!=null&&text(r,"phase").equals("LOADING")&&mc.level.dimension().equals(net.muxigame.core.feature.challenge.ChallengeArena.DIMENSION)&&mc.level.hasChunkAt(mc.player.blockPosition())&&!(mc.screen instanceof net.minecraft.client.gui.screens.ReceivingLevelScreen))action("ready","");
     }
     public static boolean refillNearby(){
-        var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null||mc.screen!=null||!supported()||!flag(state,"locked")||number(state,"arenaVersion")!=2||number(state,"ammoCooldown")>0)return false;
+        var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null||mc.screen!=null||!supported()||!flag(state,"locked")||number(state,"arenaVersion")!=3||number(state,"ammoCooldown")>0)return false;
         if(!mc.level.dimension().equals(net.muxigame.core.feature.challenge.ChallengeArena.DIMENSION))return false;
-        int floor=Math.max(0,Math.min(2,(int)Math.floor((mc.player.getY()-65)/10)));
-        var station=new net.minecraft.core.BlockPos(number(state,"arenaOrigin")+40,65+floor*10,36);
+        var station=new net.minecraft.core.BlockPos(number(state,"arenaOrigin")+40,65,36);
         if(mc.player.distanceToSqr(station.getCenter())>25)return false;
         action("resupply","");return true;
     }
@@ -45,7 +44,7 @@ public final class ChallengeClient {
         String prefix=number(r,"batch")+"/"+number(r,"batchCount")+" 批 · ";
         if(flag(r,"batchBlocked"))return prefix+"先清怪，再继续投放";
         if(number(r,"batchUnspawned")>0)return prefix+"投放中，待出 "+number(r,"batchUnspawned");
-        if(number(r,"batch")>=number(r,"batchCount"))return prefix+"清理整波剩余 "+number(r,"aliveCount");
+        if(number(r,"batch")>=number(r,"batchCount"))return number(r,"bossCount")>0?"Boss ×"+number(r,"bossCount")+" 持续增援 · 残敌 "+number(r,"aliveCount"):prefix+"清理整波剩余 "+number(r,"aliveCount");
         return prefix+"本批剩 "+number(r,"batchAlive")+" · 下批 ≤"+number(r,"batchSeconds")+"秒";
     }
     public static String summary(){var r=mine();if(r==null)return "封锁研究所 · 单人 / 1–4 人合作";String s=text(r,"phase");if(s.equals("LOADING"))return "等待队员加载地图…";if(s.equals("COUNTDOWN")||s.equals("REST"))return (s.equals("COUNTDOWN")?"首波准备":"下一波")+" · "+number(r,"seconds")+" 秒";if(s.equals("RUNNING")&&number(r,"batchCount")>0)return number(r,"wave")+"/"+number(r,"total")+" 波 · "+batchStatus(r);return phase(s)+" · "+number(r,"wave")+"/"+number(r,"total")+" 波 · 剩余 "+number(r,"remaining");}

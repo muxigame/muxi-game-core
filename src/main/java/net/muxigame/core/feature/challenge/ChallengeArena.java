@@ -21,11 +21,12 @@ public final class ChallengeArena {
     public ChallengeArena(int slot){
         if(slot<0||slot>=ChallengeRules.MAX_ROOMS)throw new IllegalArgumentException("arena slot");this.slot=slot;
         List<SpawnSite> points=new ArrayList<>();
+        points.add(new SpawnSite("core","L1 零号封锁门 · 核心感染巢穴",0,pos(49,1,43),pos(44,5,43)));
         for(int f=0;f<3;f++){
-            var small=ResearchLayout.rooms(f).stream().filter(r->r.width()>=8&&r.depth()>=8&&!r.kind().equals("lobby")).sorted(Comparator.comparingInt(r->r.width()*r.depth())).limit(4).toList();
+            var small=ResearchLayout.rooms(f).stream().filter(r->r.width()>=8&&r.depth()>=8&&!r.kind().equals("lobby")&&!r.kind().equals("nest")).sorted(Comparator.comparingInt(r->r.width()*r.depth())).limit(4).toList();
             for(int i=0;i<small.size();i++){var r=small.get(i);points.add(new SpawnSite(f+"-room-"+i,"L"+(f+1)+" "+r.name(),f,pos(r.doorX()+r.inwardX()*3,1+f*10,r.doorZ()+r.inwardZ()*3),pos(r.doorX(),5+f*10,r.doorZ())));}
             points.add(new SpawnSite(f+"-north","L"+(f+1)+" 北端走廊",f,pos(40,1+f*10,5),pos(40,5+f*10,5)));
-            points.add(new SpawnSite(f+"-south","L"+(f+1)+" 南端走廊",f,pos(40,1+f*10,76),pos(40,5+f*10,76)));
+            points.add(new SpawnSite(f+"-south","L"+(f+1)+" 南端走廊",f,pos(f==0?40:18,1+f*10,76),pos(f==0?40:18,5+f*10,76)));
         }
         sites=List.copyOf(points);
     }
@@ -37,12 +38,15 @@ public final class ChallengeArena {
     public int floor(double y){return Math.max(0,Math.min(2,(int)Math.floor((y-BASE-1)/10)));}
     public List<SpawnSite> sites(){return sites;}
     public List<BlockPos> spawns(int floor){return sites.stream().filter(s->s.floor==floor).map(SpawnSite::position).toList();}
-    public BlockPos ammoStation(int floor){return pos(40,1+floor*10,36);}
-    public BlockPos medicalStation(int floor){return pos(40,1+floor*10,44);}
-    public BlockPos itemStation(int floor){return pos(40,1+floor*10,50);}
+    public BlockPos ammoStation(int floor){return pos(40,1,36);}
+    /** One flight per connection: turn around the central wing to reach the next flight. */
+    public BlockPos stairEntrance(int from,int to){int flight=Math.min(from,to);return flight==0?pos(40,1+from*10,from<to?11:22):pos(8,1+from*10,from<to?69:58);}
+    public BlockPos stairExit(int from,int to){int next=from+(from<to?1:-1);return stairEntrance(next,from);}
+    public BlockPos corridor(int floor){return floor==0?pos(40,1,40):floor==1?pos(40,11,22):pos(8,21,55);}
+    public boolean safeDrop(double x,double y,double z){int f=floor(y);return Math.abs(x-origin()-8.5)<=1.5&&Math.abs(z-(f==0?54.5:49.5))<=1.5&&f<2&&y<=BASE+3+f*10;}
     public ResearchLayout.Room roomAt(double x,double y,double z){return ResearchLayout.at(floor(y),(int)Math.floor(x)-origin(),(int)Math.floor(z));}
     public BlockPos outside(ResearchLayout.Room room,int floor){return pos(room.doorX()-room.inwardX()*2,1+floor*10,room.doorZ()-room.inwardZ()*2);}
-    public BlockPos recoveryWaypoint(double x,double y,double z,double targetY){return pos(40,1+floor(y)*10,40);}
+    public BlockPos recoveryWaypoint(double x,double y,double z,double targetY){var room=roomAt(x,y,z);return room!=null?outside(room,floor(y)):corridor(floor(y));}
     public void keepLoaded(ServerLevel level,boolean forced){for(int x=origin()>>4;x<=(origin()+SIZE-1)>>4;x++)for(int z=0;z<=(SIZE-1)>>4;z++)level.setChunkForced(x,z,forced);}
     public void lamps(ServerLevel level,List<SpawnSite> active,boolean on){
         for(var s:sites){BlockState wanted=Blocks.REDSTONE_LAMP.defaultBlockState().setValue(RedstoneLampBlock.LIT,on&&active.contains(s));if(!level.getBlockState(s.lamp).equals(wanted))level.setBlock(s.lamp,wanted,2);}
@@ -53,19 +57,28 @@ public final class ChallengeArena {
         if(x==0||x==80||z==0||z==80)return (h>=3&&h<=6?Blocks.TINTED_GLASS:Blocks.WHITE_CONCRETE).defaultBlockState();
         if((x==1||x==79||z==1||z==79)&&h>0)return Blocks.GRAY_CONCRETE.defaultBlockState();
         if(h==5)for(var s:sites)if(s.floor==f){int dx=Math.abs(s.lamp.getX()-origin()-x),dz=Math.abs(s.lamp.getZ()-z);if(dx+dz==0)return Blocks.REDSTONE_LAMP.defaultBlockState();if(dx+dz==1)return Blocks.RED_STAINED_GLASS.defaultBlockState();}
-        boolean north=z>=12&&z<=21,south=z>=59&&z<=68;
-        if(x>=38&&x<=42&&(north||south)&&y>0){int step=north?z-12:68-z;if(y==1+step||y==11+step)return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING,north?Direction.SOUTH:Direction.NORTH);return Blocks.AIR.defaultBlockState();}
-        if((x==37||x==43)&&(north||south)&&h>=1&&h<=2)return Blocks.IRON_BARS.defaultBlockState();
-        if(y==21&&x>=38&&x<=42&&(z==11||z==69))return Blocks.IRON_BARS.defaultBlockState();
+        // Safe downward shortcuts are staggered, never a two-storey fall through aligned holes.
+        for(int upper=1;upper<=2;upper++){int dz=upper==1?54:49;
+            if(x>=7&&x<=9&&z>=dz-1&&z<=dz+1){
+                if(y==(upper-1)*10)return Blocks.HAY_BLOCK.defaultBlockState();
+                if(y>(upper-1)*10&&y<=upper*10+4)return Blocks.AIR.defaultBlockState();
+            }
+            if(y==upper*10&&(x==6||x==10)&&z>=dz-2&&z<=dz+2)return Blocks.YELLOW_CONCRETE.defaultBlockState();
+        }
+        boolean north=x>=38&&x<=42&&z>=12&&z<=21&&y>=1&&y<=19;
+        boolean west=x>=6&&x<=10&&z>=59&&z<=68&&y>=11&&y<=29;
+        if(north||west){int step=north?z-12:68-z;if(y==(north?1:11)+step)return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING,north?Direction.SOUTH:Direction.NORTH);return Blocks.AIR.defaultBlockState();}
+        if(((x==37||x==43)&&z>=12&&z<=21&&y>=1&&y<=12)||((x==5||x==11)&&z>=59&&z<=68&&y>=11&&y<=22)){
+            int step=x>20?z-12:68-z,base=x>20?1:11;if(y>=base+step&&y<=base+step+1)return Blocks.IRON_BARS.defaultBlockState();return Blocks.AIR.defaultBlockState();
+        }
         if(h==0){
             if(room==null){if(x==40&&z%4==0)return Blocks.SEA_LANTERN.defaultBlockState();return (x==39||x==41?f==0?Blocks.YELLOW_CONCRETE:f==1?Blocks.CYAN_CONCRETE:Blocks.RED_CONCRETE:Blocks.POLISHED_ANDESITE).defaultBlockState();}
             return (room.wall(x,z)?Blocks.GRAY_CONCRETE:x%8==0||z%8==0?Blocks.WHITE_CONCRETE:Blocks.LIGHT_GRAY_CONCRETE).defaultBlockState();
         }
-        if(x>=39&&x<=41&&z==36&&h<=2)return (x==40&&h==1?Blocks.BARREL:h==2?Blocks.YELLOW_CONCRETE:Blocks.IRON_BLOCK).defaultBlockState();
-        if(x==40&&z==44&&h<=2)return (h==1?Blocks.EMERALD_BLOCK:Blocks.SEA_LANTERN).defaultBlockState();
-        if(x==40&&z==50&&h<=2)return (h==1?Blocks.REDSTONE_BLOCK:Blocks.IRON_TRAPDOOR).defaultBlockState();
+        if(f==0&&x>=39&&x<=41&&z==36&&h<=2)return (x==40&&h==1?Blocks.BARREL:h==2?Blocks.YELLOW_CONCRETE:Blocks.IRON_BLOCK).defaultBlockState();
         if(room!=null&&room.wall(x,z)){
-            if(room.door(x,z)&&h<=3)return Blocks.AIR.defaultBlockState();
+            if(room.door(x,z)&&h<=4)return Blocks.AIR.defaultBlockState();
+            if(room.kind().equals("nest")&&x==44&&z>=40&&z<=46&&h<=5)return Blocks.AIR.defaultBlockState();
             return (h>=3&&h<=5?room.kind().equals("containment")?Blocks.LIME_STAINED_GLASS:Blocks.LIGHT_BLUE_STAINED_GLASS:h==8?Blocks.CYAN_CONCRETE:Blocks.SMOOTH_QUARTZ).defaultBlockState();
         }
         if(h==9&&(x%8==4&&z%8==4))return Blocks.SEA_LANTERN.defaultBlockState();
@@ -98,6 +111,7 @@ public final class ChallengeArena {
             case "containment" -> {
                 if(lx>=w-7&&lx<=w-3&&lz>=d-7&&lz<=d-3&&h<=4){if(lx==w-7||lx==w-3||lz==d-7||lz==d-3)return Blocks.LIME_STAINED_GLASS.defaultBlockState();if(h==1&&lx==w-5&&lz==d-5)return Blocks.AMETHYST_BLOCK.defaultBlockState();}
             }
+            case "nest" -> {if(lx>=w-4&&h<=4)return (h==2?Blocks.REDSTONE_LAMP:Blocks.DEEPSLATE_TILES).defaultBlockState();}
             case "maintenance" -> {
                 for(int i=0;i<Math.min(5,(w-6)/4);i++)if(lx>=3+i*4&&lx<=4+i*4&&lz>=d/2&&lz<=d/2+1&&h<=1+i/2)return Blocks.POLISHED_ANDESITE.defaultBlockState();
                 if(lx>=3&&lx<w-3&&lz>=d-5&&lz<=d-4&&h==4)return Blocks.IRON_BLOCK.defaultBlockState();
@@ -109,8 +123,9 @@ public final class ChallengeArena {
     public void labels(ServerLevel level){
         for(int f=0;f<3;f++){
             for(var room:ResearchLayout.rooms(f))label(level,pos(room.doorX(),4+f*10,room.doorZ()),"L"+(f+1)+" "+room.name());
-            label(level,pos(40,4+f*10,36),"弹药补给柜 · 附近按换弹键 R");label(level,pos(40,4+f*10,44),"医疗补给 · 右键");label(level,pos(40,4+f*10,50),"道具补给 · 右键");
-            label(level,pos(40,4+f*10,10),"北侧楼梯");label(level,pos(40,4+f*10,70),"南侧楼梯");
+            if(f==0)label(level,pos(40,4,36),"唯一弹药柜 · R补弹 · 每人冷却10秒");
+            if(f<2){var entry=stairEntrance(f,f+1);label(level,entry.above(3),f==0?"上行① · 北侧楼梯 → L2":"上行② · 西侧楼梯 → L3");}
+            if(f>0)label(level,pos(8,3+f*10,f==1?54:49),"破损地板 · 下方缓冲区 · 单层下落捷径");
         }
         for(var s:sites)label(level,s.lamp.above(2),"刷怪口 · "+s.name);
     }

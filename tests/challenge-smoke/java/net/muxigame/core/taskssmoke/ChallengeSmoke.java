@@ -33,6 +33,8 @@ public final class ChallengeSmoke {
     private ChallengeFeature.Room room;
     private ChallengeFeature.Room batchRoom;
     private Set<UUID> firstBatch=Set.of();
+    private int stoppedReinforcements,reinforcementBalance;
+    private UUID modularBoss;
     private ListTag original;
     private Zombie scoredVictim;
     private int balanceBeforeKill;
@@ -87,7 +89,9 @@ public final class ChallengeSmoke {
             if(ticks==80){
                 feature.start(q);q.setInvulnerable(true);feature.clientReady(q);
                 var startWave=ChallengeFeature.class.getDeclaredMethod("wave",ChallengeFeature.Room.class);startWave.setAccessible(true);startWave.invoke(feature,batchRoom);
-                check("normal first wave splits into three batches",batchRoom.planned==20&&batchRoom.batchSize==8&&batchRoom.batchCount==3&&batchRoom.batchNumber==1&&batchRoom.batchLimit==8);
+                check("no special solo first wave split",batchRoom.planned==20&&batchRoom.batchSize==20&&batchRoom.batchCount==1&&ChallengeRules.batchSize(1,4)==20);
+                // Explicit small-quota fixture exercises batching; this is not the production solo rule.
+                batchRoom.batchSize=8;batchRoom.batchCount=3;batchRoom.batchLimit=8;
                 check("batch deadline starts at twenty five seconds",batchRoom.batchDeadline-server.getTickCount()==500);
             }
             if(ticks==121){
@@ -127,19 +131,24 @@ public final class ChallengeSmoke {
                 check("floor at spawn is solid",level.getBlockState(room.arena.spawn().below()).isSolidRender(level,room.arena.spawn().below()));
                 check("spawn has two blocks headroom",level.isEmptyBlock(room.arena.spawn())&&level.isEmptyBlock(room.arena.spawn().above()));
                 for(int floor=0;floor<3;floor++)for(var s:room.arena.spawns(floor))check("safe zombie spawn "+s,level.isEmptyBlock(s)&&level.isEmptyBlock(s.above()));
-                check("asymmetric building has fifty two rooms",ChallengeArena.ROOMS.size()==52);
+                check("asymmetric building has forty four rooms",ChallengeArena.ROOMS.size()==44);
                 check("expanded map footprint",ChallengeArena.SIZE==81);
                 check("north stair is a physical stair block",level.getBlockState(room.arena.pos(40,1,12)).getBlock() instanceof net.minecraft.world.level.block.StairBlock);
                 check("upper stairwell has clearance",level.isEmptyBlock(room.arena.pos(40,10,12)));
                 check("ammunition cabinet has real barrel",level.getBlockState(room.arena.ammoStation(0)).is(net.minecraft.world.level.block.Blocks.BARREL));
-                check("jump platforms present",!level.isEmptyBlock(room.arena.pos(21,23,54)));
+                check("jump platforms present",!level.isEmptyBlock(room.arena.pos(41,23,65)));
+                check("only lower floor has a supply cabinet",!level.getBlockState(room.arena.pos(40,11,36)).is(net.minecraft.world.level.block.Blocks.BARREL)&&!level.getBlockState(room.arena.pos(40,21,36)).is(net.minecraft.world.level.block.Blocks.BARREL));
+                check("medical and item facilities removed",level.isEmptyBlock(room.arena.pos(40,1,44))&&level.isEmptyBlock(room.arena.pos(40,1,50)));
+                check("old upper north flight removed",!(level.getBlockState(room.arena.pos(40,11,12)).getBlock() instanceof net.minecraft.world.level.block.StairBlock));
+                check("second flight has rotated to west",level.getBlockState(room.arena.pos(8,11,68)).getBlock() instanceof net.minecraft.world.level.block.StairBlock);
+                check("staggered broken floors have physical cushions",level.isEmptyBlock(room.arena.pos(8,10,54))&&level.isEmptyBlock(room.arena.pos(8,20,49))&&level.getBlockState(room.arena.pos(8,0,54)).is(net.minecraft.world.level.block.Blocks.HAY_BLOCK)&&level.getBlockState(room.arena.pos(8,10,49)).is(net.minecraft.world.level.block.Blocks.HAY_BLOCK));
                 feature.start(p);
                 var routeProbe=EntityType.ZOMBIE.create(level);routeProbe.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE).setBaseValue(192);routeProbe.getNavigation().setMaxVisitedNodesMultiplier(3);
                 for(var site:room.arena.sites()){
                     routeProbe.setPos(site.position().getX()+0.5,site.position().getY(),site.position().getZ()+0.5);routeProbe.setOnGround(true);routeProbe.getNavigation().stop();
                     var area=room.arena.roomAt(routeProbe.getX(),routeProbe.getY(),routeProbe.getZ());
                     if(area!=null){var outside=room.arena.outside(area,site.floor());var route=routeProbe.getNavigation().createPath(outside,0);check("spawn portal exits room "+site.name(),route!=null&&route.canReach());routeProbe.setPos(outside.getX()+0.5,outside.getY(),outside.getZ()+0.5);routeProbe.getNavigation().stop();}
-                    var hallway=routeProbe.getNavigation().createPath(room.arena.pos(40,1+site.floor()*10,40),0);check("spawn portal connects to main corridor "+site.name(),hallway!=null&&hallway.canReach());
+                    var hallway=routeProbe.getNavigation().createPath(room.arena.corridor(site.floor()),0);check("spawn portal connects to main corridor "+site.name(),hallway!=null&&hallway.canReach());
                 }
                 check("solo waits for client world load",room.phase==ChallengeFeature.Phase.LOADING && room.mobs.isEmpty() && room.alive.size()==1);
                 feature.clientReady(p);
@@ -181,7 +190,7 @@ public final class ChallengeSmoke {
                 var mob=(Zombie)server.getLevel(ChallengeArena.DIMENSION).getEntity(room.mobs.iterator().next());
                 check("arena kills do not advance daily tasks",!DailyTasksFeature.active(server).acceptsCombat(p,mob));
                 check("configured health applied",mob.getMaxHealth()==20);
-                check("slower normal zombies and increased wave count",Math.abs(mob.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-0.19)<0.001 && room.planned==20);
+                check("slow fixed normal zombies and team sized wave",Math.abs(mob.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-0.12)<0.001 && room.planned==20);
                 check("zombie physically moves along pursuit route",pursuer.position().distanceToSqr(pursuitStart)>0.01);
                 check("pursuit has no wandering goal",mob.goalSelector.getAvailableGoals().stream().allMatch(g->g.getGoal() instanceof ChallengePursuitGoal));
                 check("spawn assigns room player immediately",mob.getTarget()==p);
@@ -220,18 +229,19 @@ public final class ChallengeSmoke {
                 for(UUID id:room.mobs){var entity=level.getEntity(id);if(entity!=null)entity.discard();}room.mobs.clear();
                 room.wave=4;room.phase=ChallengeFeature.Phase.REST;room.timer=0;
             }
-            if(ticks==219){var boss=(Zombie)server.getLevel(ChallengeArena.DIMENSION).getEntity(room.boss);boss.setNoAi(true);boss.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);boss.teleportTo(5.5,65,5.5);stuckPosition=boss.position();room.lastPositions.put(boss.getUUID(),stuckPosition);room.stalled.put(boss.getUUID(),140);}
+            if(ticks==219){var boss=(Mob)server.getLevel(ChallengeArena.DIMENSION).getEntity(room.boss);boss.setNoAi(true);boss.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);boss.teleportTo(5.5,65,5.5);stuckPosition=boss.position();room.lastPositions.put(boss.getUUID(),stuckPosition);room.stalled.put(boss.getUUID(),140);}
             if(ticks==220){
                 var level=server.getLevel(ChallengeArena.DIMENSION);
-                check("boss wave actually spawns boss",room.boss!=null && level.getEntity(room.boss) instanceof Zombie);
-                var boss=(Zombie)level.getEntity(room.boss);
+                check("early boss is hostile iron golem",room.boss!=null && level.getEntity(room.boss) instanceof net.minecraft.world.entity.animal.IronGolem);
+                var boss=(Mob)level.getEntity(room.boss);
                 check("stalled zombie repaths without teleporting",room.stalled.get(boss.getUUID())==0 && boss.position().distanceToSqr(stuckPosition)<1);
-                check("boss has difficulty and wave scaled health",Math.abs(boss.getMaxHealth()-ChallengeRules.health(room.difficulty,5,true))<0.1);
+                check("boss has difficulty and wave scaled health",Math.abs(boss.getMaxHealth()-ChallengeRules.Enemy.IRON.health*1.28)<0.1);
                 check("boss health bar attached",room.bossBar.getPlayers().contains(p));
-                check("map signage generated",level.getEntitiesOfClass(Display.TextDisplay.class,new net.minecraft.world.phys.AABB(0,64,0,81,96,81)).size()==ChallengeArena.ROOMS.size()+15+room.arena.sites().size());
+                check("map signage generated",level.getEntitiesOfClass(Display.TextDisplay.class,new net.minecraft.world.phys.AABB(0,64,0,81,96,81)).size()==ChallengeArena.ROOMS.size()+5+room.arena.sites().size());
                 // Native ground navigation must find both flights; no teleport shortcut is accepted.
                 var probe=net.minecraft.world.entity.EntityType.ZOMBIE.create(level);probe.setPos(40.5,65,26.5);probe.setOnGround(true);probe.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE).setBaseValue(192);
-                for(var waypoint:List.of(room.arena.pos(40,1,11),room.arena.pos(40,11,22),room.arena.pos(40,11,11),room.arena.pos(40,21,22),room.arena.pos(40,21,26))){
+                probe.getNavigation().setMaxVisitedNodesMultiplier(3);
+                for(var waypoint:List.of(room.arena.stairEntrance(0,1),room.arena.stairExit(0,1),room.arena.stairEntrance(1,2),room.arena.stairExit(1,2),room.arena.corridor(2))){
                     var route=probe.getNavigation().createPath(waypoint,0);
                     check("physical stair route segment reaches "+waypoint,route!=null&&route.canReach());
                     probe.setPos(waypoint.getX()+0.5,waypoint.getY(),waypoint.getZ()+0.5);probe.setOnGround(true);probe.getNavigation().stop();
@@ -248,6 +258,18 @@ public final class ChallengeSmoke {
                 var after=p.getInventory().save(new ListTag());
                 NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(p,net.minecraft.world.InteractionHand.MAIN_HAND,pad,new net.minecraft.world.phys.BlockHitResult(pad.getCenter(),net.minecraft.core.Direction.UP,pad,false)));
                 check("resupply cannot inflate ammo on repeat",p.getInventory().save(new ListTag()).equals(after));
+                check("cooldown reports ten seconds",com.google.gson.JsonParser.parseString(feature.snapshot(p,"")).getAsJsonObject().get("ammoCooldown").getAsInt()==10);
+                room.supplies.put(p.getUUID()+":ammo",server.getTickCount()-199);
+                try{feature.resupply(p);throw new AssertionError("early resupply accepted");}catch(IllegalArgumentException expected){check("resupply rejects 199 ticks",true);}
+                room.supplies.put(p.getUUID()+":ammo",server.getTickCount()-200);feature.resupply(p);check("resupply permits 200 ticks",room.supplies.get(p.getUUID()+":ammo")==server.getTickCount());
+                p.setPos(8.5,65,54.5);
+                var safeFall=new net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent(p,new net.neoforged.neoforge.common.damagesource.DamageContainer(p.damageSources().fall(),7));NeoForge.EVENT_BUS.post(safeFall);
+                check("designated downward shortcut cancels fall injury",safeFall.isCanceled());
+                p.setPos(40.5,65,40.5);
+                var ordinaryFall=new net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent(p,new net.neoforged.neoforge.common.damagesource.DamageContainer(p.damageSources().fall(),7));NeoForge.EVENT_BUS.post(ordinaryFall);
+                check("fall protection is not global",!ordinaryFall.isCanceled());
+                var advance=ChallengeFeature.class.getDeclaredMethod("wave",ChallengeFeature.Room.class);advance.setAccessible(true);advance.invoke(feature,room);
+                try{feature.resupply(p);throw new AssertionError("wave transition bypassed cooldown");}catch(IllegalArgumentException expected){check("wave transition never resets ammo cooldown",true);}
                 feature.leave(p,"退出测试");
                 check("subthreshold score carries to next settlement",p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("pendingScore")==0&&p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("exchangeRemainder")==40);
                 check("leave restores original inventory components",p.getInventory().save(new ListTag()).equals(original));
@@ -284,6 +306,73 @@ public final class ChallengeSmoke {
                 }
                 room=feature.create(p,ChallengeRules.Difficulty.HARD);
             }
+            if(ticks==240){
+                var level=server.getLevel(ChallengeArena.DIMENSION);
+                for(var kind:ChallengeRules.Enemy.values()){
+                    Mob enemy=ChallengeEnemies.create(level,kind,ChallengeRules.Difficulty.NORMAL,1,new ChallengeArena(1));
+                    check("native enemy health "+kind,Math.abs(enemy.getMaxHealth()-kind.health)<0.1);
+                    check("native enemy final speed "+kind,Math.abs(enemy.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-kind.speed)<0.001);
+                    ChallengeEnemies.target(enemy,q);check("native enemy acquires player "+kind,enemy.getTarget()==q);
+                    if(kind==ChallengeRules.Enemy.MODULAR){check("actual installed modular golem initialized",net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(enemy.getType()).toString().equals("modulargolems:metal_golem"));check("modular golem has all four material parts",((List<?>)enemy.getClass().getMethod("getMaterials").invoke(enemy)).size()==4);check("modular golem is hostile not owned by player",(boolean)enemy.getClass().getMethod("isHostile").invoke(enemy));}
+                    if(kind==ChallengeRules.Enemy.RUNNER)check("runner is a real baby zombie",enemy instanceof Zombie z&&z.isBaby());
+                    enemy.discard();
+                }
+                for(int wave:List.of(1,7,8,14,15,25)){
+                    int[] floors=new int[3];for(int i=0;i<100;i++)floors[ChallengeRules.spawnFloor(wave,i)]++;
+                    check("strong floor-one bias at wave "+wave,floors[0]==(wave<8?100:75)&&floors[1]==(wave<8?0:wave<15?25:20)&&floors[2]==(wave<15?0:5));
+                }
+                batchRoom=feature.create(q,ChallengeRules.Difficulty.EXTREME);batchRoom.arena.build(level,300000);
+            }
+            if(ticks==250){
+                feature.start(q);q.setInvulnerable(true);feature.clientReady(q);batchRoom.wave=14;
+                var wave=ChallengeFeature.class.getDeclaredMethod("wave",ChallengeFeature.Room.class);wave.setAccessible(true);wave.invoke(feature,batchRoom);
+                batchRoom.planned=3;batchRoom.batchSize=3;batchRoom.batchCount=1;batchRoom.batchLimit=3;
+                var spawn=ChallengeFeature.class.getDeclaredMethod("spawn",ChallengeFeature.Room.class,ServerLevel.class);spawn.setAccessible(true);
+                while(batchRoom.issued<3)spawn.invoke(feature,batchRoom,server.getLevel(ChallengeArena.DIMENSION));
+                check("extreme mixes a large boss and two small bosses",batchRoom.bosses.size()==3&&batchRoom.bosses.containsValue(ChallengeRules.Enemy.WARDEN)&&Collections.frequency(new ArrayList<>(batchRoom.bosses.values()),ChallengeRules.Enemy.IRON)==2);
+                check("core nest always activated",batchRoom.activeSites.getFirst().id().equals("core"));
+                batchRoom.timer=server.getTickCount();
+                var level=server.getLevel(ChallengeArena.DIMENSION);var blast=batchRoom.arena.pos(40,1,28);
+                var stand=EntityType.ARMOR_STAND.create(level);stand.moveTo(blast.getX()+0.5,blast.getY(),blast.getZ()+2.5,0,0);level.addFreshEntity(stand);
+                var sentinel=blast.offset(1,0,0);level.setBlock(sentinel,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+                var creeper=EntityType.CREEPER.create(level);creeper.getPersistentData().putString(ChallengeFeature.MOB,batchRoom.id);creeper.moveTo(blast.getX()+0.5,blast.getY(),blast.getZ()+0.5,0,0);level.addFreshEntity(creeper);
+                var explode=net.minecraft.world.entity.monster.Creeper.class.getDeclaredMethod("explodeCreeper");explode.setAccessible(true);explode.invoke(creeper);
+                check("real creeper blast retains entity damage",stand.isRemoved()||stand.getHealth()<stand.getMaxHealth());
+                check("real creeper blast cannot destroy terrain",level.getBlockState(sentinel).is(net.minecraft.world.level.block.Blocks.STONE));
+                stand.discard();level.setBlock(sentinel,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
+            }
+            if(ticks==260){
+                // Extra fixture boss validates a real modular entity over native server ticks, not just construction.
+                var spawn=ChallengeFeature.class.getDeclaredMethod("spawnEnemy",ChallengeFeature.Room.class,ServerLevel.class,ChallengeRules.Enemy.class,boolean.class,boolean.class);spawn.setAccessible(true);spawn.invoke(feature,batchRoom,server.getLevel(ChallengeArena.DIMENSION),ChallengeRules.Enemy.MODULAR,false,false);
+                modularBoss=batchRoom.bosses.entrySet().stream().filter(entry->entry.getValue()==ChallengeRules.Enemy.MODULAR).findFirst().orElseThrow().getKey();
+            }
+            if(ticks==290){
+                check("boss survives ordinary wave timeout",feature.room(q.getUUID())==batchRoom&&batchRoom.phase==ChallengeFeature.Phase.RUNNING);
+                check("boss produces continuous bounded reinforcements",batchRoom.reinforcementIssued>0&&batchRoom.issued==3&&batchRoom.mobs.size()<=ChallengeRules.MAX_LIVING);
+                var modular=(Mob)server.getLevel(ChallengeArena.DIMENSION).getEntity(modularBoss);
+                check("native modular boss remains alive and scaled after ticking",modular!=null&&modular.isAlive()&&modular.getMaxHealth()==1024&&(boolean)modular.getClass().getMethod("isHostile").invoke(modular));
+                var snapshot=com.google.gson.JsonParser.parseString(feature.snapshot(q,"")).getAsJsonObject();
+                var own=java.util.stream.StreamSupport.stream(snapshot.getAsJsonArray("rooms").spliterator(),false).map(com.google.gson.JsonElement::getAsJsonObject).filter(row->row.get("mine").getAsBoolean()).findFirst().orElseThrow();
+                check("client state explicitly exposes ongoing multi boss siege",own.get("bossCount").getAsInt()==4&&own.get("reinforcementIssued").getAsInt()>0);
+                var victim=(Mob)server.getLevel(ChallengeArena.DIMENSION).getEntity(batchRoom.reinforcements.iterator().next());
+                float healthBefore=victim.getHealth();victim.hurt(victim.damageSources().mobAttack(modular),20);
+                check("challenge enemies cannot damage their own group",victim.getHealth()==healthBefore);
+                reinforcementBalance=q.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("pendingScore");
+                victim.hurt(q.damageSources().playerAttack(q),100000);
+            }
+            if(ticks==292){
+                check("endless boss reinforcements cannot mint damage or kill score",q.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("pendingScore")==reinforcementBalance);
+                UUID small=batchRoom.bosses.entrySet().stream().filter(entry->entry.getValue()==ChallengeRules.Enemy.IRON).findFirst().orElseThrow().getKey();
+                ((Mob)server.getLevel(ChallengeArena.DIMENSION).getEntity(small)).hurt(q.damageSources().playerAttack(q),100000);
+            }
+            if(ticks==294)check("killing one small boss does not stop remaining boss siege",batchRoom.bosses.size()==3&&batchRoom.phase==ChallengeFeature.Phase.RUNNING);
+            if(ticks==300){for(UUID id:Set.copyOf(batchRoom.bosses.keySet())){var mob=(Mob)server.getLevel(ChallengeArena.DIMENSION).getEntity(id);mob.invulnerableTime=0;mob.hurt(q.damageSources().playerAttack(q),100000);}}
+            if(ticks==302){check("all boss deaths end siege trigger",batchRoom.bosses.isEmpty());stoppedReinforcements=batchRoom.reinforcementIssued;}
+            if(ticks==342){
+                check("no new reinforcements after all bosses die",batchRoom.reinforcementIssued==stoppedReinforcements);
+                check("boss death still waits for remaining enemies",batchRoom.phase==ChallengeFeature.Phase.RUNNING&&!batchRoom.mobs.isEmpty());
+                feature.leave(q,"siege checks complete");q.setInvulnerable(false);
+            }
             if(ticks==350){
                 feature.start(p);room.phase=ChallengeFeature.Phase.RUNNING;room.wave=10;room.issued=room.planned=0;room.kills.put(p.getUUID(),100);room.timer=server.getTickCount()+1000;
             }
@@ -292,6 +381,9 @@ public final class ChallengeSmoke {
                 CompoundTag t=p.getPersistentData().getCompound(ChallengeFeature.STATE);
                 check("win recorded once",t.getInt("wins")==1&&t.getInt("hardWins")==1);
                 check("completion credits replace automatic loot",t.getInt("credits")>0 && t.getList("rewards",Tag.TAG_COMPOUND).isEmpty());
+                check("lowered score exchange rate is server authoritative",com.google.gson.JsonParser.parseString(feature.snapshot(p,"")).getAsJsonObject().get("exchangeRate").getAsInt()==500);
+                // Seed an already-earned wallet for purchase transaction tests, independent of completion balance.
+                t.putInt("credits",100);p.getPersistentData().put(ChallengeFeature.STATE,t);
                 int base=t.getInt("credits");feature.claimTask(p,0);
                 int balance=p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits");check("milestone awards shop credits",balance==base+4);
                 try{feature.claimTask(p,0);throw new AssertionError("duplicate task accepted");}catch(IllegalArgumentException expected){check("duplicate task rejected",true);}
@@ -320,14 +412,14 @@ public final class ChallengeSmoke {
             }
             if(ticks==495){
                 feature.start(p);feature.clientReady(p);room.phase=ChallengeFeature.Phase.RUNNING;room.wave=1;room.planned=1;room.issued=0;room.timer=server.getTickCount()+2000;
-                var level=server.getLevel(ChallengeArena.DIMENSION);p.teleportTo(level,40.5,85,26.5,0,0);
+                var level=server.getLevel(ChallengeArena.DIMENSION);p.teleportTo(level,8.5,85,55.5,0,0);
                 var spawn=ChallengeFeature.class.getDeclaredMethod("spawn",ChallengeFeature.Room.class,ServerLevel.class);spawn.setAccessible(true);spawn.invoke(feature,room,level);
                 walkerId=room.mobs.iterator().next();
             }
-            if(ticks>495&&stairWalker==null&&walkerId!=null){var entity=server.getLevel(ChallengeArena.DIMENSION).getEntity(walkerId);if(entity instanceof Zombie z){stairWalker=z;stairWalker.teleportTo(40.5,65,26.5);stairWalker.setOnGround(true);}}
+            if(ticks>495&&stairWalker==null&&walkerId!=null){var entity=server.getLevel(ChallengeArena.DIMENSION).getEntity(walkerId);if(entity instanceof Zombie z){stairWalker=z;stairWalker.teleportTo(40.5,65,11.5);stairWalker.setOnGround(true);stairWalker.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0.30);/* Accelerated traversal fixture; production 0.12 was asserted above. */}}
             if(ticks>495&&stairWalker!=null&&stairWalker.getY()>=84.5&&stairWalker.distanceToSqr(p)<9){check("live zombie physically climbs two stair flights to the player",true);feature.leave(p,"route complete");finish(server,null);}
             if(ticks>495&&ticks%100==0&&stairWalker!=null){var path=stairWalker.getNavigation().getPath();System.err.println("STAIR WALK tick="+ticks+" pos="+stairWalker.position()+" target="+p.position()+" pathEnd="+(path==null?"none":path.getEndNode())+" velocity="+stairWalker.getDeltaMovement());}
-            if(ticks>1750)throw new AssertionError("stair walk timeout, position="+(stairWalker==null?"none":stairWalker.position()));
+            if(ticks>2550)throw new AssertionError("stair walk timeout, position="+(stairWalker==null?"none":stairWalker.position()));
         }catch(Throwable error){finish(server,error);}
     }
 }

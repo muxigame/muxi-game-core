@@ -91,12 +91,12 @@ public final class ChallengeScreen extends Screen {
             String[] rewards={"兑换币 +4","兑换币 +6","兑换币 +12"};
             for(int i=0;i<array("tasks").size();i++){JsonObject t=array("tasks").get(i).getAsJsonObject();g.drawString(font,text(t,"title"),left,top+22+i*36,flag(t,"ready")?0xFF8AF0A8:0xFFE6EBEF);g.drawString(font,rewards[i],left,top+34+i*36,0xFFA1AAB6);}
             g.drawString(font,font.plainSubstrByWidth(text(state,"last"),365),left,top+126,0xFFE1BA7C);
-            g.drawWordWrap(font,Component.literal("战斗积分与兑换币独立。每 100 分结算 1 兑换币，余数保留；任务直接给币。当前兑换币："+number(state,"coins")),left,top+168,360,0xFFA1AAB6);
+            g.drawWordWrap(font,Component.literal("战斗积分与兑换币独立。每 "+number(state,"exchangeRate")+" 分结算 1 兑换币，余数保留；任务直接给币。当前兑换币："+number(state,"coins")),left,top+168,360,0xFFA1AAB6);
         }else if(tab==Tab.SHOP){
             g.drawString(font,"兑换币："+number(state,"coins")+" · 本局："+number(state,"earned")+" 分 / 可兑 "+number(state,"exchangePreview")+" 币",left,top,0xFF8AF0A8);
             int count=Math.max(1,(height-top-80)/27),start=page*count;
             for(int i=start;i<Math.min(array("shop").size(),start+count);i++)g.drawString(font,text(array("shop").get(i).getAsJsonObject(),"title"),left,top+35+(i-start)*27,0xFFE6EBEF);
-            if(flag(state,"locked"))g.drawString(font,"结束后按 100 分 : 1 币结算；阵亡也按已得分结算。",left,top+14,0xFFE1BA7C);
+            if(flag(state,"locked"))g.drawString(font,"结束后按 "+number(state,"exchangeRate")+" 分 : 1 币结算；阵亡也结算。",left,top+14,0xFFE1BA7C);
             else g.drawString(font,"枪械：配方估值 + 25% 装配费，再折算兑换币",left,top+14,0xFFA1AAB6);
         }else if(tab==Tab.LOADOUT){
             g.drawString(font,"主武器："+selectedName("primary")+" · 副武器："+selectedName("secondary"),left,top,0xFF8AF0A8);
@@ -111,7 +111,7 @@ public final class ChallengeScreen extends Screen {
                 }
             }
         }else{
-            String text="研究所：81×81 / 三层 / "+ChallengeArena.ROOMS.size()+" 间大小房间\n一层：入口大厅、办公室、收发检疫、后勤通道\n二层：实验准备、分析培养、病房、洗消缓冲\n三层：指挥通信、机房、维护作业、高危隔离\n\n支走廊连接大小房间，南北楼梯上下楼，维护区可跑酷。\n刷怪口位于小房间和走廊尽头，每波启用位置不同。\n倒计时先亮爆闪红灯，提前选择火力位置再迎击尸群。\n黄色弹药柜 5 格内按换弹键 R 补满弹匣和备弹。\n医疗 / 道具柜右键使用，每人每波各一次。\n全员加载后准备 30 秒，波间休整 12 秒。\n普通尸群较慢但更多，第 5 波倍数出现暴君。\n默认 MP5A5＋格洛克17；结束按 100 分 : 1 币结算。";
+            String text="研究所：81×81 / 三层 / "+ChallengeArena.ROOMS.size()+" 间大小房间\n一层：零号封锁门、接待后勤，主尸群入口\n二层：中央实验翼、环形绕行通道、观察病房\n三层：西侧通道、横向机房、隔离翼与维护厅\n\n北侧单梯上二层，绕中央翼至西侧单梯上三层。\n破损房间可向下跳一层，下方黄色标记缓冲区。\n一层大量出怪，第8波开放二层，第15波开放三层。\n零号封锁门每波激活，红灯爆闪预告零散入口。\n唯一黄色弹药柜位于一层，5格内R补弹，冷却10秒。\n没有医疗或道具补给，全员加载后准备30秒。\n普通僵尸慢速压场；幼尸、苦力怕、猪人构成威胁。\nBoss波铁傀儡→装配傀儡→坚守者，存活时不断增援。\n极限25波，大Boss与小Boss同时出现。\n500分换1币；Boss额外增援不产出积分，防止拖局刷币。";
             g.drawWordWrap(font,Component.literal(text),left,top,365,0xFFE6EBEF);
         }
         String notice=text(state,"notice");if(!notice.isEmpty())g.drawString(font,font.plainSubstrByWidth(notice,370),left,height-16,0xFFE1BA7C);
