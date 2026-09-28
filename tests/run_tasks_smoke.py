@@ -27,6 +27,7 @@ def run() -> None:
     parser.add_argument('--extended', action='store_true', help='Also exercise native maid/golem ownership, crops, flowers and mod foods')
     parser.add_argument('--challenge', action='store_true', help='Exercise challenge rooms, arena, inventory recovery and rewards')
     args = parser.parse_args()
+    if args.challenge: args.integrations=True
     server = args.server.resolve()
     release = json.loads((ROOT / 'build/release.json').read_text(encoding='utf-8'))
     core = ROOT / 'build/libs' / release['artifact']

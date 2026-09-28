@@ -7,7 +7,7 @@ import net.neoforged.fml.ModList;
 /** A server-side slot and component snapshot prevents swapping an item after selecting it. */
 public record ChallengeLoadout(int primary,int secondary,ItemStack first,ItemStack second) {
     public static ChallengeLoadout defaults(){return new ChallengeLoadout(-1,-1,ItemStack.EMPTY,ItemStack.EMPTY);}
-    public static boolean weapon(ItemStack s){return !s.isEmpty() && (s.getItem() instanceof SwordItem || s.getItem() instanceof BowItem || s.getItem() instanceof CrossbowItem || ModList.get().isLoaded("tacz") && ChallengeGuns.isGun(s));}
+    public static boolean weapon(ItemStack s){return !s.isEmpty() && ModList.get().isLoaded("tacz") && ChallengeGuns.isGun(s);}
     public ChallengeLoadout select(ServerPlayer p,boolean main,int slot){
         if(slot< -1 || slot>=36)throw new IllegalArgumentException("请选择背包中的武器");
         if(slot>=0 && slot==(main?secondary:primary))throw new IllegalArgumentException("主副武器不能选择同一个背包槽位");

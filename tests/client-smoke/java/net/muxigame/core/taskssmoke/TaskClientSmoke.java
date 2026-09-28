@@ -29,6 +29,10 @@ public final class TaskClientSmoke {
         if(started || ++ticks<40 || mc.getOverlay()!=null || mc.screen==null) return;
         started=true;
         try {
+            if(net.neoforged.fml.ModList.get().isLoaded("tacz")){
+                Class<?> reload=Class.forName("com.tacz.guns.client.input.ReloadKey");
+                if(Arrays.stream(reload.getDeclaredMethods()).noneMatch(m->m.getName().contains("muxi$refill")))throw new AssertionError("TaCZ reload hook was not applied");
+            }
             ItemStack sword=new ItemStack(Items.IRON_SWORD);
             sword.set(DataComponents.CUSTOM_NAME,Component.literal("巡夜者的铁剑"));
             sword.set(DataComponents.DAMAGE,12); sword.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE,true);
@@ -64,8 +68,8 @@ public final class TaskClientSmoke {
             try {
                 detail.init(minecraft,width,height);
                 net.muxigame.core.client.challenge.ChallengeClient.state=com.google.gson.JsonParser.parseString("""
-                    {"available":true,"self":"qa","wins":2,"kills":140,"best":6200,"rewards":0,"credits":6200,"earned":300,"primary":5,"secondary":-1,"last":"通关 · 困难 · 6200 分 · B 级",
-                     "shop":[{"id":"diamond","title":"钻石 ×2","cost":400},{"id":"glock","title":"格洛克 17","cost":2500},{"id":"ak47","title":"AK47","cost":6000}],
+                    {"available":true,"self":"qa","wins":2,"kills":140,"best":6200,"rewards":0,"credits":62,"coins":62,"earned":300,"exchangePreview":3,"primary":5,"secondary":-1,"last":"通关 · 困难 · 6200 分 → 62 兑换币",
+                     "shop":[{"id":"diamond","title":"钻石 ×1","cost":40},{"id":"glock","title":"格洛克 17","cost":40},{"id":"mp5","title":"MP5A5","cost":105}],
                      "weapons":[{"slot":5,"name":"弩（渲染示例）"},{"slot":8,"name":"弓（渲染示例）"}],
                      "rooms":[{"id":"qa-room","host":"other","name":"研究所突击队","difficulty":"HARD","phase":"LOBBY","wave":0,"total":10,"count":2,"mine":false,"invited":true}],
                      "players":[],"tasks":[{"title":"首次防线：完成一次挑战","ready":true,"claimed":false},{"title":"清剿行动：累计击败 100 只入侵僵尸","ready":true,"claimed":true},{"title":"精英防线：完成困难及以上挑战","ready":true,"claimed":false}]}
@@ -95,25 +99,40 @@ public final class TaskClientSmoke {
                     }
                     detail.render(g,16,228,delta);
                 }
-                else {
+                else if(frames<240) {
                     if(frames==120){Field tab=challenge.getClass().getDeclaredField("tab");tab.setAccessible(true);tab.set(challenge,Enum.valueOf((Class<Enum>)tab.getType(),"TASKS"));Method rebuild=challenge.getClass().getDeclaredMethod("rebuild");rebuild.setAccessible(true);rebuild.invoke(challenge);}
                     if(frames==160 || frames==200){Field tab=challenge.getClass().getDeclaredField("tab");tab.setAccessible(true);tab.set(challenge,Enum.valueOf((Class<Enum>)tab.getType(),frames==160?"SHOP":"LOADOUT"));Method rebuild=challenge.getClass().getDeclaredMethod("rebuild");rebuild.setAccessible(true);rebuild.invoke(challenge);}
                     challenge.render(g,16,228,delta);
                 }
+                else renderArena(g,frames>=250?1:0);
                 Component note=Component.literal("本地界面测试 · 示例任务");
                 g.drawString(font,note,width-font.width(note)-12,height-18,0xFF81909C,true);
                 frames++;
-                if(frames==30 || frames==70 || frames==110 || frames==150 || frames==190 || frames==230) {
+                if(frames==30 || frames==70 || frames==110 || frames==150 || frames==190 || frames==230 || frames==248 || frames==258) {
                     g.flush();
                     try(var image=Screenshot.takeScreenshot(minecraft.getMainRenderTarget())) {
-                        image.writeToFile(Path.of(frames==30?"task-hud.png":frames==70?"task-mainline.png":frames==110?"challenge-lobby.png":frames==150?"challenge-tasks.png":frames==190?"challenge-shop.png":"challenge-loadout.png"));
+                        image.writeToFile(Path.of(frames==30?"task-hud.png":frames==70?"task-mainline.png":frames==110?"challenge-lobby.png":frames==150?"challenge-tasks.png":frames==190?"challenge-shop.png":frames==230?"challenge-loadout.png":frames==248?"research-floor-1.png":"research-floor-2.png"));
                     }
                 }
-                if(frames==240) {
-                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"windowVisible\":false,\"nativeFrames\":240,\"screenshots\":[\"task-hud.png\",\"task-mainline.png\",\"challenge-lobby.png\",\"challenge-tasks.png\",\"challenge-shop.png\",\"challenge-loadout.png\"],\"fixture\":\"hidden native render, early window disabled; synthetic data, no server or player\"}");
+                if(frames==260) {
+                    Files.writeString(Path.of("client-smoke-result.json"),"{\"success\":true,\"windowVisible\":false,\"nativeFrames\":260,\"taczReloadHook\":"+net.neoforged.fml.ModList.get().isLoaded("tacz")+",\"screenshots\":[\"task-hud.png\",\"task-mainline.png\",\"challenge-lobby.png\",\"challenge-tasks.png\",\"challenge-shop.png\",\"challenge-loadout.png\",\"research-floor-1.png\",\"research-floor-2.png\"],\"fixture\":\"hidden native render, early window disabled; synthetic UI and production map geometry, no real players\"}");
                     minecraft.stop();
                 }
             } catch(Throwable e) { failure(e); }
+        }
+        private void renderArena(GuiGraphics g,int floor){
+            g.drawCenteredString(font,"封锁研究所 · L"+(floor+1)+" 原生方块剖视（隐藏前墙与顶棚）",width/2,20,0xFFE6EBEF);
+            g.flush();com.mojang.blaze3d.platform.Lighting.setupFor3DItems();
+            g.pose().pushPose();g.pose().translate(width/2.0,height/2.0,250);g.pose().scale(3,-3,3);
+            g.pose().mulPose(com.mojang.math.Axis.XP.rotationDegrees(35));g.pose().mulPose(com.mojang.math.Axis.YP.rotationDegrees(-45));g.pose().translate(-40,0,-40);
+            var arena=new net.muxigame.core.feature.challenge.ChallengeArena(0);
+            for(int y=0;y<9;y++)for(int z=0;z<80;z++)for(int x=0;x<80;x++){
+                var state=arena.block(x,y+floor*10,z);if(state.isAir())continue;
+                g.pose().pushPose();g.pose().translate(x,y,z);
+                minecraft.getBlockRenderer().renderSingleBlock(state,g.pose(),g.bufferSource(),15728880,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+                g.pose().popPose();
+            }
+            g.flush();g.pose().popPose();com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
         }
     }
 }

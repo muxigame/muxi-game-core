@@ -19,11 +19,11 @@ public final class ChallengeScreen extends Screen {
     public boolean isPauseScreen(){return false;}
     protected void init(){left=Math.max(10,(width-380)/2);top=42;rebuild();action("list","");}
     private void button(String text,int x,int y,int w,Runnable click){addRenderableWidget(Button.builder(Component.literal(text),b->click.run()).bounds(x,y,w,18).build());}
-    private String signature(){return tab+":"+array("rooms").toString().replaceAll("\"seconds\":\\d+","\"seconds\":0")+array("players")+array("tasks")+array("weapons")+number(state,"credits")+number(state,"primary")+":"+number(state,"secondary")+number(state,"rewards");}
+    private String signature(){return tab+":"+array("rooms").toString().replaceAll("\"seconds\":\\d+","\"seconds\":0")+array("players")+array("tasks")+array("weapons")+array("shop")+number(state,"coins")+number(state,"primary")+":"+number(state,"secondary")+number(state,"rewards");}
     private void rebuild(){
         clearWidgets();signature=signature();
         button("大厅",left,20,54,()->{tab=Tab.LOBBY;page=0;rebuild();});button("任务",left+58,20,54,()->{tab=Tab.TASKS;page=0;rebuild();});
-        button("积分商店",left+116,20,68,()->{tab=Tab.SHOP;page=0;rebuild();});button("携带武器",left+188,20,68,()->{tab=Tab.LOADOUT;page=0;rebuild();});
+        button("兑换商店",left+116,20,68,()->{tab=Tab.SHOP;page=0;rebuild();});button("携带武器",left+188,20,68,()->{tab=Tab.LOADOUT;page=0;rebuild();});
         button("地图",left+260,20,54,()->{tab=Tab.MAP;rebuild();});button("返回",left+318,20,54,this::onClose);
         if(!supported() && !flag(state,"available"))return;
         if(tab==Tab.LOBBY){
@@ -51,14 +51,14 @@ public final class ChallengeScreen extends Screen {
         }else if(tab==Tab.SHOP){
             int count=Math.max(1,(height-top-80)/27),start=page*count;
             for(int i=start;i<Math.min(array("shop").size(),start+count);i++){
-                JsonObject offer=array("shop").get(i).getAsJsonObject();String order=text(offer,"id")+":"+number(state,"shopRevision");
-                Button b=Button.builder(Component.literal("购买 · "+number(offer,"cost")+" 分"),it->action("buy",order)).bounds(left+245,top+30+(i-start)*27,125,18).build();
-                b.active=!flag(state,"locked")&&number(state,"credits")>=number(offer,"cost");addRenderableWidget(b);
+                JsonObject offer=array("shop").get(i).getAsJsonObject();String order=text(offer,"id")+":"+number(state,"shopRevision")+":"+number(offer,"cost");
+                Button b=Button.builder(Component.literal("兑换 · "+number(offer,"cost")+" 币"),it->action("buy",order)).bounds(left+245,top+30+(i-start)*27,125,18).build();
+                b.active=!flag(state,"locked")&&number(state,"coins")>=number(offer,"cost");addRenderableWidget(b);
             }
             pages(array("shop").size(),count);
         }else if(tab==Tab.LOADOUT){
             if(!flag(state,"locked")){
-                button("主武器：新手默认",left,top+28,180,()->action("primary","-1"));button("副武器：新手默认",left+190,top+28,180,()->action("secondary","-1"));
+                button("默认主武器：MP5A5",left,top+28,180,()->action("primary","-1"));button("默认副武器：格洛克17",left+190,top+28,180,()->action("secondary","-1"));
                 int count=Math.max(1,(height-top-130)/30),start=page*count;
                 for(int i=start;i<Math.min(array("weapons").size(),start+count);i++){
                     JsonObject w=array("weapons").get(i).getAsJsonObject();String slot=Integer.toString(number(w,"slot"));int y=top+77+(i-start)*30;
@@ -77,22 +77,23 @@ public final class ChallengeScreen extends Screen {
         if(!supported() && !flag(state,"available"))g.drawWordWrap(font,Component.literal("服务端尚未启用挑战模式，请等待新版服务端生效。"),left,top+20,360,0xFFE0B080);
         else if(tab==Tab.LOBBY){
             JsonObject r=mine();
-            if(r==null){g.drawString(font,"封锁研究所 · 三层 / 12 房间 · 每队 1–4 人",left,top,0xFFE6EBEF);g.drawString(font,"房间列表（由房主邀请后加入）",left,top+48,0xFFA1AAB6);int y=top+67;for(JsonElement e:array("rooms")){JsonObject q=e.getAsJsonObject();g.drawString(font,font.plainSubstrByWidth(text(q,"name")+" · "+ChallengeRules.Difficulty.parse(text(q,"difficulty")).title+" · "+number(q,"count")+"/4",265),left,y,0xFFE6EBEF);g.drawString(font,phase(text(q,"phase")),left,y+11,0xFFA1AAB6);y+=30;}}
+            if(r==null){g.drawString(font,"封锁研究所 · 三层 / "+ChallengeArena.ROOMS.size()+" 间房 · 每队 1–4 人",left,top,0xFFE6EBEF);g.drawString(font,"房间列表（由房主邀请后加入）",left,top+48,0xFFA1AAB6);int y=top+67;for(JsonElement e:array("rooms")){JsonObject q=e.getAsJsonObject();g.drawString(font,font.plainSubstrByWidth(text(q,"name")+" · "+ChallengeRules.Difficulty.parse(text(q,"difficulty")).title+" · "+number(q,"count")+"/4",265),left,y,0xFFE6EBEF);g.drawString(font,phase(text(q,"phase")),left,y+11,0xFFA1AAB6);y+=30;}}
             else {g.drawString(font,"房间 "+text(r,"id")+" · "+phase(text(r,"phase")),left,top,0xFF8AF0A8);g.drawString(font,"队伍 "+number(r,"count")+"/4 · "+ChallengeRules.Difficulty.parse(text(r,"difficulty")).title,left,top+23,0xFFE6EBEF);
-                if(!text(r,"phase").equals("LOBBY")&&!text(r,"phase").equals("BUILDING")){g.drawString(font,"波次 "+number(r,"wave")+"/"+number(r,"total")+" · 敌人 "+number(r,"remaining")+" · "+number(r,"seconds")+" 秒",left,top+55,0xFFE6EBEF);g.drawWordWrap(font,Component.literal("原背包已保管。战斗中装备栏锁定，用数字键切换武器；右键彩色地面补给点。阵亡或离场恢复背包。"),left,top+80,360,0xFFA1AAB6);}
+                if(!text(r,"phase").equals("LOBBY")&&!text(r,"phase").equals("BUILDING")){g.drawString(font,"波次 "+number(r,"wave")+"/"+number(r,"total")+" · 敌人 "+number(r,"remaining")+" · "+number(r,"seconds")+" 秒",left,top+55,0xFFE6EBEF);g.drawWordWrap(font,Component.literal("全部队员加载完成后，首波准备 30 秒。用数字键切换武器，弹药柜 5 格内按换弹键 R 补满弹匣和备弹。上下楼走南北楼梯。"),left,top+80,360,0xFFA1AAB6);}
                 else g.drawString(font,"房主邀请在线玩家：",left,top+78,0xFFA1AAB6);
             }
         }else if(tab==Tab.TASKS){
             g.drawString(font,"通关 "+number(state,"wins")+" 次 · 击杀 "+number(state,"kills")+" · 最高分 "+number(state,"best"),left,top,0xFFE6EBEF);
-            String[] rewards={"挑战积分 +350","挑战积分 +600","挑战积分 +1200"};
+            String[] rewards={"兑换币 +4","兑换币 +6","兑换币 +12"};
             for(int i=0;i<array("tasks").size();i++){JsonObject t=array("tasks").get(i).getAsJsonObject();g.drawString(font,text(t,"title"),left,top+22+i*36,flag(t,"ready")?0xFF8AF0A8:0xFFE6EBEF);g.drawString(font,rewards[i],left,top+34+i*36,0xFFA1AAB6);}
             g.drawString(font,font.plainSubstrByWidth(text(state,"last"),365),left,top+126,0xFFE1BA7C);
-            g.drawWordWrap(font,Component.literal("实际伤害、击杀和爆头击杀均有积分；通关追加积分。积分跨局保留，离场后在积分商店自由购买物品。当前余额："+number(state,"credits")),left,top+168,360,0xFFA1AAB6);
+            g.drawWordWrap(font,Component.literal("战斗积分与兑换币独立。每 100 分结算 1 兑换币，余数保留；任务直接给币。当前兑换币："+number(state,"coins")),left,top+168,360,0xFFA1AAB6);
         }else if(tab==Tab.SHOP){
-            g.drawString(font,"可用积分："+number(state,"credits")+" · 本局已得："+number(state,"earned"),left,top,0xFF8AF0A8);
+            g.drawString(font,"兑换币："+number(state,"coins")+" · 本局："+number(state,"earned")+" 分 / 可兑 "+number(state,"exchangePreview")+" 币",left,top,0xFF8AF0A8);
             int count=Math.max(1,(height-top-80)/27),start=page*count;
             for(int i=start;i<Math.min(array("shop").size(),start+count);i++)g.drawString(font,text(array("shop").get(i).getAsJsonObject(),"title"),left,top+35+(i-start)*27,0xFFE6EBEF);
-            if(flag(state,"locked"))g.drawString(font,"离场后可购买；阵亡保留已获击杀积分。",left,top+14,0xFFE1BA7C);
+            if(flag(state,"locked"))g.drawString(font,"结束后按 100 分 : 1 币结算；阵亡也按已得分结算。",left,top+14,0xFFE1BA7C);
+            else g.drawString(font,"枪械：配方估值 + 25% 装配费，再折算兑换币",left,top+14,0xFFA1AAB6);
         }else if(tab==Tab.LOADOUT){
             g.drawString(font,"主武器："+selectedName("primary")+" · 副武器："+selectedName("secondary"),left,top,0xFF8AF0A8);
             if(flag(state,"locked"))g.drawString(font,"本局已锁定装备，结束后再选择。",left,top+28,0xFFE1BA7C);
@@ -106,12 +107,13 @@ public final class ChallengeScreen extends Screen {
                 }
             }
         }else{
-            String text="封锁研究所：三层 / 12 房间\n一层：接待大厅、检疫室、安保室、物资仓\n二层：实验室 A / B、医疗站、电源室\n三层：指挥室、服务器机房、隔离舱、屋顶防线\n\n中央十字走廊连接四间房，各角落为僵尸刷新点。\n右键紫珀块上楼 / 青金石块下楼；僵尸会跨层追击。\n金块补弹药（冷却 30 秒），数量随难度增加。\n绿宝石块医疗 / 食物，红石块道具：每人每波一次。\n波间休整 12 秒。每 3 波疾行，每 4 波装甲突袭。\n每 5 波感染暴君：紫色血条，注意蓄力范围攻击！\n单波限时 5 分钟，阵亡淘汰；全部淘汰即失败。\n临时枪械、弓箭和护甲入场配发，离场恢复原背包。";
+            String text="研究所：81×81 / 三层 / "+ChallengeArena.ROOMS.size()+" 间大小房间\n一层：入口大厅、办公室、收发检疫、后勤通道\n二层：实验准备、分析培养、病房、洗消缓冲\n三层：指挥通信、机房、维护作业、高危隔离\n\n支走廊连接大小房间，南北楼梯上下楼，维护区可跑酷。\n刷怪口位于小房间和走廊尽头，每波启用位置不同。\n倒计时先亮爆闪红灯，提前选择火力位置再迎击尸群。\n黄色弹药柜 5 格内按换弹键 R 补满弹匣和备弹。\n医疗 / 道具柜右键使用，每人每波各一次。\n全员加载后准备 30 秒，波间休整 12 秒。\n普通尸群较慢但更多，第 5 波倍数出现暴君。\n默认 MP5A5＋格洛克17；结束按 100 分 : 1 币结算。";
             g.drawWordWrap(font,Component.literal(text),left,top,365,0xFFE6EBEF);
         }
         String notice=text(state,"notice");if(!notice.isEmpty())g.drawString(font,font.plainSubstrByWidth(notice,370),left,height-16,0xFFE1BA7C);
+        if(tab==Tab.LOBBY&&mine()!=null&&mine().has("sites")&&!mine().getAsJsonArray("sites").isEmpty())g.drawWordWrap(font,Component.literal(ChallengeClient.activeSites()),left,top+125,365,0xFFFF8D8D);
         super.render(g,mx,my,dt);
     }
-    private String selectedName(String key){int slot=state.has(key)?number(state,key):-1;for(JsonElement e:array("weapons")){JsonObject w=e.getAsJsonObject();if(number(w,"slot")==slot)return font.plainSubstrByWidth(text(w,"name"),100);}return slot<0?"新手默认":"槽 "+(slot+1);}
-    private static String phase(String phase){return switch(phase){case "BUILDING"->"地图生成中";case "LOBBY"->"等待开局";case "COUNTDOWN"->"准备倒计时";case "RUNNING"->"战斗中";case "REST"->"波间补给";default->phase;};}
+    private String selectedName(String key){int slot=state.has(key)?number(state,key):-1;for(JsonElement e:array("weapons")){JsonObject w=e.getAsJsonObject();if(number(w,"slot")==slot)return font.plainSubstrByWidth(text(w,"name"),100);}return slot<0?(key.equals("primary")?"MP5A5":"格洛克17"):"槽 "+(slot+1);}
+    private static String phase(String phase){return switch(phase){case "BUILDING"->"地图生成中";case "LOBBY"->"等待开局";case "LOADING"->"等待地图加载";case "COUNTDOWN"->"首波准备倒计时";case "RUNNING"->"战斗中";case "REST"->"波间补给";default->phase;};}
 }

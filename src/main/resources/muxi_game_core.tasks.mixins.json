@@ -4,5 +4,6 @@
   "package": "net.muxigame.core.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": ["PlayerListSaveInvoker", "ChallengeContainerMixin"],
+  "client": ["ChallengeReloadMixin"],
   "injectors": {"defaultRequire": 1}
 }

@@ -22,6 +22,10 @@ public final class ChallengeInventory {
         loadout.validate(p);
         if(pending(p)) throw new IllegalStateException("Return snapshot already exists");
         if(!p.containerMenu.getCarried().isEmpty()) throw new IllegalArgumentException("请先放下鼠标上拿着的物品");
+        if(!ModList.get().isLoaded("tacz"))throw new IllegalArgumentException("挑战需要 TaCZ 枪械模组");
+        ItemStack primary=loadout.primary()>=0?loadout.first().copyWithCount(1):ChallengeGuns.gun(p,"tacz:hk_mp5a5");
+        ItemStack secondary=loadout.secondary()>=0?loadout.second().copyWithCount(1):ChallengeGuns.gun(p,"tacz:glock_17");
+        if(!ChallengeGuns.isGun(primary)||!ChallengeGuns.isGun(secondary))throw new IllegalArgumentException("挑战武器模型不可用");
         p.closeContainer();
         CompoundTag t=new CompoundTag(); t.put("inventory",p.getInventory().save(new ListTag()));
         t.putString("dimension",p.level().dimension().location().toString());
@@ -31,27 +35,15 @@ public final class ChallengeInventory {
         t.putInt("mode",p.gameMode.getGameModeForPlayer().getId()); t.putInt("selected",p.getInventory().selected);
         p.getPersistentData().put(KEY,t); save(p);
         p.getInventory().clearContent();
-        p.getInventory().setItem(0,new ItemStack(Items.IRON_SWORD));
-        p.getInventory().setItem(1,new ItemStack(Items.BOW));
+        p.getInventory().setItem(0,primary);
+        p.getInventory().setItem(1,secondary);
         p.getInventory().setItem(2,new ItemStack(Items.COOKED_BEEF,16));
-        p.getInventory().setItem(9,new ItemStack(Items.ARROW,64));
         p.getInventory().setItem(36,new ItemStack(Items.IRON_BOOTS));
         p.getInventory().setItem(37,new ItemStack(Items.IRON_LEGGINGS));
         p.getInventory().setItem(38,new ItemStack(Items.IRON_CHESTPLATE));
         p.getInventory().setItem(39,new ItemStack(Items.IRON_HELMET));
         p.getInventory().setItem(40,new ItemStack(Items.SHIELD));
-        if(ModList.get().isLoaded("tacz")) {
-            ItemStack gun=ChallengeGuns.gun(p,"tacz:glock_17");
-            if(!gun.isEmpty()) {
-                p.getInventory().setItem(0,gun); p.getInventory().setItem(3,new ItemStack(Items.IRON_SWORD));
-            }
-        }
-        if(loadout.primary()>=0)p.getInventory().setItem(0,loadout.first().copyWithCount(1));
-        if(loadout.secondary()>=0)p.getInventory().setItem(1,loadout.second().copyWithCount(1));
-        if(ModList.get().isLoaded("tacz")) {
-            int slot=10;
-            for(ItemStack ammo:ChallengeGuns.supplies(p,60)){p.getInventory().setItem(slot++,ammo.copy());p.getInventory().setItem(slot++,ammo.copy());}
-        }
+        ChallengeGuns.refill(p);
         p.getInventory().selected=0;p.setGameMode(GameType.ADVENTURE);p.setHealth(p.getMaxHealth());
         p.getFoodData().setFoodLevel(20);p.getFoodData().setSaturation(10);p.inventoryMenu.broadcastChanges();
     }

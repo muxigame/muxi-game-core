@@ -289,11 +289,11 @@ public final class DailyTasksClient {
             var challenge=net.muxigame.core.client.challenge.ChallengeClient.state;
             int y=challengeY+SECTION_HEADER;
             g.drawString(font,trimmed(font,net.muxigame.core.client.challenge.ChallengeClient.summary(),width),0,y,TEXT,true);
-            g.drawString(font,"抵御入侵 · 波次 / Boss / 补给 / 传送",0,y+11,MUTED,true);
-            String rewards="积分 "+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"credits")+" · 本局 +"+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"earned");
+            g.drawString(font,trimmed(font,net.muxigame.core.client.challenge.ChallengeClient.activeSites(),width),0,y+11,0xFFFF8D8D,true);
+            String rewards="兑换币 "+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"coins")+" · 本局 "+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"earned")+" 分";
             g.drawString(font,rewards,0,y+22,READY,true);
-            g.drawString(font,"[ 房间 / 携带武器 / 任务 / 积分商店 ]",0,y+34,READY,true);
-            if(interactive && in(mx,my,0,y,width,48))hoveredText="点击打开挑战大厅，支持单独挑战；击杀与爆头得积分，离场后到商店购买物品。";
+            g.drawString(font,"[ 房间 / 携带武器 / 任务 / 兑换商店 ]",0,y+34,READY,true);
+            if(interactive && in(mx,my,0,y,width,48))hoveredText=net.muxigame.core.client.challenge.ChallengeClient.activeSites()+"。每 100 战斗积分结算 1 兑换币，点击进入大厅。";
         }
         g.pose().popPose();
         if(interactive) {

@@ -21,7 +21,7 @@ public final class ChallengeRules {
     public static String waveName(int wave,Difficulty d) {
         return boss(wave,d)?"特殊波次 · 感染暴君":wave%3==0?"特殊波次 · 疾行尸群":wave%4==0?"特殊波次 · 装甲突袭":"僵尸入侵";
     }
-    public static int count(int wave,int players) { return Math.min(48,6+wave*2+Math.max(0,Math.min(4,players)-1)*4); }
+    public static int count(int wave,int players) { return Math.min(120,16+wave*4+Math.max(0,Math.min(4,players)-1)*8); }
     public static double health(Difficulty d,int wave,boolean boss) { return (boss?180:20)*d.health*(1+0.07*(wave-1)); }
     public static double damage(Difficulty d,int wave,boolean boss) { return (boss?7:3)*d.damage*(1+0.025*(wave-1)); }
     public static int score(Difficulty d,int kills,int waves,int seconds,boolean won) {

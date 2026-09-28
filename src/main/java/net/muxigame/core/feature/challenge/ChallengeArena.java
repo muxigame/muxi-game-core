@@ -1,87 +1,118 @@
 package net.muxigame.core.feature.challenge;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import java.util.*;
 
-/** Three floors, four rooms per floor, central cross corridors. Bounded incremental generation. */
+/** Asymmetric research building, physical stairs, optional parkour and telegraphed spawn portals. */
 public final class ChallengeArena {
     public static final ResourceKey<Level> DIMENSION=ResourceKey.create(Registries.DIMENSION,ResourceLocation.parse("muxi_game_core:quarantine"));
-    public static final int SIZE=49, BASE=64, HEIGHT=25, SPACING=256;
-    public static final List<String> ROOMS=List.of("接待大厅","检疫室","安保室","物资仓", "实验室 A","实验室 B","医疗站","电源室", "指挥室","服务器机房","隔离舱","屋顶防线");
+    public static final int SIZE=81,BASE=64,FLOOR_HEIGHT=10,HEIGHT=31,SPACING=256;
+    public static final List<String> ROOMS=ResearchLayout.FLOORS.stream().flatMap(List::stream).map(ResearchLayout.Room::name).toList();
+    public record SpawnSite(String id,String name,int floor,BlockPos position,BlockPos lamp){}
     private final int slot;
+    private final List<SpawnSite> sites;
     private int cursor;
-    public ChallengeArena(int slot) { if(slot<0 || slot>=ChallengeRules.MAX_ROOMS) throw new IllegalArgumentException("arena slot");this.slot=slot; }
-    public int origin() { return slot*SPACING; }
-    public boolean ready() { return cursor>=SIZE*SIZE*HEIGHT; }
-    public BlockPos spawn() { return pos(24,1,24); }
-    public BlockPos pos(int x,int y,int z) { return new BlockPos(origin()+x,BASE+y,z); }
-    public boolean contains(double x,double y,double z) { return x>=origin()+1 && x<origin()+48 && z>=1 && z<48 && y>=BASE+1 && y<BASE+24; }
-    public int floor(double y) { return Math.max(0,Math.min(2,((int)y-BASE)/8)); }
-    public List<BlockPos> spawns(int floor) {
-        int y=1+8*floor;
-        return List.of(pos(5,y,5),pos(43,y,5),pos(5,y,43),pos(43,y,43),pos(12,y,12),pos(36,y,36));
-    }
-    public boolean atPad(BlockPos p,int x,int z) { return p.getX()==origin()+x && p.getZ()==z && (p.getY()-BASE)%8==0 && p.getY()>=BASE && p.getY()<BASE+24; }
-    public BlockPos lift(int floor,boolean up) { return pos(up?26:22,1+8*((floor+(up?1:2))%3),24); }
-    public BlockState block(int x,int y,int z) {
-        int floor=y/8;
-        if(y==HEIGHT-1) return Blocks.BEDROCK.defaultBlockState();
-        if(y%8==0) {
-            if(x==22 && z==24) return Blocks.LAPIS_BLOCK.defaultBlockState();
-            if(x==26 && z==24) return Blocks.PURPUR_BLOCK.defaultBlockState();
-            if(x==24 && z==20) return Blocks.GOLD_BLOCK.defaultBlockState();
-            if(x==24 && z==28) return Blocks.EMERALD_BLOCK.defaultBlockState();
-            if(x==12 && z==24) return Blocks.REDSTONE_BLOCK.defaultBlockState();
-            if(x==24 && z==24) return Blocks.SEA_LANTERN.defaultBlockState();
-            if(x%8==4 && z%8==4) return Blocks.SEA_LANTERN.defaultBlockState();
-            return (floor==0?Blocks.POLISHED_ANDESITE:floor==1?Blocks.DEEPSLATE_TILES:Blocks.POLISHED_DIORITE).defaultBlockState();
+    public ChallengeArena(int slot){
+        if(slot<0||slot>=ChallengeRules.MAX_ROOMS)throw new IllegalArgumentException("arena slot");this.slot=slot;
+        List<SpawnSite> points=new ArrayList<>();
+        for(int f=0;f<3;f++){
+            var small=ResearchLayout.rooms(f).stream().filter(r->r.width()>=8&&r.depth()>=8&&!r.kind().equals("lobby")).sorted(Comparator.comparingInt(r->r.width()*r.depth())).limit(4).toList();
+            for(int i=0;i<small.size();i++){var r=small.get(i);points.add(new SpawnSite(f+"-room-"+i,"L"+(f+1)+" "+r.name(),f,pos(r.doorX()+r.inwardX()*3,1+f*10,r.doorZ()+r.inwardZ()*3),pos(r.doorX(),5+f*10,r.doorZ())));}
+            points.add(new SpawnSite(f+"-north","L"+(f+1)+" 北端走廊",f,pos(40,1+f*10,5),pos(40,5+f*10,5)));
+            points.add(new SpawnSite(f+"-south","L"+(f+1)+" 南端走廊",f,pos(40,1+f*10,76),pos(40,5+f*10,76)));
         }
-        if(x==0 || x==48 || z==0 || z==48) return (y%8>=3 && y%8<=5?Blocks.TINTED_GLASS:Blocks.BEDROCK).defaultBlockState();
-        // Rooms on either side of a seven-block-wide cross corridor. Two-wide doors.
-        boolean wallX=(x==20 || x==28) && (z<20 || z>28) && !(z>=10&&z<=12 || z>=36&&z<=38);
-        boolean wallZ=(z==20 || z==28) && (x<20 || x>28) && !(x>=10&&x<=12 || x>=36&&x<=38);
-        if((wallX || wallZ) && y%8<=6) return (y%8>=3?Blocks.GLASS:Blocks.STONE_BRICKS).defaultBlockState();
-        int rx=Math.min(x,48-x),rz=Math.min(z,48-z);
-        // Perimeter shelves, counters and waist-high cover leave the doorways and spawn cells open.
-        if(rx==3 && rz>=8 && rz<=16 && y%8<=3)
-            return (floor==0?Blocks.BARREL:floor==1?Blocks.WHITE_CONCRETE:Blocks.BOOKSHELF).defaultBlockState();
-        if(rx>=8 && rx<=12 && rz==16 && y%8==1) return Blocks.SMOOTH_QUARTZ.defaultBlockState();
-        if(rx==10 && rz==16 && y%8==2) return (floor==1?Blocks.BREWING_STAND:Blocks.IRON_BARS).defaultBlockState();
-        if(rx==16 && rz>=8 && rz<=10 && y%8==1) return Blocks.POLISHED_ANDESITE.defaultBlockState();
-        if(rx==10 && rz==10 && y%8==7) return Blocks.SEA_LANTERN.defaultBlockState();
-        if(y%8==1 && (x==8 || x==40) && (z==8 || z==40)) return Blocks.IRON_BLOCK.defaultBlockState();
+        sites=List.copyOf(points);
+    }
+    public int origin(){return slot*SPACING;}
+    public boolean ready(){return cursor>=SIZE*SIZE*HEIGHT;}
+    public BlockPos pos(int x,int y,int z){return new BlockPos(origin()+x,BASE+y,z);}
+    public BlockPos spawn(){return pos(40,1,40);}
+    public boolean contains(double x,double y,double z){return x>=origin()+1&&x<origin()+80&&z>=1&&z<80&&y>=BASE+1&&y<BASE+30;}
+    public int floor(double y){return Math.max(0,Math.min(2,(int)Math.floor((y-BASE-1)/10)));}
+    public List<SpawnSite> sites(){return sites;}
+    public List<BlockPos> spawns(int floor){return sites.stream().filter(s->s.floor==floor).map(SpawnSite::position).toList();}
+    public BlockPos ammoStation(int floor){return pos(40,1+floor*10,36);}
+    public BlockPos medicalStation(int floor){return pos(40,1+floor*10,44);}
+    public BlockPos itemStation(int floor){return pos(40,1+floor*10,50);}
+    public ResearchLayout.Room roomAt(double x,double y,double z){return ResearchLayout.at(floor(y),(int)Math.floor(x)-origin(),(int)Math.floor(z));}
+    public BlockPos outside(ResearchLayout.Room room,int floor){return pos(room.doorX()-room.inwardX()*2,1+floor*10,room.doorZ()-room.inwardZ()*2);}
+    public BlockPos recoveryWaypoint(double x,double y,double z,double targetY){return pos(40,1+floor(y)*10,40);}
+    public void keepLoaded(ServerLevel level,boolean forced){for(int x=origin()>>4;x<=(origin()+SIZE-1)>>4;x++)for(int z=0;z<=(SIZE-1)>>4;z++)level.setChunkForced(x,z,forced);}
+    public void lamps(ServerLevel level,List<SpawnSite> active,boolean on){
+        for(var s:sites){BlockState wanted=Blocks.REDSTONE_LAMP.defaultBlockState().setValue(RedstoneLampBlock.LIT,on&&active.contains(s));if(!level.getBlockState(s.lamp).equals(wanted))level.setBlock(s.lamp,wanted,2);}
+    }
+    public BlockState block(int x,int y,int z){
+        int f=Math.min(2,y/10),h=y%10;var room=ResearchLayout.at(f,x,z);
+        if(y==30)return (x%8==0||z%8==0?Blocks.SEA_LANTERN:Blocks.SMOOTH_QUARTZ).defaultBlockState();
+        if(x==0||x==80||z==0||z==80)return (h>=3&&h<=6?Blocks.TINTED_GLASS:Blocks.WHITE_CONCRETE).defaultBlockState();
+        if((x==1||x==79||z==1||z==79)&&h>0)return Blocks.GRAY_CONCRETE.defaultBlockState();
+        if(h==5)for(var s:sites)if(s.floor==f){int dx=Math.abs(s.lamp.getX()-origin()-x),dz=Math.abs(s.lamp.getZ()-z);if(dx+dz==0)return Blocks.REDSTONE_LAMP.defaultBlockState();if(dx+dz==1)return Blocks.RED_STAINED_GLASS.defaultBlockState();}
+        boolean north=z>=12&&z<=21,south=z>=59&&z<=68;
+        if(x>=38&&x<=42&&(north||south)&&y>0){int step=north?z-12:68-z;if(y==1+step||y==11+step)return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING,north?Direction.SOUTH:Direction.NORTH);return Blocks.AIR.defaultBlockState();}
+        if((x==37||x==43)&&(north||south)&&h>=1&&h<=2)return Blocks.IRON_BARS.defaultBlockState();
+        if(y==21&&x>=38&&x<=42&&(z==11||z==69))return Blocks.IRON_BARS.defaultBlockState();
+        if(h==0){
+            if(room==null){if(x==40&&z%4==0)return Blocks.SEA_LANTERN.defaultBlockState();return (x==39||x==41?f==0?Blocks.YELLOW_CONCRETE:f==1?Blocks.CYAN_CONCRETE:Blocks.RED_CONCRETE:Blocks.POLISHED_ANDESITE).defaultBlockState();}
+            return (room.wall(x,z)?Blocks.GRAY_CONCRETE:x%8==0||z%8==0?Blocks.WHITE_CONCRETE:Blocks.LIGHT_GRAY_CONCRETE).defaultBlockState();
+        }
+        if(x>=39&&x<=41&&z==36&&h<=2)return (x==40&&h==1?Blocks.BARREL:h==2?Blocks.YELLOW_CONCRETE:Blocks.IRON_BLOCK).defaultBlockState();
+        if(x==40&&z==44&&h<=2)return (h==1?Blocks.EMERALD_BLOCK:Blocks.SEA_LANTERN).defaultBlockState();
+        if(x==40&&z==50&&h<=2)return (h==1?Blocks.REDSTONE_BLOCK:Blocks.IRON_TRAPDOOR).defaultBlockState();
+        if(room!=null&&room.wall(x,z)){
+            if(room.door(x,z)&&h<=3)return Blocks.AIR.defaultBlockState();
+            return (h>=3&&h<=5?room.kind().equals("containment")?Blocks.LIME_STAINED_GLASS:Blocks.LIGHT_BLUE_STAINED_GLASS:h==8?Blocks.CYAN_CONCRETE:Blocks.SMOOTH_QUARTZ).defaultBlockState();
+        }
+        if(h==9&&(x%8==4&&z%8==4))return Blocks.SEA_LANTERN.defaultBlockState();
+        if(room==null||room.access(x,z))return Blocks.AIR.defaultBlockState();
+        int lx=x-room.x1(),lz=z-room.z1(),w=room.width(),d=room.depth();
+        switch(room.kind()){
+            case "office","lobby" -> {
+                if(lz==2&&lx>=2&&lx<w-2){if(h==1)return Blocks.SMOOTH_QUARTZ.defaultBlockState();if(h==2&&lx%4==0)return Blocks.BLACK_STAINED_GLASS_PANE.defaultBlockState();}
+                if(lz==4&&lx%4==0&&h==1)return Blocks.POLISHED_BLACKSTONE_STAIRS.defaultBlockState().setValue(StairBlock.FACING,Direction.NORTH);
+                if(lx==2&&lz>=7&&lz<d-2&&h<=3)return Blocks.BOOKSHELF.defaultBlockState();
+            }
+            case "security","utilities" -> {
+                if(lx==w-3&&lz>=2&&lz<d-2&&h<=3)return (lz%3==0?Blocks.SEA_LANTERN:Blocks.IRON_BLOCK).defaultBlockState();
+                if(lx==2&&lz==2&&h==1)return Blocks.CAULDRON.defaultBlockState();
+            }
+            case "lab" -> {
+                if(lx>=3&&lx<w-3&&lz%7==3){if(h==1)return Blocks.SMOOTH_QUARTZ.defaultBlockState();if(h==2&&lx%4==0)return Blocks.BREWING_STAND.defaultBlockState();}
+                if(lx==w-3&&lz>=3&&lz<d-3&&h<=3)return (lz%3==0?Blocks.SEA_LANTERN:Blocks.WHITE_CONCRETE).defaultBlockState();
+            }
+            case "ward" -> {
+                if(lx>=2&&lx<w-2&&lx%4==2&&lz>=2&&lz<d-2&&(lz%6==2||lz%6==3)&&h==1)return Blocks.WHITE_BED.defaultBlockState().setValue(BedBlock.FACING,Direction.SOUTH).setValue(BedBlock.PART,lz%6==3?net.minecraft.world.level.block.state.properties.BedPart.HEAD:net.minecraft.world.level.block.state.properties.BedPart.FOOT);
+                if(lx==w-2&&Math.abs(lz-d/2)<=2&&h<=5)return (h==3||lz==d/2?Blocks.RED_CONCRETE:Blocks.WHITE_CONCRETE).defaultBlockState();
+            }
+            case "store","cold" -> {
+                if(lx>1&&lx<w-2&&lz>1&&lz<d-2&&(lx%6==2||lx%6==3)&&(lz%6==2||lz%6==3)&&h<=3)return (room.kind().equals("cold")?h==2?Blocks.PACKED_ICE:Blocks.WHITE_CONCRETE:Blocks.BARREL).defaultBlockState();
+            }
+            case "server" -> {
+                if(lx>=2&&lx<w-2&&lz>=2&&lz<d-2&&(lx%6==2||lx%6==3)&&lz%7<4&&h<=4)return (h==3?Blocks.SEA_LANTERN:Blocks.BLACK_CONCRETE).defaultBlockState();
+            }
+            case "containment" -> {
+                if(lx>=w-7&&lx<=w-3&&lz>=d-7&&lz<=d-3&&h<=4){if(lx==w-7||lx==w-3||lz==d-7||lz==d-3)return Blocks.LIME_STAINED_GLASS.defaultBlockState();if(h==1&&lx==w-5&&lz==d-5)return Blocks.AMETHYST_BLOCK.defaultBlockState();}
+            }
+            case "maintenance" -> {
+                for(int i=0;i<Math.min(5,(w-6)/4);i++)if(lx>=3+i*4&&lx<=4+i*4&&lz>=d/2&&lz<=d/2+1&&h<=1+i/2)return Blocks.POLISHED_ANDESITE.defaultBlockState();
+                if(lx>=3&&lx<w-3&&lz>=d-5&&lz<=d-4&&h==4)return Blocks.IRON_BLOCK.defaultBlockState();
+            }
+        }
         return Blocks.AIR.defaultBlockState();
     }
-    public void build(ServerLevel level,int budget) {
-        for(int i=0;i<budget && !ready();i++,cursor++) {
-            int x=cursor%SIZE,z=(cursor/SIZE)%SIZE,y=cursor/(SIZE*SIZE);
-            BlockPos p=pos(x,y,z); BlockState state=block(x,y,z);
-            if(!level.getBlockState(p).equals(state)) level.setBlock(p,state,2);
+    public void build(ServerLevel level,int budget){for(int i=0;i<budget&&!ready();i++,cursor++){int x=cursor%SIZE,z=(cursor/SIZE)%SIZE,y=cursor/(SIZE*SIZE);var p=pos(x,y,z);var state=block(x,y,z);if(!level.getBlockState(p).equals(state))level.setBlock(p,state,18);}}
+    public void labels(ServerLevel level){
+        for(int f=0;f<3;f++){
+            for(var room:ResearchLayout.rooms(f))label(level,pos(room.doorX(),4+f*10,room.doorZ()),"L"+(f+1)+" "+room.name());
+            label(level,pos(40,4+f*10,36),"弹药补给柜 · 附近按换弹键 R");label(level,pos(40,4+f*10,44),"医疗补给 · 右键");label(level,pos(40,4+f*10,50),"道具补给 · 右键");
+            label(level,pos(40,4+f*10,10),"北侧楼梯");label(level,pos(40,4+f*10,70),"南侧楼梯");
         }
+        for(var s:sites)label(level,s.lamp.above(2),"刷怪口 · "+s.name);
     }
-    public void labels(ServerLevel level) {
-        for(int floor=0;floor<3;floor++) {
-            int y=3+floor*8;
-            for(int i=0;i<4;i++) label(level,pos(i%2==0?10:38,y,i<2?10:38),"第 "+(floor+1)+" 层 · "+ROOMS.get(floor*4+i));
-            label(level,pos(24,y,20),"弹药补充 · 右键金块");
-            label(level,pos(24,y,28),"医疗 / 食物 · 右键绿宝石");
-            label(level,pos(12,y,24),"道具刷新 · 右键红石块");
-            label(level,pos(22,y,24),"下层 ↓");label(level,pos(26,y,24),"上层 ↑");
-        }
-    }
-    private void label(ServerLevel level,BlockPos p,String text) {
-        var display=net.minecraft.world.entity.EntityType.TEXT_DISPLAY.create(level);
-        if(display!=null){
-            display.setPos(p.getX()+0.5,p.getY(),p.getZ()+0.5);
-            var data=display.saveWithoutId(new net.minecraft.nbt.CompoundTag());
-            data.putString("text",net.minecraft.network.chat.Component.Serializer.toJson(net.minecraft.network.chat.Component.literal(text),level.registryAccess()));
-            data.putString("billboard","center");display.load(data);level.addFreshEntity(display);
-        }
-    }
+    private void label(ServerLevel level,BlockPos p,String text){var display=net.minecraft.world.entity.EntityType.TEXT_DISPLAY.create(level);if(display!=null){display.setPos(p.getX()+0.5,p.getY(),p.getZ()+0.5);var data=display.saveWithoutId(new net.minecraft.nbt.CompoundTag());var name=net.minecraft.network.chat.Component.literal(text);if(text.startsWith("刷怪口"))name.withStyle(net.minecraft.ChatFormatting.RED);data.putString("text",net.minecraft.network.chat.Component.Serializer.toJson(name,level.registryAccess()));data.putString("billboard","center");display.load(data);level.addFreshEntity(display);}}
 }

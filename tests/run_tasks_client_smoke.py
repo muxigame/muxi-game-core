@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import zipfile
+import argparse
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
@@ -30,6 +31,9 @@ def allowed(rules: list[dict] | None) -> bool:
 
 
 def main() -> None:
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--tacz',action='store_true',help='Also load actual TaCZ and verify reload-key mixin application')
+    args=parser.parse_args()
     game=ROOT.parent/'_client_test/game'
     version='BatterMC5Remake'
     meta=json.loads((game/f'versions/{version}/{version}.json').read_text(encoding='utf-8'))
@@ -39,6 +43,11 @@ def main() -> None:
     (lab/'options.txt').write_text('lang:zh_cn\nguiScale:2\nmaxFps:30\nenableVsync:false\nonboardAccessibility:false\nsoundCategory_master:0.0\nfullscreen:false\npauseOnLostFocus:false\n',encoding='utf-8')
     release=json.loads((ROOT/'build/release.json').read_text(encoding='utf-8'))
     core=ROOT/'build/libs'/release['artifact']; shutil.copy2(core,lab/'mods'/core.name)
+    if args.tacz:
+        for pattern in ['tacz-neoforge*.jar','architectury-*.jar']:
+            jars=list((ROOT.parent/'bmc5server/mods').glob(pattern))
+            if len(jars)!=1:raise SystemExit('Ambiguous client test dependency '+pattern)
+            shutil.copy2(jars[0],lab/'mods'/jars[0].name)
     libraries=[]
     for lib in meta['libraries']:
         if not allowed(lib.get('rules')): continue
