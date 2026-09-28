@@ -16,6 +16,11 @@ public final class ChallengeClient {
     public static boolean supported(){var c=Minecraft.getInstance().getConnection();return c!=null && NetworkRegistry.hasChannel(c,ChallengeNetwork.Action.TYPE.id());}
     public static void action(String action,String value){if(supported())PacketDistributor.sendToServer(new ChallengeNetwork.Action(action,value));}
     public static void open(){Minecraft.getInstance().setScreen(new ChallengeScreen());}
+    /** The player inventory already synchronizes the real gun model and its item components. */
+    public static net.minecraft.world.item.ItemStack weaponIcon(int slot){
+        var p=Minecraft.getInstance().player;
+        return p!=null && slot>=0 && slot<36?p.getInventory().getItem(slot):net.minecraft.world.item.ItemStack.EMPTY;
+    }
     public static String text(JsonObject o,String key){return o.has(key)?o.get(key).getAsString():"";}
     public static int number(JsonObject o,String key){return o.has(key)?o.get(key).getAsInt():0;}
     public static boolean flag(JsonObject o,String key){return o.has(key)&&o.get(key).getAsBoolean();}

@@ -112,6 +112,14 @@ public final class ChallengeSmoke {
                 check("pursuit navigation computes route",route);
                 check("navigation can reach player through room doors",mob.getNavigation().getPath().canReach());
                 balanceBeforeKill=p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits");
+                mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION).setBaseValue(10);
+                mob.setAbsorptionAmount(5);check("absorption fixture has real shield health",mob.getAbsorptionAmount()==5);
+                mob.hurt(p.damageSources().playerAttack(p),4);
+                check("absorbed damage earns no points",p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits")==balanceBeforeKill);
+                mob.setAbsorptionAmount(0);mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR).setBaseValue(0);
+                for(int hit=0;hit<3;hit++){mob.invulnerableTime=0;mob.hurt(p.damageSources().playerAttack(p),0.4f);}
+                check("fractional health damage accumulates into points",p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits")==balanceBeforeKill+1);
+                mob.setHealth(mob.getMaxHealth());mob.invulnerableTime=0;
                 scoredVictim=mob;mob.hurt(p.damageSources().playerAttack(p),10000);
                 if(net.neoforged.fml.ModList.get().isLoaded("tacz")){
                     var cls=Class.forName("com.tacz.guns.api.event.common.EntityKillByGunEvent");
@@ -121,12 +129,13 @@ public final class ChallengeSmoke {
                 }
             }
             if(ticks==202){
-                int expected=net.neoforged.fml.ModList.get().isLoaded("tacz")?20:10;
+                int expected=(net.neoforged.fml.ModList.get().isLoaded("tacz")?20:10)+20;
                 check("confirmed kill awards score with native lethal headshot bonus",p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits")==balanceBeforeKill+expected);
+                check("overkill and healed health do not exceed spawn HP damage budget",Math.abs(p.getPersistentData().getCompound(ChallengeFeature.STATE).getDouble("damageDone")-20)<0.001);
                 NeoForge.EVENT_BUS.post(new LivingDeathEvent(scoredVictim,p.damageSources().playerAttack(p)));
             }
             if(ticks==204){
-                int expected=net.neoforged.fml.ModList.get().isLoaded("tacz")?20:10;
+                int expected=(net.neoforged.fml.ModList.get().isLoaded("tacz")?20:10)+20;
                 check("replayed death cannot award twice",p.getPersistentData().getCompound(ChallengeFeature.STATE).getInt("credits")==balanceBeforeKill+expected);
                 var level=server.getLevel(ChallengeArena.DIMENSION);
                 for(UUID id:room.mobs){var entity=level.getEntity(id);if(entity!=null)entity.discard();}room.mobs.clear();

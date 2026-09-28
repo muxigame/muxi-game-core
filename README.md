@@ -3,7 +3,7 @@
 muxigame 整合包的**功能集成模组**：服务端功能（登录核验、昵称同步、玩法规则），以及客户端的显示兼容（到处显示昵称而不是 UID）。
 
 - 模组 ID：`muxi_game_core`
-- 当前版本：`1.8.1`
+- 当前版本：`1.8.2`
 - 当前目标：Minecraft `1.21.1` / NeoForge `21.1.250` / Java `21`
 - 服务端和客户端装同一个 jar：服务端入口 `MuxiGameCore`（`dist = DEDICATED_SERVER`），客户端入口 `client/MuxiGameCoreClient`。
   每日任务使用可选的 `daily-tasks-2` 自定义网络通道；两端建议同时更新至 1.7.x。

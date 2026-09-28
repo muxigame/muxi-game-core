@@ -46,6 +46,7 @@ public final class ChallengeFeature implements ServerFeature {
         public final Map<UUID,Long> invites=new HashMap<>();
         public final Map<UUID,Integer> kills=new HashMap<>();
         public final Map<UUID,Integer> earned=new HashMap<>();
+        public final Map<UUID,Double> damageRemaining=new HashMap<>();
         public final Map<UUID,net.minecraft.world.phys.Vec3> lastPositions=new HashMap<>();
         public final Map<UUID,Integer> stalled=new HashMap<>();
         public final Set<UUID> mobs=new HashSet<>();
@@ -67,6 +68,8 @@ public final class ChallengeFeature implements ServerFeature {
     private final Map<UUID,Headshot> headshots=new HashMap<>();
     private final Map<UUID,ChallengeLoadout> loadouts=new HashMap<>();
     private final Set<UUID> dirty=new HashSet<>();
+    private record DamageSample(net.minecraft.world.damagesource.DamageSource source,float health,int tick){}
+    private final Map<LivingEntity,ArrayDeque<DamageSample>> damageSamples=new WeakHashMap<>();
     public static ChallengeFeature active(MinecraftServer server) {return ACTIVE.get(server);}
     public static boolean locked(ServerPlayer p) {return ChallengeInventory.pending(p);}
     public static boolean dimension(net.minecraft.world.level.Level level) {return level.dimension().equals(ChallengeArena.DIMENSION);}
@@ -79,6 +82,7 @@ public final class ChallengeFeature implements ServerFeature {
         bus.addListener(this::clonePlayer);bus.addListener(this::respawn);
         bus.addListener(EventPriority.HIGHEST,this::death);bus.addListener(EventPriority.LOWEST,true,this::trackDeath);
         bus.addListener(this::damage);bus.addListener(this::drops);bus.addListener(this::xp);
+        bus.addListener(EventPriority.HIGHEST,this::beforeDamage);bus.addListener(EventPriority.LOWEST,this::afterDamage);
         bus.addListener(this::join);bus.addListener(this::interact);bus.addListener(this::breakBlock);
         bus.addListener(this::place);bus.addListener(this::explosion);bus.addListener(this::toss);bus.addListener(this::command);
         bus.addListener(this::entityInteract);
@@ -87,7 +91,7 @@ public final class ChallengeFeature implements ServerFeature {
     }
     private void started(ServerStartedEvent e) {server=e.getServer();ACTIVE.put(server,this);}
     private void stopping(ServerStoppingEvent e) {if(e.getServer()==server){for(Room r:List.copyOf(rooms)) finish(r,false,"服务器维护，本局不结算通关奖励");close();}}
-    public void close(){if(server!=null)ACTIVE.remove(server);rooms.clear();deaths.clear();rate.clear();evacuate.clear();headshots.clear();loadouts.clear();dirty.clear();server=null;}
+    public void close(){if(server!=null)ACTIVE.remove(server);rooms.clear();deaths.clear();rate.clear();evacuate.clear();headshots.clear();loadouts.clear();dirty.clear();damageSamples.clear();server=null;}
     private void login(PlayerEvent.PlayerLoggedInEvent e) {
         if(e.getEntity() instanceof ServerPlayer p && p.server==server) {
             if(locked(p)){ChallengeInventory.restore(p);tell(p,"已恢复挑战前的背包和位置；中断的挑战不重复结算。");}
@@ -242,10 +246,12 @@ public final class ChallengeFeature implements ServerFeature {
         z.goalSelector.removeAllGoals(g->true);z.targetSelector.removeAllGoals(g->true);z.goalSelector.addGoal(0,new ChallengePursuitGoal(z));
         if(boss){z.setCustomName(Component.literal("感染暴君 · 第 "+r.wave+" 波"));z.setCustomNameVisible(true);z.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.8);}
         if(boss || r.wave%4==0){z.setItemSlot(EquipmentSlot.HEAD,new ItemStack(Items.IRON_HELMET));z.setItemSlot(EquipmentSlot.CHEST,new ItemStack(Items.IRON_CHESTPLATE));}
-        z.setTarget(target);if(level.addFreshEntity(z)){r.mobs.add(z.getUUID());r.issued++;if(boss){r.boss=z.getUUID();r.bossBar.setName(z.getDisplayName());r.bossBar.setProgress(1);for(UUID id:r.alive){ServerPlayer p=server.getPlayerList().getPlayer(id);if(p!=null)r.bossBar.addPlayer(p);}}}
+        z.setTarget(target);if(level.addFreshEntity(z)){r.mobs.add(z.getUUID());r.damageRemaining.put(z.getUUID(),(double)z.getMaxHealth());r.issued++;if(boss){r.boss=z.getUUID();r.bossBar.setName(z.getDisplayName());r.bossBar.setProgress(1);for(UUID id:r.alive){ServerPlayer p=server.getPlayerList().getPlayer(id);if(p!=null)r.bossBar.addPlayer(p);}}}
     }
     private void tick(ServerTickEvent.Post e){
         if(e.getServer()!=server)return;ticks++;
+        damageSamples.values().forEach(samples->samples.removeIf(sample->server.getTickCount()-sample.tick>2));
+        damageSamples.values().removeIf(ArrayDeque::isEmpty);
         for(UUID id:Set.copyOf(evacuate)){evacuate.remove(id);ServerPlayer p=server.getPlayerList().getPlayer(id);if(p!=null)leave(p,"本局已淘汰");}
         for(var entry:List.copyOf(deaths.entrySet())) {
             LivingDeathEvent death=entry.getValue();if(!death.isCanceled() && death.getEntity().isDeadOrDying()){
@@ -299,6 +305,28 @@ public final class ChallengeFeature implements ServerFeature {
         if(ticks%40==0)for(ServerPlayer p:server.getPlayerList().getPlayers())send(p,"");
     }
     private void death(LivingDeathEvent e){if(e.getEntity() instanceof ServerPlayer p && locked(p)){e.setCanceled(true);p.setHealth(Math.max(1,p.getMaxHealth()));p.invulnerableTime=100;evacuate.add(p.getUUID());Room r=room(p.getUUID());if(r!=null)r.alive.remove(p.getUUID());}}
+    private Room damageRoom(ServerPlayer p,LivingEntity victim){
+        if(p==null || p.server!=server)return null;Room r=room(p.getUUID());
+        return r!=null && r.phase==Phase.RUNNING && r.alive.contains(p.getUUID()) && r.mobs.contains(victim.getUUID()) && dimension(victim.level())?r:null;
+    }
+    private void beforeDamage(LivingDamageEvent.Pre e){
+        if(damageRoom(TaskOwnership.credit(e.getSource()),e.getEntity())==null)return;
+        var samples=damageSamples.computeIfAbsent(e.getEntity(),key->new ArrayDeque<>());
+        if(samples.size()<16)samples.push(new DamageSample(e.getSource(),e.getEntity().getHealth(),server.getTickCount()));
+    }
+    private void afterDamage(LivingDamageEvent.Post e){
+        var samples=damageSamples.get(e.getEntity());if(samples==null || samples.isEmpty() || samples.peek().source!=e.getSource())return;
+        DamageSample before=samples.pop();ServerPlayer p=TaskOwnership.credit(e.getSource());Room r=damageRoom(p,e.getEntity());
+        if(r==null || before.tick!=server.getTickCount())return;
+        // Health actually removed, after armor/absorption. Overkill and healing cannot mint extra points.
+        double actual=Math.min(Math.min(before.health-e.getEntity().getHealth(),e.getNewDamage()),r.damageRemaining.getOrDefault(e.getEntity().getUUID(),0d));
+        if(!Double.isFinite(actual) || actual<=0)return;
+        r.damageRemaining.computeIfPresent(e.getEntity().getUUID(),(id,left)->Math.max(0,left-actual));
+        CompoundTag t=progress(p);double value=t.getDouble("damageFraction")+actual*r.difficulty.reward;
+        int points=(int)Math.floor(value);t.putDouble("damageFraction",value-points);
+        t.putDouble("damageDone",t.getDouble("damageDone")+actual);credit(t,points);
+        r.earned.merge(p.getUUID(),points,Integer::sum);p.getPersistentData().put(STATE,t);dirty.add(p.getUUID());
+    }
     private void trackDeath(LivingDeathEvent e){if(e.getEntity().getPersistentData().contains(MOB))deaths.put(e.getEntity().getUUID(),e);}
     private void damage(LivingIncomingDamageEvent e){
         if(e.getEntity() instanceof ServerPlayer p && locked(p)){
@@ -362,7 +390,7 @@ public final class ChallengeFeature implements ServerFeature {
         Room own=room(p.getUUID());o.addProperty("earned",own==null?0:own.earned.getOrDefault(p.getUUID(),0));o.addProperty("locked",locked(p));
         JsonArray shop=new JsonArray();for(var offer:ChallengeShop.OFFERS){if(offer.stack(p).isEmpty())continue;JsonObject row=new JsonObject();row.addProperty("id",offer.id());row.addProperty("title",offer.title());row.addProperty("cost",offer.cost());shop.add(row);}o.add("shop",shop);
         var selected=loadouts.getOrDefault(p.getUUID(),ChallengeLoadout.defaults());o.addProperty("primary",selected.primary());o.addProperty("secondary",selected.secondary());
-        JsonArray weapons=new JsonArray();if(!locked(p))for(int i=0;i<36;i++){ItemStack stack=p.getInventory().getItem(i);if(!ChallengeLoadout.weapon(stack))continue;JsonObject row=new JsonObject();row.addProperty("slot",i);row.addProperty("name",stack.getHoverName().getString());weapons.add(row);}o.add("weapons",weapons);
+        JsonArray weapons=new JsonArray();if(!locked(p) && ModList.get().isLoaded("tacz"))for(int i=0;i<36;i++){ItemStack stack=p.getInventory().getItem(i);if(!ChallengeGuns.isGun(stack))continue;JsonObject row=new JsonObject();row.addProperty("slot",i);row.addProperty("name",stack.getHoverName().getString());weapons.add(row);}o.add("weapons",weapons);
         JsonArray tasks=new JsonArray();for(int i=0;i<3;i++){JsonObject task=new JsonObject();task.addProperty("title",ChallengeRules.TASKS.get(i));task.addProperty("ready",taskReady(t,i));task.addProperty("claimed",t.getBoolean("task"+i));tasks.add(task);}o.add("tasks",tasks);return o.toString();
     }
     private void send(ServerPlayer p,String message){ChallengeNetwork.send(p,snapshot(p,message));if(!message.isEmpty())tell(p,message);}

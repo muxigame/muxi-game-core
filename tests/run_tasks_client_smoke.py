@@ -63,7 +63,7 @@ def main() -> None:
             '[[mods]]\nmodId="muxi_tasks_client_smoke"\nversion="1.0.0"\ndisplayName="Isolated native task UI tests"\n'
             '[[dependencies.muxi_tasks_client_smoke]]\nmodId="muxi_game_core"\ntype="required"\nversionRange="[1.5.0,)"\nordering="AFTER"\nside="CLIENT"\n')
         for p in classes.rglob('*.class'): z.write(p,p.relative_to(classes).as_posix())
-        z.writestr('muxi_hidden_render.mixins.json',json.dumps({'required':True,'minVersion':'0.8','package':'net.muxigame.core.taskssmoke.mixin','compatibilityLevel':'JAVA_21','client':['HiddenWindowMixin'],'injectors':{'defaultRequire':1}}))
+        z.writestr('muxi_hidden_render.mixins.json',json.dumps({'required':True,'minVersion':'0.8','package':'net.muxigame.core.taskssmoke.mixin','compatibilityLevel':'JAVA_21','client':['HiddenWindowMixin','WeaponIconFixtureMixin'],'injectors':{'defaultRequire':1}}))
     old_natives=game/f'versions/{version}/{version}-natives'
     if old_natives.is_dir(): shutil.copytree(old_natives,lab/'natives',dirs_exist_ok=True)
     substitutions={

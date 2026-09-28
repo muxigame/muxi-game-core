@@ -87,7 +87,7 @@ public final class ChallengeScreen extends Screen {
             String[] rewards={"挑战积分 +350","挑战积分 +600","挑战积分 +1200"};
             for(int i=0;i<array("tasks").size();i++){JsonObject t=array("tasks").get(i).getAsJsonObject();g.drawString(font,text(t,"title"),left,top+22+i*36,flag(t,"ready")?0xFF8AF0A8:0xFFE6EBEF);g.drawString(font,rewards[i],left,top+34+i*36,0xFFA1AAB6);}
             g.drawString(font,font.plainSubstrByWidth(text(state,"last"),365),left,top+126,0xFFE1BA7C);
-            g.drawWordWrap(font,Component.literal("击杀得分、爆头击杀额外加分；通关追加积分。积分跨局保留，离场后在积分商店自由购买物品。当前余额："+number(state,"credits")),left,top+168,360,0xFFA1AAB6);
+            g.drawWordWrap(font,Component.literal("实际伤害、击杀和爆头击杀均有积分；通关追加积分。积分跨局保留，离场后在积分商店自由购买物品。当前余额："+number(state,"credits")),left,top+168,360,0xFFA1AAB6);
         }else if(tab==Tab.SHOP){
             g.drawString(font,"可用积分："+number(state,"credits")+" · 本局已得："+number(state,"earned"),left,top,0xFF8AF0A8);
             int count=Math.max(1,(height-top-80)/27),start=page*count;
@@ -97,9 +97,13 @@ public final class ChallengeScreen extends Screen {
             g.drawString(font,"主武器："+selectedName("primary")+" · 副武器："+selectedName("secondary"),left,top,0xFF8AF0A8);
             if(flag(state,"locked"))g.drawString(font,"本局已锁定装备，结束后再选择。",left,top+28,0xFFE1BA7C);
             else{
-                g.drawString(font,"完整保留改装组件；开局后恢复记录保管原件。",left,top+55,0xFFA1AAB6);
                 int count=Math.max(1,(height-top-130)/30),start=page*count;
-                for(int i=start;i<Math.min(array("weapons").size(),start+count);i++){JsonObject w=array("weapons").get(i).getAsJsonObject();g.drawString(font,font.plainSubstrByWidth("槽 "+(number(w,"slot")+1)+" · "+text(w,"name"),230),left,top+82+(i-start)*30,0xFFE6EBEF);}
+                for(int i=start;i<Math.min(array("weapons").size(),start+count);i++){
+                    JsonObject w=array("weapons").get(i).getAsJsonObject();int y=top+77+(i-start)*30;
+                    var stack=ChallengeClient.weaponIcon(number(w,"slot"));
+                    if(!stack.isEmpty())g.renderItem(stack,left,y+1);
+                    g.drawString(font,font.plainSubstrByWidth(text(w,"name"),208),left+22,y+5,0xFFE6EBEF);
+                }
             }
         }else{
             String text="封锁研究所：三层 / 12 房间\n一层：接待大厅、检疫室、安保室、物资仓\n二层：实验室 A / B、医疗站、电源室\n三层：指挥室、服务器机房、隔离舱、屋顶防线\n\n中央十字走廊连接四间房，各角落为僵尸刷新点。\n右键紫珀块上楼 / 青金石块下楼；僵尸会跨层追击。\n金块补弹药（冷却 30 秒），数量随难度增加。\n绿宝石块医疗 / 食物，红石块道具：每人每波一次。\n波间休整 12 秒。每 3 波疾行，每 4 波装甲突袭。\n每 5 波感染暴君：紫色血条，注意蓄力范围攻击！\n单波限时 5 分钟，阵亡淘汰；全部淘汰即失败。\n临时枪械、弓箭和护甲入场配发，离场恢复原背包。";

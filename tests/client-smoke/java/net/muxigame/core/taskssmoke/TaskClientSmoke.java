@@ -66,7 +66,7 @@ public final class TaskClientSmoke {
                 net.muxigame.core.client.challenge.ChallengeClient.state=com.google.gson.JsonParser.parseString("""
                     {"available":true,"self":"qa","wins":2,"kills":140,"best":6200,"rewards":0,"credits":6200,"earned":300,"primary":5,"secondary":-1,"last":"通关 · 困难 · 6200 分 · B 级",
                      "shop":[{"id":"diamond","title":"钻石 ×2","cost":400},{"id":"glock","title":"格洛克 17","cost":2500},{"id":"ak47","title":"AK47","cost":6000}],
-                     "weapons":[{"slot":5,"name":"改装 AK47 · 保留瞄具 / 弹匣"},{"slot":8,"name":"改装格洛克 17"}],
+                     "weapons":[{"slot":5,"name":"弩（渲染示例）"},{"slot":8,"name":"弓（渲染示例）"}],
                      "rooms":[{"id":"qa-room","host":"other","name":"研究所突击队","difficulty":"HARD","phase":"LOBBY","wave":0,"total":10,"count":2,"mine":false,"invited":true}],
                      "players":[],"tasks":[{"title":"首次防线：完成一次挑战","ready":true,"claimed":false},{"title":"清剿行动：累计击败 100 只入侵僵尸","ready":true,"claimed":true},{"title":"精英防线：完成困难及以上挑战","ready":true,"claimed":false}]}
                     """).getAsJsonObject();
