@@ -13,6 +13,6 @@ public abstract class SurvivalLevelNoiseMixin {
     @Redirect(method="create(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/level/levelgen/synth/NormalNoise;",
         at=@At(value="INVOKE",target="Lnet/minecraft/resources/ResourceLocation;hashCode()I"))
     private int muxi$featureNoiseSalt(ResourceLocation location) {
-        return (location.equals(WorldDimensions.OVERWORLD.location())?Level.OVERWORLD.location():location).hashCode();
+        return (WorldDimensions.exploration(location)?Level.OVERWORLD.location():location).hashCode();
     }
 }

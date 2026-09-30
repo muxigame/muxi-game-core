@@ -95,7 +95,7 @@ public final class PortalSmoke {
         check("real Twilight dimension loaded",tf!=null);
         var tfCheck=Class.forName("twilightforest.events.ProgressionEvents").getDeclaredMethod("checkForPortalCreation",ServerPlayer.class,Level.class,float.class);tfCheck.setAccessible(true);
         var config=Class.forName("twilightforest.config.TFConfig");config.getField("allowPortalsInOtherDimensions").setBoolean(null,true);
-        for(var key:List.of(WorldDimensions.OVERWORLD)) {
+        for(var key:WorldDimensions.EXPLORATION) {
             ServerLevel level=server.getLevel(key);p.teleportTo(level,0.5,181,0.5,0,0);
             check("adventure Nether ignition blocked in "+key.location(),!(boolean)fireMethod.invoke(null,level));
             for(var remote:List.of(Level.NETHER,Level.END,tf.dimension())) {
@@ -189,7 +189,7 @@ public final class PortalSmoke {
         if(done)return;
         if(++ticks==1) {
             e.getServer().overworld().setChunkForced(12,0,true);
-            for(var key:List.of(WorldDimensions.OVERWORLD))e.getServer().getLevel(key).setChunkForced(0,0,true);
+            for(var key:WorldDimensions.EXPLORATION)e.getServer().getLevel(key).setChunkForced(0,0,true);
         }
         if(ticks<60)return;done=true;var result=new LinkedHashMap<String,Object>();
         try{exercise(e.getServer());result.put("success",true);}catch(Throwable error){error.printStackTrace();result.put("success",false);result.put("error",error.toString());}

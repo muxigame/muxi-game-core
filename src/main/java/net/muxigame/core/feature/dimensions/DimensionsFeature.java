@@ -20,7 +20,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import java.util.Set;
 
-/** Home and survival worlds with shared inventory and administrator recovery commands. */
+/** Home and overworld-like survival worlds with shared inventory and administrator recovery commands. */
 public final class DimensionsFeature implements ServerFeature {
     public static final String POSITIONS = "muxi_dimension_positions";
     private static final String COOLDOWN = "muxi_dimension_travel_tick";
@@ -46,7 +46,8 @@ public final class DimensionsFeature implements ServerFeature {
             ServerPlayer player = c.getSource().getPlayerOrException();
             player.sendSystemMessage(Component.literal("当前维度：" + WorldDimensions.name(player.level().dimension())));
             for (var destination : WorldDimensions.ALL)
-                player.sendSystemMessage(Component.literal("[前往" + destination.name() + "]")
+                player.sendSystemMessage(Component.literal("[前往" + destination.name() + "]"
+                    + (destination.resettable() ? "（可重置）" : "（长期保留）"))
                     .withStyle(s -> s.withColor(0x83D9AE).withClickEvent(new ClickEvent(
                         ClickEvent.Action.RUN_COMMAND, "/muxiworld " + destination.command()))));
             return 1;
