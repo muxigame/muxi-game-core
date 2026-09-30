@@ -12,10 +12,14 @@
     "xaerominimap.RadarLabelMixin",
     "xaerominimap.TrackedPlayerLabelMixin",
     "xaerominimap.WaypointShareNoticeMixin",
+    "xaerominimap.WaystoneMarkerFilterMixin",
     "xaeroworldmap.TrackedPlayerMarkerMixin",
     "xaeroworldmap.PlayerTrackerReaderMixin",
     "xaeroworldmap.MenuEntryNameMixin",
-    "xaeroworldmap.DimensionLabelMixin"
+    "xaeroworldmap.DimensionLabelMixin",
+    "xaeroworldmap.GuiMapAccessor",
+    "xaeroworldmap.WaystoneWaypointColorMixin",
+    "xaeroworldmap.WaystoneWaypointMenuMixin"
   ],
   "server": [],
   "injectors": {

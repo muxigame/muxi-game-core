@@ -8,6 +8,7 @@ import net.muxigame.core.feature.identity.IdentityFeature;
 import net.muxigame.core.feature.login.LoginGate;
 import net.muxigame.core.feature.tasks.DailyTasksFeature;
 import net.muxigame.core.feature.tasks.TaskNetwork;
+import net.muxigame.core.feature.waystones.WaystoneMapNetwork;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModList;
@@ -32,6 +33,7 @@ public final class MuxiGameCore {
         net.muxigame.core.threading.ChunkTravel.register(NeoForge.EVENT_BUS);
         net.muxigame.core.feature.dimensions.WorldPortals.register(modBus);
         TaskNetwork.register(modBus);
+        WaystoneMapNetwork.register(modBus);
         net.muxigame.core.feature.challenge.ChallengeNetwork.register(modBus);
         CoreConfig config = CoreConfig.load(Path.of(CoreConfig.FILE));
         // 先注册进服核验：它是这台服务器唯一的身份关口，出问题要第一时间在日志里看见。
@@ -45,6 +47,8 @@ public final class MuxiGameCore {
         if (ModList.get().isLoaded("champions")) register(new ChampionsFeature());
         // 普通聊天按 Tab 也能补在线玩家的昵称（原版只补 UID）；只发原版的补全包，不需要配置。
         if (ModList.get().isLoaded("simplenicknames")) register(new ChatCompletionFeature());
+        register(new net.muxigame.core.feature.rules.CreeperTerrainProtection());
+        register(new net.muxigame.core.feature.teleport.TpaFeature());
         register(new DailyTasksFeature());
         register(new net.muxigame.core.feature.dimensions.DimensionsFeature());
         register(new net.muxigame.core.feature.challenge.ChallengeFeature());

@@ -32,6 +32,12 @@ type="required"
 versionRange="[1.21.1]"
 side="BOTH"
 [[dependencies.muxi_game_core]]
+modId="waystones"
+type="required"
+versionRange="[21.1.42,22)"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.muxi_game_core]]
 modId="simplenicknames"
 type="optional"
 versionRange="[0.8.0,0.9)"

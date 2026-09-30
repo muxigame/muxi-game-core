@@ -5,6 +5,7 @@ import net.muxigame.core.nickname.Nicknames;
 import net.muxigame.core.client.tasks.DailyTasksClient;
 import net.muxigame.core.feature.tasks.DailyTasksFeature;
 import net.muxigame.core.feature.tasks.TaskNetwork;
+import net.muxigame.core.feature.waystones.WaystoneMapNetwork;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.api.distmarker.Dist;
@@ -23,6 +24,7 @@ public final class MuxiGameCoreClient {
     public MuxiGameCoreClient(IEventBus modBus) {
         net.muxigame.core.feature.dimensions.WorldPortals.register(modBus);
         TaskNetwork.register(modBus);
+        WaystoneMapNetwork.register(modBus);
         net.muxigame.core.feature.challenge.ChallengeNetwork.register(modBus);
         new net.muxigame.core.feature.challenge.ChallengeFeature().register(NeoForge.EVENT_BUS);
         net.muxigame.core.client.challenge.ChallengeClient.register(modBus,NeoForge.EVENT_BUS);

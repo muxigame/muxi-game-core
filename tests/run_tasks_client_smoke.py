@@ -60,6 +60,13 @@ def main() -> None:
         if len(server_cores)!=1:raise ValueError('Expected one core JAR in the paired isolated server')
         core=server_cores[0]
     shutil.copy2(core,lab/'mods'/core.name)
+    # Game Core 1.12+ has a real Waystones/Xaero integration. Keep these in the
+    # minimal native smoke fixture so required dependencies and map mixin targets
+    # are exercised instead of only being compile-checked.
+    for pattern in ['balm-neoforge*.jar','waystones-neoforge*.jar','xaerominimap-neoforge*.jar','xaeroworldmap-neoforge*.jar']:
+        jars=list((ROOT.parent/'bmc5server/mods').glob(pattern))
+        if len(jars)!=1: raise SystemExit('Ambiguous client test dependency '+pattern)
+        shutil.copy2(jars[0],lab/'mods'/jars[0].name)
     if args.tacz and not args.load_role:
         for pattern in ['tacz-neoforge*.jar','architectury-*.jar']:
             jars=list((ROOT.parent/'bmc5server/mods').glob(pattern))
