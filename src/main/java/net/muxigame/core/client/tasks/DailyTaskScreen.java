@@ -11,7 +11,7 @@ import java.util.*;
 
 /** Mouse-unlocked view of the same left-side tasks. Native item renderer and tooltip, no fake item textures. */
 public final class DailyTaskScreen extends Screen {
-    private static final int ROW=48;
+    private static final int ROW=52;
     private int left,top,column,first,visible;
     private Tab tab=Tab.DAILY;
     private String signature="";
@@ -20,15 +20,16 @@ public final class DailyTaskScreen extends Screen {
     private enum Tab { DAILY, MAINLINE }
     public DailyTaskScreen() { super(Component.translatable("muxi.tasks.title")); }
     @Override protected void init() {
-        left=12; column=Math.min(270,width-24); top=52;
-        visible=Math.max(1,(height-84)/ROW);
+        column=Math.min(330,width-40); left=Math.max(12,(width-column)/2); top=54;
+        visible=Math.max(1,(height-100)/ROW);
         int size=DailyTasksClient.empty()?0:DailyTasksClient.snapshot.rows().size();
         first=Math.max(0,Math.min(first,Math.max(0,size-visible)));
         rebuild(); DailyTasksClient.request();
     }
     private String signature() {
         var s=DailyTasksClient.snapshot;
-        return s==null?"":s.day()+":"+s.rerollsRemaining()+":"+s.rows().stream().map(r->r.id()+r.claimed()).toList()+":"+first;
+        return (s==null?"":s.day()+":"+s.rerollsRemaining()+":"+s.rows().stream().map(r->r.id()+r.claimed()).toList())
+            +":"+DailyTasksClient.settings.trackedDaily+":"+first+":"+tab;
     }
     private void rebuild() {
         clearWidgets(); claimButtons.clear(); rerollButtons.clear(); signature=signature();
@@ -42,11 +43,15 @@ public final class DailyTaskScreen extends Screen {
         }
         var s=DailyTasksClient.snapshot;
         if(s!=null) for(int i=first;i<Math.min(s.rows().size(),first+visible);i++) {
-            TaskNetwork.Row row=s.rows().get(i); int y=top+33+(i-first)*ROW;
-            Button button=new TextButton(left+column-44,y+26,44,18,
+            TaskNetwork.Row row=s.rows().get(i); int y=top+35+(i-first)*ROW;
+            addRenderableWidget(new TextButton(left+column-46,y+29,46,18,
+                Component.translatable(DailyTasksClient.settings.isTracked(row.id())?"muxi.tasks.untrack":"muxi.tasks.track"),b->{
+                    DailyTasksClient.settings.toggleTracked(row.id()); rebuild();
+                }));
+            Button button=new TextButton(left+column-94,y+29,44,18,
                 Component.translatable(row.claimed()?"muxi.tasks.claimed":"muxi.tasks.claim"),b->DailyTasksClient.claim(current(row.id())));
             button.active=row.ready(); claimButtons.add(button); addRenderableWidget(button);
-            Button reroll=new TextButton(left+column-92,y+26,46,18,Component.translatable("muxi.tasks.reroll"),b->confirmReroll(current(row.id())));
+            Button reroll=new TextButton(left+column-144,y+29,46,18,Component.translatable("muxi.tasks.reroll"),b->confirmReroll(current(row.id())));
             reroll.active=DailyTasksClient.rerollable(row); rerollButtons.add(reroll); addRenderableWidget(reroll);
         }
         addRenderableWidget(new TextButton(left,height-27,110,18,Component.translatable(DailyTasksClient.settings.visible?"muxi.tasks.hide":"muxi.tasks.show"),b->{
@@ -80,7 +85,12 @@ public final class DailyTaskScreen extends Screen {
     @Override public boolean isPauseScreen() { return false; }
     @Override public void renderBackground(GuiGraphics g,int mx,int my,float delta) { /* No full-screen blur or menu texture. */ }
     @Override public void render(GuiGraphics g,int mx,int my,float delta) {
-        g.fillGradient(0,0,Math.min(width,left+column+24),height,0xA010141C,0x5010141C);
+        int panelTop=46, panelBottom=height-36;
+        g.fill(left-10,panelTop,left+column+10,panelBottom,0xD0181C22);
+        g.fill(left-9,panelTop+1,left+column+9,panelTop+2,0xFF5A6068);
+        g.fill(left-9,panelBottom-2,left+column+9,panelBottom-1,0xFF090B0E);
+        g.fill(left-10,panelTop,left-9,panelBottom,0xFF4A5058);
+        g.fill(left+column+9,panelTop,left+column+10,panelBottom,0xFF090B0E);
         if(tab==Tab.MAINLINE) { renderMainline(g); super.render(g,mx,my,delta); return; }
         g.drawString(font,title,left,top,DailyTasksClient.TEXT,true);
         if(DailyTasksClient.empty()) {
@@ -95,14 +105,17 @@ public final class DailyTaskScreen extends Screen {
         g.drawString(font,allowance,left+column-font.width(allowance),top+15,DailyTasksClient.MUTED,true);
         ItemStack hovered=null; String description=null;
         for(int i=first;i<Math.min(s.rows().size(),first+visible);i++) {
-            var row=s.rows().get(i); int y=top+33+(i-first)*ROW; String progress=DailyTasksClient.progress(row);
+            var row=s.rows().get(i); int y=top+35+(i-first)*ROW; String progress=DailyTasksClient.progress(row);
+            boolean tracked=DailyTasksClient.settings.isTracked(row.id());
+            g.fill(left-4,y-5,left+column+4,y+46,tracked?0x80343F37:0x7030343A);
+            g.fill(left-4,y-5,left-3,y+46,tracked?DailyTasksClient.READY:0xFF606872);
             g.drawString(font,DailyTasksClient.trimmed(font,DailyTasksClient.title(row),column-font.width(progress)-12),left,y,DailyTasksClient.color(row),true);
             g.drawString(font,progress,left+column-font.width(progress),y,DailyTasksClient.color(row),true);
             g.drawString(font,DailyTasksClient.trimmed(font,row.description(),column),left,y+13,DailyTasksClient.MUTED,true);
-            ItemStack item=DailyTasksClient.rewardLine(g,row,left,y+28,left+column-98,mx,my); if(item!=null) hovered=item;
+            ItemStack item=DailyTasksClient.rewardLine(g,row,left,y+29,left+column-150,mx,my); if(item!=null) hovered=item;
             if(mx>=left && mx<left+column && my>=y && my<y+24) description=row.description();
         }
-        String footer=!s.notice().isEmpty()?s.notice():s.rows().size()>visible?DailyTasksClient.label("scroll"):"";
+        String footer=!s.notice().isEmpty()?s.notice():s.rows().size()>visible?DailyTasksClient.label("scroll"):DailyTasksClient.label("track_hint");
         g.drawString(font,DailyTasksClient.trimmed(font,footer,column),left,height-42,DailyTasksClient.MUTED,true);
         super.render(g,mx,my,delta);
         if(hovered!=null) g.renderTooltip(font,hovered,mx,my);
@@ -113,13 +126,14 @@ public final class DailyTaskScreen extends Screen {
         g.drawString(font,Component.translatable("muxi.mainline.subtitle"),left,top+15,DailyTasksClient.MUTED,true);
         int y=top+42;
         for(MainlineTasks.Entry entry:MainlineTasks.CURRENT) {
+            g.fill(left-4,y-6,left+column+4,y+37,0x7030343A);
             g.drawString(font,entry.title(),left,y,DailyTasksClient.READY,true);
             g.drawWordWrap(font,Component.literal(entry.description()),left,y+16,column,DailyTasksClient.MUTED);
             y+=48;
         }
     }
     @Override public boolean mouseScrolled(double x,double y,double horizontal,double vertical) {
-        if(!DailyTasksClient.empty()) {
+        if(tab==Tab.DAILY && !DailyTasksClient.empty()) {
             int count=DailyTasksClient.snapshot.rows().size();
             int next=Math.max(0,Math.min(Math.max(0,count-visible),first-(int)Math.signum(vertical)));
             if(next!=first) { first=next; rebuild(); return true; }

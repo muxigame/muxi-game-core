@@ -25,9 +25,9 @@ public final class DailyTasksClient {
     static final KeyMapping OPEN=new KeyMapping("key.muxi_game_core.daily_tasks",InputConstants.KEY_F8,"key.categories.muxi_game_core");
     private static final ResourceLocation EXPERIENCE_ORB_TEXTURE=ResourceLocation.withDefaultNamespace("textures/entity/experience_orb.png");
     private static final float HUD_SCALE=0.65f;
-    private static final int SECTION_HEADER=15, ROW=36, MAINLINE_ROW=24;
+    private static final int TOP_BAR=20, SECTION_HEADER=15, ROW=36;
     private static final int ACTION_WIDTH=34, ACTION_HEIGHT=11, ACTION_GAP=3;
-    private static final int TOGGLE_WIDTH=34, TOGGLE_HEIGHT=11;
+    private static final int TASK_BUTTON_WIDTH=48, TASK_BUTTON_HEIGHT=18;
     static TaskNetwork.Snapshot snapshot;
     static TaskHudSettings settings;
     static long receivedAt;
@@ -59,13 +59,14 @@ public final class DailyTasksClient {
     }
     private static void receive(TaskNetwork.Snapshot update) {
         snapshot=update; receivedAt=System.nanoTime();
+        settings.pruneTracked(update.rows().stream().map(TaskNetwork.Row::id).toList());
         Minecraft mc=Minecraft.getInstance();
-        if(update.open() && mc.player!=null && !(mc.screen instanceof DailyTaskScreen)) mc.setScreen(new DailyTaskScreen());
+        if(update.open() && mc.player!=null && !(mc.screen instanceof DailyTaskScreen)) openTaskApp();
     }
     private static void tick(ClientTickEvent.Post event) {
         Minecraft mc=Minecraft.getInstance();
         if(mc.player==null) return;
-        while(OPEN.consumeClick()) if(mc.screen==null) mc.setScreen(new DailyTaskScreen());
+        while(OPEN.consumeClick()) if(mc.screen==null) openTaskApp();
         if(++ticks%60==0 && snapshot==null && supported()) request();
     }
     private static void logout(ClientPlayerNetworkEvent.LoggingOut event) { snapshot=null; receivedAt=0; lastClaim=0; ticks=0; }
@@ -74,7 +75,11 @@ public final class DailyTasksClient {
         return connection!=null && NetworkRegistry.hasChannel(connection,TaskNetwork.Request.TYPE.id());
     }
     static boolean empty() { return snapshot==null || snapshot.rows().isEmpty(); }
-    private static boolean hasContent() { return !empty() || !MainlineTasks.CURRENT.isEmpty(); }
+    private static boolean hasContent() { return snapshot!=null || supported(); }
+    static List<TaskNetwork.Row> trackedRows() {
+        if(snapshot==null) return List.of();
+        return snapshot.rows().stream().filter(r->settings.isTracked(r.id())).toList();
+    }
     static void request() { if(supported()) PacketDistributor.sendToServer(new TaskNetwork.Request(false)); }
     static void claim(TaskNetwork.Row row) {
         long now=System.nanoTime();
@@ -130,11 +135,8 @@ public final class DailyTasksClient {
     }
 
     private static int logicalHeight() {
-        int daily=empty()?0:snapshot.rows().size();
-        int height=SECTION_HEADER+(settings.dailyExpanded?daily*ROW:0)+SECTION_HEADER;
-        if(settings.mainlineExpanded) height+=MainlineTasks.CURRENT.size()*MAINLINE_ROW;
-        height+=SECTION_HEADER+(settings.challengeExpanded?48:0);
-        return height;
+        List<TaskNetwork.Row> tracked=trackedRows();
+        return TOP_BAR+SECTION_HEADER+(tracked.isEmpty()?14:tracked.size()*ROW);
     }
     private static Box box(int screenWidth,int screenHeight,int preferredLeft,int maxWidth) {
         int width=Math.min(settings.width,Math.max(90,Math.min(maxWidth,screenWidth-8)));
@@ -165,40 +167,29 @@ public final class DailyTasksClient {
     }
     private static int refreshX(int width) { return width-ACTION_WIDTH*2-ACTION_GAP; }
     private static int claimX(int width) { return width-ACTION_WIDTH; }
-    private static int toggleX(int width) { return width-TOGGLE_WIDTH; }
     private static void screenClick(ScreenEvent.MouseButtonPressed.Pre event) {
         Screen screen=event.getScreen();
         if(!supportedScreen(screen)) return;
         Box box=screenBox(screen);
         if(box==null || !box.contains(event.getMouseX(),event.getMouseY())) return;
-        event.setCanceled(true);
         if(event.getButton()!=0) return;
         double mx=(event.getMouseX()-box.x)/HUD_SCALE, my=(event.getMouseY()-box.y)/HUD_SCALE;
         int width=box.logicalWidth();
-        if(in(mx,my,toggleX(width),0,TOGGLE_WIDTH,TOGGLE_HEIGHT)) {
-            settings.dailyExpanded=!settings.dailyExpanded; settings.save(); return;
+        if(in(mx,my,0,0,TASK_BUTTON_WIDTH,TASK_BUTTON_HEIGHT)) {
+            event.setCanceled(true);
+            if(screen instanceof InventoryScreen inventory && !inventory.getMenu().getCarried().isEmpty()) return;
+            openTaskApp();
+            return;
         }
-        int dailyHeight=settings.dailyExpanded && !empty()?snapshot.rows().size()*ROW:0;
-        int mainHeaderY=SECTION_HEADER+dailyHeight;
-        if(in(mx,my,toggleX(width),mainHeaderY,TOGGLE_WIDTH,TOGGLE_HEIGHT)) {
-            settings.mainlineExpanded=!settings.mainlineExpanded; settings.save(); return;
-        }
-        int challengeY=mainHeaderY+SECTION_HEADER+(settings.mainlineExpanded?MainlineTasks.CURRENT.size()*MAINLINE_ROW:0);
-        if(in(mx,my,toggleX(width),challengeY,TOGGLE_WIDTH,TOGGLE_HEIGHT)) {
-            settings.challengeExpanded=!settings.challengeExpanded;settings.save();return;
-        }
-        if(settings.challengeExpanded && in(mx,my,0,challengeY+SECTION_HEADER,width,48)) {
-            if(screen instanceof InventoryScreen inventory && !inventory.getMenu().getCarried().isEmpty())return;
-            net.muxigame.core.client.challenge.ChallengeClient.open();return;
-        }
-        if(empty() || !settings.dailyExpanded) return;
+        List<TaskNetwork.Row> tracked=trackedRows();
+        if(tracked.isEmpty()) return;
+        int index=(int)Math.floor((my-(TOP_BAR+SECTION_HEADER))/ROW);
+        if(index<0 || index>=tracked.size()) return;
         if(screen instanceof InventoryScreen inventory && !inventory.getMenu().getCarried().isEmpty()) return;
-        int index=(int)Math.floor((my-SECTION_HEADER)/ROW);
-        if(index<0 || index>=snapshot.rows().size()) return;
-        TaskNetwork.Row row=snapshot.rows().get(index);
-        int y=SECTION_HEADER+index*ROW+ROW-ACTION_HEIGHT-1;
-        if(in(mx,my,claimX(width),y,ACTION_WIDTH,ACTION_HEIGHT)) claim(row);
-        else if(in(mx,my,refreshX(width),y,ACTION_WIDTH,ACTION_HEIGHT) && rerollable(row)) confirmReroll(screen,row);
+        TaskNetwork.Row row=tracked.get(index);
+        int y=TOP_BAR+SECTION_HEADER+index*ROW+ROW-ACTION_HEIGHT-1;
+        if(in(mx,my,claimX(width),y,ACTION_WIDTH,ACTION_HEIGHT)) { event.setCanceled(true); claim(row); }
+        else if(in(mx,my,refreshX(width),y,ACTION_WIDTH,ACTION_HEIGHT) && rerollable(row)) { event.setCanceled(true); confirmReroll(screen,row); }
     }
     private static void confirmReroll(Screen parent,TaskNetwork.Row row) {
         if(snapshot==null || !rerollable(row)) return;
@@ -212,7 +203,16 @@ public final class DailyTasksClient {
     }
     private static void screenKey(ScreenEvent.KeyPressed.Pre event) {
         if(event.getScreen() instanceof InventoryScreen && OPEN.matches(event.getKeyCode(),event.getScanCode())) {
-            event.setCanceled(true); Minecraft.getInstance().setScreen(new DailyTaskScreen());
+            event.setCanceled(true); openTaskApp();
+        }
+    }
+
+    private static void openTaskApp() {
+        try {
+            Class<?> terminal=Class.forName("net.muxigame.terminal.client.TerminalClient");
+            terminal.getMethod("openApp",String.class).invoke(null,"tasks");
+        } catch (ReflectiveOperationException | LinkageError ignored) {
+            Minecraft.getInstance().setScreen(new DailyTaskScreen());
         }
     }
 
@@ -221,83 +221,59 @@ public final class DailyTasksClient {
         g.drawString(font,text,x+ACTION_WIDTH-font.width(text),y+1,shown,true);
         if(hovered) g.hLine(x+ACTION_WIDTH-font.width(text),x+ACTION_WIDTH-1,y+10,shown);
     }
-    private static void toggle(GuiGraphics g,Font font,boolean expanded,int width,int y,boolean hovered) {
-        String text=label(expanded?"hide_section":"show_section");
-        int x=toggleX(width), color=hovered?0xFFFFFFFF:MUTED;
-        g.drawString(font,text,x+TOGGLE_WIDTH-font.width(text),y+1,color,true);
-        if(hovered) g.hLine(x+TOGGLE_WIDTH-font.width(text),x+TOGGLE_WIDTH-1,y+10,color);
-    }
     private static void compact(GuiGraphics g,Box box,int mouseX,int mouseY,boolean interactive) {
         Font font=Minecraft.getInstance().font;
         int width=box.logicalWidth();
         double mx=interactive?(mouseX-box.x)/HUD_SCALE:-1, my=interactive?(mouseY-box.y)/HUD_SCALE:-1;
         ItemStack hoveredItem=null; String hoveredText=null;
+        List<TaskNetwork.Row> tracked=trackedRows();
         g.pose().pushPose();
         g.pose().translate(box.x,box.y,0);
         g.pose().scale(HUD_SCALE,HUD_SCALE,1);
 
-        long completed=empty()?0:snapshot.rows().stream().filter(r->r.progress()>=r.goal()).count();
-        String heading=label("title")+(empty()?"":"  "+completed+"/"+snapshot.rows().size());
-        g.drawString(font,heading,0,0,MUTED,true);
-        boolean dailyToggleHover=interactive && in(mx,my,toggleX(width),0,TOGGLE_WIDTH,TOGGLE_HEIGHT);
-        toggle(g,font,settings.dailyExpanded,width,0,dailyToggleHover);
-        if(!empty()) {
+        boolean taskHover=interactive && in(mx,my,0,0,TASK_BUTTON_WIDTH,TASK_BUTTON_HEIGHT);
+        g.fill(0,0,TASK_BUTTON_WIDTH,TASK_BUTTON_HEIGHT,taskHover?0xB050565E:0x90343A42);
+        g.fill(0,TASK_BUTTON_HEIGHT-1,TASK_BUTTON_WIDTH,TASK_BUTTON_HEIGHT,taskHover?0xFFFFFFFF:0xFF8A939E);
+        g.renderItem(new ItemStack(Items.WRITABLE_BOOK),1,1);
+        g.drawString(font,label("open_button"),19,5,taskHover?0xFFFFFFFF:TEXT,true);
+
+        int headerY=TOP_BAR;
+        long completed=tracked.stream().filter(r->r.progress()>=r.goal()).count();
+        String heading=label("tracked_title")+"  "+completed+"/"+tracked.size();
+        g.drawString(font,trimmed(font,heading,width),0,headerY,MUTED,true);
+        if(!tracked.isEmpty()) {
             String countdown=remaining();
-            int countdownX=toggleX(width)-font.width(countdown)-6;
-            if(countdownX>font.width(heading)+4) g.drawString(font,countdown,countdownX,0,MUTED,true);
-            if(settings.dailyExpanded) for(int i=0;i<snapshot.rows().size();i++) {
-                TaskNetwork.Row row=snapshot.rows().get(i); int y=SECTION_HEADER+i*ROW; String progress=progress(row);
-                boolean complete=row.progress()>=row.goal();
-                if(complete) {
-                    g.fill(-2,y-2,width+2,y+ROW-2,row.claimed()?0x30347643:0x503B8F50);
-                    g.fill(-2,y-2,1,y+ROW-2,row.claimed()?CLAIMED:READY);
-                }
-                String rowTitle=(complete?"✓ ":"")+title(row);
-                g.drawString(font,trimmed(font,rowTitle,width-font.width(progress)-8),3,y,color(row),true);
-                g.drawString(font,progress,width-font.width(progress),y,color(row),true);
-                g.drawString(font,trimmed(font,row.description(),width-3),3,y+9,complete?0xFFD5F6DC:MUTED,true);
-
-                int actionY=y+ROW-ACTION_HEIGHT-1;
-                boolean refreshHover=interactive && in(mx,my,refreshX(width),actionY,ACTION_WIDTH,ACTION_HEIGHT);
-                boolean claimHover=interactive && in(mx,my,claimX(width),actionY,ACTION_WIDTH,ACTION_HEIGHT);
-                action(g,font,label("refresh_button"),refreshX(width),actionY,rerollable(row)?TEXT:MUTED,refreshHover && rerollable(row));
-                String claimText=label(row.claimed()?"claimed":"claim");
-                action(g,font,claimText,claimX(width),actionY,row.claimed()?CLAIMED:row.ready()?READY:MUTED,claimHover && row.ready());
-                ItemStack item=rewardLine(g,row,3,y+18,refreshX(width)-4,(int)mx,(int)my);
-                if(item!=null) hoveredItem=item;
-                if(interactive && in(mx,my,0,y,width,ROW) && item==null) hoveredText=row.description();
-            }
+            if(!countdown.isEmpty() && font.width(heading)+font.width(countdown)+8<width)
+                g.drawString(font,countdown,width-font.width(countdown),headerY,MUTED,true);
         }
-
-        int mainY=SECTION_HEADER+(settings.dailyExpanded && !empty()?snapshot.rows().size()*ROW:0);
-        g.drawString(font,Component.translatable("muxi.mainline.title"),0,mainY+1,0xFFE1BA7C,true);
-        boolean mainToggleHover=interactive && in(mx,my,toggleX(width),mainY,TOGGLE_WIDTH,TOGGLE_HEIGHT);
-        toggle(g,font,settings.mainlineExpanded,width,mainY,mainToggleHover);
-        if(settings.mainlineExpanded && !MainlineTasks.CURRENT.isEmpty()) {
-            int y=mainY+SECTION_HEADER;
-            for(MainlineTasks.Entry entry:MainlineTasks.CURRENT) {
-                g.drawString(font,trimmed(font,entry.title(),width),0,y,READY,true);
-                g.drawString(font,trimmed(font,entry.description(),width),0,y+10,MUTED,true);
-                if(interactive && in(mx,my,0,y,width,MAINLINE_ROW)) hoveredText=entry.description();
-                y+=MAINLINE_ROW;
+        int rowsY=TOP_BAR+SECTION_HEADER;
+        if(tracked.isEmpty()) {
+            g.drawString(font,trimmed(font,label("tracked_empty"),width),3,rowsY+2,MUTED,true);
+        } else for(int i=0;i<tracked.size();i++) {
+            TaskNetwork.Row row=tracked.get(i); int y=rowsY+i*ROW; String progress=progress(row);
+            boolean complete=row.progress()>=row.goal();
+            if(complete) {
+                g.fill(-2,y-2,width+2,y+ROW-2,row.claimed()?0x30347643:0x503B8F50);
+                g.fill(-2,y-2,1,y+ROW-2,row.claimed()?CLAIMED:READY);
             }
-        }
-        int challengeY=mainY+SECTION_HEADER+(settings.mainlineExpanded?MainlineTasks.CURRENT.size()*MAINLINE_ROW:0);
-        g.drawString(font,"挑战任务",0,challengeY+1,0xFFDF9292,true);
-        toggle(g,font,settings.challengeExpanded,width,challengeY,interactive&&in(mx,my,toggleX(width),challengeY,TOGGLE_WIDTH,TOGGLE_HEIGHT));
-        if(settings.challengeExpanded){
-            var challenge=net.muxigame.core.client.challenge.ChallengeClient.state;
-            int y=challengeY+SECTION_HEADER;
-            g.drawString(font,trimmed(font,net.muxigame.core.client.challenge.ChallengeClient.summary(),width),0,y,TEXT,true);
-            g.drawString(font,trimmed(font,net.muxigame.core.client.challenge.ChallengeClient.activeSites(),width),0,y+11,0xFFFF8D8D,true);
-            String rewards="兑换币 "+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"coins")+" · 本局 "+net.muxigame.core.client.challenge.ChallengeClient.number(challenge,"earned")+" 分";
-            g.drawString(font,rewards,0,y+22,READY,true);
-            g.drawString(font,"[ 房间 / 携带武器 / 任务 / 兑换商店 ]",0,y+34,READY,true);
-            if(interactive && in(mx,my,0,y,width,48))hoveredText=net.muxigame.core.client.challenge.ChallengeClient.activeSites()+"。每 100 战斗积分结算 1 兑换币，点击进入大厅。";
+            String rowTitle=(complete?"✓ ":"")+title(row);
+            g.drawString(font,trimmed(font,rowTitle,width-font.width(progress)-8),3,y,color(row),true);
+            g.drawString(font,progress,width-font.width(progress),y,color(row),true);
+            g.drawString(font,trimmed(font,row.description(),width-3),3,y+9,complete?0xFFD5F6DC:MUTED,true);
+            int actionY=y+ROW-ACTION_HEIGHT-1;
+            boolean refreshHover=interactive && in(mx,my,refreshX(width),actionY,ACTION_WIDTH,ACTION_HEIGHT);
+            boolean claimHover=interactive && in(mx,my,claimX(width),actionY,ACTION_WIDTH,ACTION_HEIGHT);
+            action(g,font,label("refresh_button"),refreshX(width),actionY,rerollable(row)?TEXT:MUTED,refreshHover && rerollable(row));
+            String claimText=label(row.claimed()?"claimed":"claim");
+            action(g,font,claimText,claimX(width),actionY,row.claimed()?CLAIMED:row.ready()?READY:MUTED,claimHover && row.ready());
+            ItemStack item=rewardLine(g,row,3,y+18,refreshX(width)-4,(int)mx,(int)my);
+            if(item!=null) hoveredItem=item;
+            if(interactive && in(mx,my,0,y,width,ROW) && item==null) hoveredText=row.description();
         }
         g.pose().popPose();
         if(interactive) {
-            if(hoveredItem!=null) g.renderTooltip(font,hoveredItem,mouseX,mouseY);
+            if(taskHover) g.renderTooltip(font,Component.translatable("muxi.tasks.open_tooltip"),mouseX,mouseY);
+            else if(hoveredItem!=null) g.renderTooltip(font,hoveredItem,mouseX,mouseY);
             else if(hoveredText!=null) g.renderTooltip(font,Component.literal(hoveredText),mouseX,mouseY);
         }
     }
