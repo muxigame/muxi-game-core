@@ -3,7 +3,7 @@
 muxigame 整合包的**功能集成模组**：服务端功能（登录核验、昵称同步、玩法规则），以及客户端的显示兼容（到处显示昵称而不是 UID）。
 
 - 模组 ID：`muxi_game_core`
-- 当前版本：`1.8.2`
+- 当前开发版本：`1.10.0-dev`（原生维度线程默认关闭）；上一生成兼容验证版本：`1.9.1`
 - 当前目标：Minecraft `1.21.1` / NeoForge `21.1.250` / Java `21`
 - 服务端和客户端装同一个 jar：服务端入口 `MuxiGameCore`（`dist = DEDICATED_SERVER`），客户端入口 `client/MuxiGameCoreClient`。
   每日任务使用可选的 `daily-tasks-2` 自定义网络通道；两端建议同时更新至 1.7.x。
@@ -11,6 +11,12 @@ muxigame 整合包的**功能集成模组**：服务端功能（登录核验、�
 - 本地构建、手动安装；没有 CI、GitHub Actions、云端构建或自动发布配置。
 
 ## 当前实现
+
+`dimensions`：原主世界显示为家园并保留存档 ID，新增生存世界。圆石、石头、石英块、泥土、草方块门框配合打火石构成双向实体门，自动生成并保存配对回程门；暮色、下界、末地入口限定在家园。`/muxiworld` 仅供管理员调试。详见 [维度细分说明](docs/dimensions.md)。
+
+`1.9.1` 补齐生存维度的 Blueprint 群系、地表与噪声盐值，Mowzie 自然生成维度条件、季节白名单、独立 Goblin Traders 计时器和 Paster Dream 世界生成存储。保留两个真实维度 ID；同种子 A/B 的测试范围及单线程配置见 [生成兼容审计](docs/dimensions-worldgen-audit.md)。
+
+维度双线程已 [接入原生 tick 与区块管线](docs/dimension-threading.md)，通过 JVM 实验开关启用，默认关闭。[独立调度模型](experiments/dimension-threads/README.md) 保留为早期协议验证。所有测试运行于无 C2ME 的隔离目录，不修改正式模组目录。
 
 `zombie-challenge`：挑战任务 HUD、大厅、邀请与单人/四人队伍，独立维度的三层研究所地图，四档难度、专用追击AI与 Boss 波次。支持自选背包中的主副武器、完整保留改装组件、新手默认装备与按口径补弹。击杀/爆头/通关获得可跨局保存的积分，在奖励商店购买物品。进入前保存原背包，退出/断线恢复。详见 [僵尸挑战说明](docs/zombie-challenge.md)。
 

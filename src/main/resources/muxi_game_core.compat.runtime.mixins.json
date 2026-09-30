@@ -6,7 +6,17 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "customnpcs.MarkDataConcurrentMapMixin",
-    "goblintraders.GoblinDespawnMixin"
+    "goblintraders.GoblinDespawnMixin",
+    "goblintraders.SurvivalGoblinSpawnerMixin",
+    "twilightforest.TwilightPortalCreationMixin",
+    "blueprint.SurvivalBiomeSlicesMixin",
+    "blueprint.SurvivalBiomeSeedMixin",
+    "blueprint.SurvivalLevelNoiseMixin",
+    "blueprint.SurvivalSurfaceRulesMixin",
+    "mowziesmobs.SurvivalSpawnRulesMixin",
+    "sereneseasons.SurvivalSeasonsMixin",
+    "pasterdream.SurvivalArenaStorageMixin",
+    "pasterdream.SurvivalOriginStructureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

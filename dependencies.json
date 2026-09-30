@@ -31,7 +31,8 @@
     "leaderboards-1.21.1-NeoForge-2.0.4.jar",
     "refinedstorage-neoforge-2.0.9.jar",
     "open-parties-and-claims-neoforge-1.21.1-0.30.3.jar",
-    "jecharacters-1.21.1-neoforge-4.5.29.jar"
+    "jecharacters-1.21.1-neoforge-4.5.29.jar",
+    "goblintraders-neoforge-1.21.1-1.11.2.jar"
   ],
   "compileOnlyNote": "Compat mixin targets, resolved in the pack mods dir. Compile-time only; never bundled or rehosted."
 }

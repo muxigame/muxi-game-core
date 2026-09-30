@@ -1,4 +1,6 @@
 {
+  "block.muxi_game_core.home_portal": "Home Portal",
+  "block.muxi_game_core.overworld_portal": "Survival World Portal",
   "key.categories.muxi_game_core": "muxi",
   "key.muxi_game_core.daily_tasks": "Daily Tasks",
   "muxi.tasks.title": "Daily Tasks",

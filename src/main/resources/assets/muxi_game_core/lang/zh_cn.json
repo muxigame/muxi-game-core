@@ -1,4 +1,6 @@
 {
+  "block.muxi_game_core.home_portal": "家园传送门",
+  "block.muxi_game_core.overworld_portal": "生存世界传送门",
   "key.categories.muxi_game_core": "muxi",
   "key.muxi_game_core.daily_tasks": "每日任务",
   "muxi.tasks.title": "每日任务",

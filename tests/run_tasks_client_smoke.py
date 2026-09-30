@@ -3,14 +3,18 @@
 Uses existing libraries/assets and an offline QA identity, never the user's account/token or production game directory.
 """
 from __future__ import annotations
+import argparse
 from datetime import datetime
 import json
+import hashlib
 import os
 from pathlib import Path
 import shutil
 import subprocess
 import sys
 import zipfile
+import uuid
+import re
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
@@ -30,15 +34,58 @@ def allowed(rules: list[dict] | None) -> bool:
 
 
 def main() -> None:
+    sys.stdout.reconfigure(encoding='utf-8',errors='replace')
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--java-home',type=Path)
+    parser.add_argument('--dimensions-server',type=Path,help='Disposable local dimension E2E server directory')
+    parser.add_argument('--load-role',help='Home, Survival, Home2, Survival2, ... (isolated load identity)')
+    parser.add_argument('--client-cpus',type=int,default=2)
+    parser.add_argument('--full-pack',action='store_true')
+    args=parser.parse_args()
+    if args.load_role and not re.fullmatch(r'(Home|Survival)([2-4])?',args.load_role):parser.error('Invalid isolated load role')
+    if not 1<=args.client_cpus<=8:parser.error('--client-cpus must be 1..8')
     game=ROOT.parent/'_client_test/game'
     version='BatterMC5Remake'
     meta=json.loads((game/f'versions/{version}/{version}.json').read_text(encoding='utf-8'))
-    lab=ROOT/'build'/('tasks-client-smoke-'+datetime.now().strftime('%Y%m%d-%H%M%S'))
+    lab=ROOT/'build'/('tasks-client-smoke-'+datetime.now().strftime('%Y%m%d-%H%M%S-%f')+'-'+uuid.uuid4().hex[:8])
     lab.mkdir(parents=True,exist_ok=False); (lab/'mods').mkdir(); (lab/'natives').mkdir(); (lab/'config').mkdir()
     (lab/'config/fml.toml').write_text('earlyWindowControl = false\nearlyWindowProvider = ""\nversionCheck = false\n',encoding='utf-8')
     (lab/'options.txt').write_text('lang:zh_cn\nguiScale:2\nmaxFps:30\nenableVsync:false\nonboardAccessibility:false\nsoundCategory_master:0.0\nfullscreen:false\npauseOnLostFocus:false\n',encoding='utf-8')
     release=json.loads((ROOT/'build/release.json').read_text(encoding='utf-8'))
-    core=ROOT/'build/libs'/release['artifact']; shutil.copy2(core,lab/'mods'/core.name)
+    core=ROOT/'build/libs'/release['artifact']
+    if args.dimensions_server:
+        server_cores=list((args.dimensions_server/'mods').glob('muxi-game-core-*.jar'))
+        if len(server_cores)!=1:raise ValueError('Expected one core JAR in the paired isolated server')
+        core=server_cores[0]
+    shutil.copy2(core,lab/'mods'/core.name)
+    if args.load_role:
+        if not args.dimensions_server: parser.error('--load-role requires --dimensions-server')
+        source=game/'mods' if args.full_pack else ROOT.parent/'bmc5server/mods'
+        for mod in source.glob('*.jar'):
+            if mod.name.startswith(('muxi-game-core-','muxi-identity-','c2me-')):continue
+            # Diagnostic GUI launcher has no gameplay registrations; keep test failures in log files.
+            if 'crashassistant' in mod.name.lower().replace('_','').replace('-',''):continue
+            if args.full_pack or 'create-1.21' in mod.name:shutil.copy2(mod,lab/'mods'/mod.name)
+        if args.full_pack:
+            # The installed QA client predates these server gameplay additions.
+            # Match their network/content registrations in this disposable client only.
+            for pattern in ('CustomNPCs-*.jar','crawlondemand-*.jar','muxi-champion-companions-*.jar'):
+                for mod in (args.dimensions_server/'mods').glob(pattern):
+                    shutil.copy2(mod,lab/'mods'/mod.name)
+            fml=(game/'config/fml.toml').read_text(encoding='utf-8')
+            fml=re.sub(r'(?m)^earlyWindowControl\s*=.*$', 'earlyWindowControl = false', fml)
+            (lab/'config/fml.toml').write_text(fml,encoding='utf-8')
+            # Reuse local native browser caches; never copy account/launcher settings.
+            for name in ('mcef-libraries','mcef-cache'):
+                if (game/'mods'/name).is_dir():shutil.copytree(game/'mods'/name,lab/'mods'/name,dirs_exist_ok=True)
+        (lab/'options.txt').write_text('lang:en_us\nguiScale:2\nmaxFps:10\nenableVsync:false\nonboardAccessibility:false\nsoundCategory_master:0.0\nfullscreen:false\npauseOnLostFocus:false\nrenderDistance:3\n',encoding='utf-8')
+    if args.dimensions_server:
+        fixture=json.loads((args.dimensions_server/'e2e-address.json').read_text(encoding='utf-8'))
+        if fixture['host']!='127.0.0.1': raise SystemExit('Dimension tests only connect to loopback')
+        for pattern in ('xaeroworldmap-*.jar','xaerominimap-*.jar'):
+            mod=next((game/'mods').glob(pattern)); shutil.copy2(mod,lab/'mods'/mod.name)
+        (lab/'config/xaero/lib').mkdir(parents=True)
+        (lab/'config/xaero/lib/common.cfg').write_text('allow_internet_access = false\n',encoding='utf-8')
     libraries=[]
     for lib in meta['libraries']:
         if not allowed(lib.get('rules')): continue
@@ -49,21 +96,25 @@ def main() -> None:
     libraries=list(dict.fromkeys(libraries))
     missing=[str(p) for p in libraries if not p.is_file()]
     if missing: raise SystemExit('Missing existing client dependencies: '+', '.join(missing))
-    compiler,_=core_build.java_tools(None)
+    compiler,runtime=core_build.java_tools(args.java_home)
     neo=game/'libraries/net/neoforged/neoforge/21.1.250/neoforge-21.1.250-client.jar'
     mc=game/'libraries/net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-srg.jar'
     # Only for compilation; runtime uses the exact version manifest's classpath.
     server_libs=list((ROOT.parent/'bmc5server/libraries').rglob('*.jar'))
-    cp=os.pathsep.join(map(str,[core,neo,mc,*libraries,*server_libs]))
+    cp=os.pathsep.join(map(str,[core,neo,mc,*libraries,*server_libs,*list((lab/'mods').glob('*.jar'))]))
     classes=lab/'test-classes'
-    core_build.compile_java(compiler,sorted((ROOT/'tests/client-smoke/java').rglob('*.java')),classes,cp,lab/'compile.args')
+    sources=sorted((ROOT/'tests/dimensions-client/java').rglob('*.java'))+[ROOT/'tests/client-smoke/java/net/muxigame/core/taskssmoke/mixin/HiddenWindowMixin.java'] if args.dimensions_server else sorted((ROOT/'tests/client-smoke/java').rglob('*.java'))
+    if args.load_role:sources=sorted((ROOT/'tests/thread-load-client/java').rglob('*.java'))+[ROOT/'tests/client-smoke/java/net/muxigame/core/taskssmoke/mixin/HiddenWindowMixin.java',ROOT/'tests/thread-load/java/net/muxigame/core/taskssmoke/mixin/ConnectionDiagnosticMixin.java']
+    if args.load_role:shutil.copytree(ROOT/'tests/thread-load-client/java',lab/'fixture-sources')
+    core_build.compile_java(compiler,sources,classes,cp,lab/'compile.args')
     with zipfile.ZipFile(lab/'mods/muxi-tasks-client-smoke-only.jar','w',zipfile.ZIP_DEFLATED) as z:
         z.writestr('META-INF/neoforge.mods.toml','modLoader="javafml"\nloaderVersion="[4,)"\nlicense="MIT"\n'
             '[[mixins]]\nconfig="muxi_hidden_render.mixins.json"\n'
             '[[mods]]\nmodId="muxi_tasks_client_smoke"\nversion="1.0.0"\ndisplayName="Isolated native task UI tests"\n'
-            '[[dependencies.muxi_tasks_client_smoke]]\nmodId="muxi_game_core"\ntype="required"\nversionRange="[1.5.0,)"\nordering="AFTER"\nside="CLIENT"\n')
+            '[[dependencies.muxi_tasks_client_smoke]]\nmodId="muxi_game_core"\ntype="required"\nversionRange="[1.5.0,)"\nordering="AFTER"\nside="CLIENT"\n'+('[[mixins]]\nconfig="muxi_load_diagnostics.mixins.json"\n' if args.load_role else ''))
+        if args.load_role:z.writestr('muxi_load_diagnostics.mixins.json',json.dumps({'required':True,'minVersion':'0.8','package':'net.muxigame.core.taskssmoke.mixin','compatibilityLevel':'JAVA_21','client':['ConnectionDiagnosticMixin'],'injectors':{'defaultRequire':1}}))
         for p in classes.rglob('*.class'): z.write(p,p.relative_to(classes).as_posix())
-        z.writestr('muxi_hidden_render.mixins.json',json.dumps({'required':True,'minVersion':'0.8','package':'net.muxigame.core.taskssmoke.mixin','compatibilityLevel':'JAVA_21','client':['HiddenWindowMixin','WeaponIconFixtureMixin'],'injectors':{'defaultRequire':1}}))
+        z.writestr('muxi_hidden_render.mixins.json',json.dumps({'required':True,'minVersion':'0.8','package':'net.muxigame.core.taskssmoke.mixin','compatibilityLevel':'JAVA_21','client':['HiddenWindowMixin'] if args.dimensions_server else ['HiddenWindowMixin','WeaponIconFixtureMixin'],'injectors':{'defaultRequire':1}}))
     old_natives=game/f'versions/{version}/{version}-natives'
     if old_natives.is_dir(): shutil.copytree(old_natives,lab/'natives',dirs_exist_ok=True)
     substitutions={
@@ -74,6 +125,9 @@ def main() -> None:
         'launcher_name':'muxi-isolated-ui-test','launcher_version':'1','classpath':os.pathsep.join(map(str,libraries)),
         'library_directory':str(game/'libraries'),'classpath_separator':os.pathsep
     }
+    if args.load_role:
+        substitutions['auth_player_name']='MuxiQA'+args.load_role
+        substitutions['auth_uuid']=uuid.UUID(bytes=hashlib.md5(('OfflinePlayer:MuxiQA'+args.load_role).encode('utf-8')).digest(),version=3).hex
     def expand(items):
         output=[]
         for item in items:
@@ -87,12 +141,17 @@ def main() -> None:
                 output.append(value)
         return output
     arguments=['-Xms512M','-Xmx2G','-XX:ActiveProcessorCount=4','-Dfile.encoding=UTF-8','-Djava.awt.headless=true',*expand(meta['arguments']['jvm']),meta['mainClass'],*expand(meta['arguments']['game'])]
+    if args.dimensions_server:
+        arguments.insert(0,'-Dmuxi.qa.server='+str(args.dimensions_server.resolve()))
+    if args.load_role:
+        arguments=[a.replace('-Xmx2G','-Xmx8G').replace('-XX:ActiveProcessorCount=4','-XX:ActiveProcessorCount='+str(args.client_cpus)) for a in arguments]
+        arguments.insert(0,'-Dmuxi.qa.loadRole='+args.load_role)
+        arguments.insert(0,'-XX:+UseG1GC')
     argfile=lab/'launch.args'
     argfile.write_text('\n'.join('"'+a.replace('\\','/').replace('"','\\"')+'"' for a in arguments),encoding='utf-8')
-    runtime=ROOT.parent/'perf-lab/java21/jdk-21.0.2/bin/java.exe'
     with (lab/'boot.log').open('w',encoding='utf-8') as log:
         process=subprocess.Popen([str(runtime),'@'+str(argfile)],cwd=lab,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT)
-        try: code=process.wait(timeout=180)
+        try: code=process.wait(timeout=(2100 if (args.dimensions_server/'stability.json').exists() else 900) if args.load_role else 300 if args.dimensions_server else 180)
         except subprocess.TimeoutExpired:
             process.terminate()
             try: process.wait(timeout=10)
