@@ -14,6 +14,8 @@ muxigame 整合包的**功能集成模组**：服务端功能（登录核验、�
 
 `dimensions`：原主世界显示为家园并保留存档 ID；新增可重置的生存世界和长期保留的冒险世界。家园↔生存仍使用现有实体门，冒险世界当前只开放管理员 `/muxiworld adventure` 入口并可建返回家园的门；暮色、下界、末地入口限定在家园。详见 [维度细分说明](docs/dimensions.md)。
 
+新玩家不再先进入家园后再传送：首次登录在 `PlayerList.placeNewPlayer` 构造登录包之前直接选择生存世界，并在距世界原点 10000 格半径内寻找随机安全陆地点。海洋、流体、树干顶、危险方块、墙体和不足两格净空的位置全部拒绝；成功落点同时作为初始重生点，之后睡床可按原版规则覆盖。已被旧首次手册流程处理的老玩家不会迁移。
+
 远端维度更新补齐两个主世界型探索维度的 Blueprint 群系、地表与噪声盐值，Mowzie 自然生成维度条件、季节白名单、独立 Goblin Traders 计时器和 Paster Dream 世界生成存储。家园、生存、冒险均保留真实独立维度 ID；同种子 A/B 的测试范围及单线程配置见 [生成兼容审计](docs/dimensions-worldgen-audit.md)。
 
 维度双线程已 [接入原生 tick 与区块管线](docs/dimension-threading.md)，通过 JVM 实验开关启用，默认关闭。[独立调度模型](experiments/dimension-threads/README.md) 保留为早期协议验证。所有测试运行于无 C2ME 的隔离目录，不修改正式模组目录。

@@ -9,6 +9,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -24,6 +25,11 @@ import java.util.Set;
 public final class DimensionsFeature implements ServerFeature {
     public static final String POSITIONS = "muxi_dimension_positions";
     private static final String COOLDOWN = "muxi_dimension_travel_tick";
+    private static final String PLAYER_PERSISTED = "PlayerPersisted";
+    private static final String FIRST_JOIN_BOOK = "muxiFirstJoinBook";
+    private static final String INITIAL_SURVIVAL_PENDING = "muxiInitialSurvivalPending";
+    private static final String INITIAL_SURVIVAL_DONE = "muxiInitialSurvivalDone";
+    private static final int INITIAL_SURVIVAL_RADIUS = 10_000;
     public String id() { return "dimensions"; }
     public void register(IEventBus bus) {
         WorldPortals.registerEvents(bus);
@@ -35,6 +41,58 @@ public final class DimensionsFeature implements ServerFeature {
     private void login(PlayerEvent.PlayerLoggedInEvent event) {
         // Tick counters reset on restart. A stored cooldown must not lock a player out after a reboot.
         event.getEntity().getPersistentData().remove(COOLDOWN);
+    }
+    private static CompoundTag persisted(ServerPlayer player) {
+        CompoundTag root = player.getPersistentData();
+        CompoundTag tag = root.getCompound(PLAYER_PERSISTED);
+        root.put(PLAYER_PERSISTED, tag);
+        return tag;
+    }
+    /** Called after player NBT is loaded but before the login packet chooses a world. */
+    public static boolean needsInitialSurvival(ServerPlayer player) {
+        CompoundTag persisted = persisted(player);
+        if (persisted.getBoolean(INITIAL_SURVIVAL_DONE)) return false;
+        if (persisted.getBoolean(INITIAL_SURVIVAL_PENDING)) return true;
+        // No handbook marker means genuinely new player. Existing players already handled by the
+        // old first-join script keep their saved dimension and position.
+        return !persisted.getBoolean(FIRST_JOIN_BOOK);
+    }
+    /** Uniform disk sampling. Each sample explicitly generates one target chunk before height/safety checks. */
+    public static BlockPos findInitialSurvivalLanding(ServerLevel target, ServerPlayer player) {
+        var random = player.getRandom();
+        int[][] offsets = {{0,0},{4,0},{-4,0},{0,4},{0,-4},{4,4},{4,-4},{-4,4},{-4,-4}};
+        for (int attempt = 0; attempt < 24; attempt++) {
+            double radius = Math.sqrt(random.nextDouble()) * INITIAL_SURVIVAL_RADIUS;
+            double angle = random.nextDouble() * Math.PI * 2.0;
+            int originX = (int)Math.floor(Math.cos(angle) * radius);
+            int originZ = (int)Math.floor(Math.sin(angle) * radius);
+            target.getChunk(originX >> 4, originZ >> 4);
+            for (int[] offset : offsets) {
+                int x = originX + offset[0], z = originZ + offset[1];
+                if ((long)x*x + (long)z*z > (long)INITIAL_SURVIVAL_RADIUS*INITIAL_SURVIVAL_RADIUS) continue;
+                BlockPos column = new BlockPos(x, 0, z);
+                if (!target.getWorldBorder().isWithinBounds(column)) continue;
+                int y = target.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+                BlockPos landing = new BlockPos(x, y, z);
+                if (safeInitialSpawn(target, landing)) return landing;
+            }
+        }
+        return null;
+    }
+    public static boolean safeInitialSpawn(ServerLevel level, BlockPos pos) {
+        if (!safe(level, pos) || level.getBiome(pos).is(BiomeTags.IS_OCEAN)) return false;
+        var floor = level.getBlockState(pos.below());
+        return !floor.is(BlockTags.LOGS) && !floor.is(Blocks.POWDER_SNOW)
+            && level.getFluidState(pos).isEmpty() && level.getFluidState(pos.above()).isEmpty();
+    }
+    /** Position is applied before ClientboundLoginPacket is constructed, so the client starts directly in survival. */
+    public static void applyInitialSurvivalSpawn(ServerPlayer player, BlockPos landing) {
+        player.setPos(landing.getX() + 0.5, landing.getY(), landing.getZ() + 0.5);
+        player.setRespawnPosition(WorldDimensions.OVERWORLD, landing, player.getYRot(), true, false);
+        CompoundTag persisted = persisted(player);
+        persisted.remove(INITIAL_SURVIVAL_PENDING);
+        persisted.putBoolean(INITIAL_SURVIVAL_DONE, true);
+        player.fallDistance = 0;
     }
     private void clonePlayer(PlayerEvent.Clone event) {
         CompoundTag old = event.getOriginal().getPersistentData();

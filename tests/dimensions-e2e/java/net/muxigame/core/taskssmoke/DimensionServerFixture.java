@@ -45,6 +45,8 @@ public final class DimensionServerFixture {
     private void login(PlayerEvent.PlayerLoggedInEvent event) {
         if(!(event.getEntity() instanceof ServerPlayer player) || !player.getGameProfile().getName().equals("MuxiTaskPreview")) return;
         if(!player.getPersistentData().getBoolean("dimension_qa_initialized")) {
+            if(!player.level().dimension().equals(WorldDimensions.OVERWORLD))
+                throw new AssertionError("new native client did not enter survival directly before PlayerLoggedInEvent");
             player.teleportTo(player.server.overworld(),0.5,180,0.5,0,0);
             player.getInventory().setItem(0,new ItemStack(Items.DIAMOND,23));
             player.getInventory().setItem(1,new ItemStack(Items.FLINT_AND_STEEL));
