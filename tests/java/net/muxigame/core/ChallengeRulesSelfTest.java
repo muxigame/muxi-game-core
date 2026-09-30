@@ -7,6 +7,7 @@ public final class ChallengeRulesSelfTest {
     public static int run(){
         check("extreme has twenty five waves",ChallengeRules.Difficulty.EXTREME.waves==25);
         check("ammo cooldown ten seconds",ChallengeRules.AMMO_COOLDOWN==200);
+        check("ammo hold is half a second",ChallengeRules.AMMO_HOLD==10);
         check("coin production reduced fivefold",ChallengeRules.EXCHANGE_RATE==500);
         for(int wave=1;wave<=25;wave++){
             check("batch sizes bounded "+wave,ChallengeRules.batchSize(wave,1)>=10&&ChallengeRules.batchSize(wave,4)<=20);
@@ -15,10 +16,11 @@ public final class ChallengeRulesSelfTest {
             check("upper floor unlock schedule "+wave,(wave>=8||floors[1]==0)&&(wave>=15||floors[2]==0));
             var bosses=ChallengeRules.bosses(wave,ChallengeRules.Difficulty.EXTREME);
             check("extreme boss composition "+wave,bosses.isEmpty()||bosses.size()==3&&bosses.getFirst()!=ChallengeRules.Enemy.IRON&&bosses.get(1)==ChallengeRules.Enemy.IRON&&bosses.get(2)==ChallengeRules.Enemy.IRON);
-            for(int i=0;i<120;i++){var kind=ChallengeRules.enemy(wave,ChallengeRules.Difficulty.EXTREME,i);check("ordinary zombies never accelerated "+wave+":"+i,kind!=ChallengeRules.Enemy.ZOMBIE||kind.speed==0.12);}
+            for(int i=0;i<120;i++){var kind=ChallengeRules.enemy(wave,ChallengeRules.Difficulty.EXTREME,i);check("ordinary zombies keep fixed near-vanilla speed "+wave+":"+i,kind!=ChallengeRules.Enemy.ZOMBIE||kind.speed==0.21);}
         }
         check("distinct upper floor plans",!ResearchLayout.rooms(1).equals(ResearchLayout.rooms(2)));
         check("core nest exists only at the bottom",ResearchLayout.rooms(0).stream().anyMatch(r->r.kind().equals("nest"))&&ResearchLayout.rooms(1).stream().noneMatch(r->r.kind().equals("nest")));
+        check("ordinary horde just below vanilla zombie, runners remain distinctly faster",ChallengeRules.Enemy.ZOMBIE.speed<0.23&&ChallengeRules.Enemy.ZOMBIE.speed>0.20&&ChallengeRules.Enemy.RUNNER.speed>ChallengeRules.Enemy.ZOMBIE.speed*1.35);
         check("living cap doubled",ChallengeRules.MAX_LIVING==96);
         check("ten enemies have five second baseline",ChallengeRules.batchSeconds(10,1)==5);
         check("twenty enemies have twenty second baseline",ChallengeRules.batchSeconds(20,1)==20);

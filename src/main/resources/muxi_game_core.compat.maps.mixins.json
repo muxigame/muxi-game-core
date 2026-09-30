@@ -14,7 +14,8 @@
     "xaerominimap.WaypointShareNoticeMixin",
     "xaeroworldmap.TrackedPlayerMarkerMixin",
     "xaeroworldmap.PlayerTrackerReaderMixin",
-    "xaeroworldmap.MenuEntryNameMixin"
+    "xaeroworldmap.MenuEntryNameMixin",
+    "xaeroworldmap.DimensionLabelMixin"
   ],
   "server": [],
   "injectors": {

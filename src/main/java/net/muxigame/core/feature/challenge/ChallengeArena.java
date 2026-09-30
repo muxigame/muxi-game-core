@@ -125,7 +125,6 @@ public final class ChallengeArena {
     public void labels(ServerLevel level){
         for(int f=0;f<3;f++){
             for(var room:ResearchLayout.rooms(f))label(level,pos(room.doorX(),4+f*10,room.doorZ()),"L"+(f+1)+" "+room.name());
-            if(f==0)label(level,pos(40,4,36),"唯一弹药柜 · 按住R 3秒 · 冷却10秒");
             if(f<2){var entry=stairEntrance(f,f+1);label(level,entry.above(3),f==0?"上行① · 北侧楼梯 → L2":"上行② · 西侧楼梯 → L3");}
             if(f>0)label(level,pos(8,3+f*10,f==1?54:49),f==2?"下落缓冲 → 二层连廊 → 一层弹药柜":"下落捷径 → 一层唯一弹药柜");
         }

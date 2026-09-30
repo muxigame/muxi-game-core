@@ -19,6 +19,8 @@ config="muxi_game_core.compat.commands.mixins.json"
 config="muxi_game_core.compat.displays.mixins.json"
 [[mixins]]
 config="muxi_game_core.compat.runtime.mixins.json"
+[[mixins]]
+config="muxi_game_core.threading.mixins.json"
 [[dependencies.muxi_game_core]]
 modId="neoforge"
 type="required"

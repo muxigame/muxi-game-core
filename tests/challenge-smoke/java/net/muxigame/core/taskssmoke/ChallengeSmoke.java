@@ -46,7 +46,7 @@ public final class ChallengeSmoke {
     public ChallengeSmoke(){NeoForge.EVENT_BUS.addListener(this::tick);}
     private void check(String name,boolean pass){if(!pass)throw new AssertionError(name);passed.add(name);}
     private void killBatch(MinecraftServer server,Set<UUID> ids){for(UUID id:Set.copyOf(ids)){var entity=server.getLevel(ChallengeArena.DIMENSION).getEntity(id);check("batch fixture entity is present",entity instanceof Zombie);((Zombie)entity).hurt(entity.damageSources().generic(),100000);}}
-    private void matureHold(ChallengeFeature feature,ServerPlayer player,MinecraftServer server)throws Exception{feature.ammoHold(player);var constructor=ChallengeFeature.AmmoHold.class.getDeclaredConstructor(int.class);constructor.setAccessible(true);var hold=constructor.newInstance(server.getTickCount()-60);hold.heartbeat=server.getTickCount();feature.room(player.getUUID()).holds.put(player.getUUID(),hold);}
+    private void matureHold(ChallengeFeature feature,ServerPlayer player,MinecraftServer server)throws Exception{feature.ammoHold(player);var constructor=ChallengeFeature.AmmoHold.class.getDeclaredConstructor(int.class);constructor.setAccessible(true);var hold=constructor.newInstance(server.getTickCount()-ChallengeRules.AMMO_HOLD);hold.heartbeat=server.getTickCount();feature.room(player.getUUID()).holds.put(player.getUUID(),hold);}
     @SuppressWarnings("unchecked")
     private ServerPlayer player(MinecraftServer server,String name) throws Exception {
         var profile=new GameProfile(UUID.randomUUID(),name);ServerPlayer p=new ServerPlayer(server,server.overworld(),profile,ClientInformation.createDefault());
@@ -101,9 +101,9 @@ public final class ChallengeSmoke {
             if(ticks>=90&&ticks<=110&&ticks%5==0)feature.ammoHold(q);
             if(ticks==110){feature.handle(q,"ammoCancel","");check("release cancels server hold immediately",!batchRoom.holds.containsKey(q.getUUID()));}
             if(ticks==111)feature.ammoHold(q);
-            if(ticks>=111&&ticks<=172&&ticks%5==0)feature.ammoHold(q);
+            if(ticks>=111&&ticks<=120&&ticks%5==0)feature.ammoHold(q);
             if(ticks==120){feature.handle(q,"ammoFinish","");check("early finish cannot grant ammunition",com.tacz.guns.api.item.IGun.getIGunOrNull(q.getInventory().getItem(0)).getCurrentAmmoCount(q.getInventory().getItem(0))==0);}
-            if(ticks==172){feature.handle(q,"ammoFinish","");check("real continuous three second hold grants native ammo",com.tacz.guns.api.item.IGun.getIGunOrNull(q.getInventory().getItem(0)).getCurrentAmmoCount(q.getInventory().getItem(0))==ChallengeGuns.capacity(q.getInventory().getItem(0)));}
+            if(ticks==121){feature.handle(q,"ammoFinish","");check("real continuous half second hold grants native ammo",com.tacz.guns.api.item.IGun.getIGunOrNull(q.getInventory().getItem(0)).getCurrentAmmoCount(q.getInventory().getItem(0))==ChallengeGuns.capacity(q.getInventory().getItem(0)));}
             if(ticks==121){
                 check("first batch stops releasing at its quota",batchRoom.issued==10&&batchRoom.batchMobs.size()==10&&batchRoom.batchNumber==1);
                 firstBatch=Set.copyOf(batchRoom.batchMobs);batchRoom.batchDeadline=server.getTickCount();
@@ -205,7 +205,7 @@ public final class ChallengeSmoke {
                 var mob=(Zombie)server.getLevel(ChallengeArena.DIMENSION).getEntity(room.mobs.iterator().next());
                 check("arena kills do not advance daily tasks",!DailyTasksFeature.active(server).acceptsCombat(p,mob));
                 check("configured health applied",mob.getMaxHealth()==20);
-                check("slow fixed normal zombies and team sized wave",Math.abs(mob.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-0.12)<0.001 && room.planned==20);
+                check("near-vanilla fixed normal zombies and team sized wave",Math.abs(mob.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-0.21)<0.001 && room.planned==20);
                 check("zombie physically moves along pursuit route",pursuer.position().distanceToSqr(pursuitStart)>0.01);
                 check("pursuit has no wandering goal",mob.goalSelector.getAvailableGoals().stream().allMatch(g->g.getGoal() instanceof ChallengePursuitGoal));
                 check("spawn assigns room player immediately",mob.getTarget()==p);
@@ -252,7 +252,7 @@ public final class ChallengeSmoke {
                 check("stalled zombie repaths without teleporting",room.stalled.get(boss.getUUID())==0 && boss.position().distanceToSqr(stuckPosition)<1);
                 check("boss has difficulty and wave scaled health",Math.abs(boss.getMaxHealth()-ChallengeRules.Enemy.IRON.health*1.28)<0.1);
                 check("boss health bar attached",room.bossBar.getPlayers().contains(p));
-                check("map signage generated",level.getEntitiesOfClass(Display.TextDisplay.class,new net.minecraft.world.phys.AABB(0,64,0,81,96,81)).size()==ChallengeArena.ROOMS.size()+5+room.arena.sites().size());
+                check("shared signage omits personal ammo status",level.getEntitiesOfClass(Display.TextDisplay.class,new net.minecraft.world.phys.AABB(0,64,0,81,96,81)).size()==ChallengeArena.ROOMS.size()+4+room.arena.sites().size());
                 // Native ground navigation must find both flights; no teleport shortcut is accepted.
                 var probe=net.minecraft.world.entity.EntityType.ZOMBIE.create(level);probe.setPos(40.5,65,26.5);probe.setOnGround(true);probe.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE).setBaseValue(192);
                 probe.getNavigation().setMaxVisitedNodesMultiplier(3);
@@ -276,6 +276,7 @@ public final class ChallengeSmoke {
                 NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(p,net.minecraft.world.InteractionHand.MAIN_HAND,pad,new net.minecraft.world.phys.BlockHitResult(pad.getCenter(),net.minecraft.core.Direction.UP,pad,false)));
                 check("resupply cannot inflate ammo on repeat",p.getInventory().save(new ListTag()).equals(after));
                 check("cooldown reports ten seconds",com.google.gson.JsonParser.parseString(feature.snapshot(p,"")).getAsJsonObject().get("ammoCooldown").getAsInt()==10);
+                room.members.add(q.getUUID());try{var pView=com.google.gson.JsonParser.parseString(feature.snapshot(p,"")).getAsJsonObject();var qView=com.google.gson.JsonParser.parseString(feature.snapshot(q,"")).getAsJsonObject();check("same room sends independent per-player cooldown",pView.get("ammoCooldown").getAsInt()==10&&qView.get("ammoCooldown").getAsInt()==0);}finally{room.members.remove(q.getUUID());}
                 room.supplies.put(p.getUUID()+":ammo",server.getTickCount()-199);
                 try{feature.resupply(p);throw new AssertionError("early resupply accepted");}catch(IllegalArgumentException expected){check("resupply rejects 199 ticks",true);}
                 room.supplies.put(p.getUUID()+":ammo",server.getTickCount()-200);matureHold(feature,p,server);feature.resupply(p);check("resupply permits 200 ticks",room.supplies.get(p.getUUID()+":ammo")==server.getTickCount());
@@ -469,7 +470,7 @@ public final class ChallengeSmoke {
                 var spawn=ChallengeFeature.class.getDeclaredMethod("spawn",ChallengeFeature.Room.class,ServerLevel.class);spawn.setAccessible(true);spawn.invoke(feature,room,level);
                 walkerId=room.mobs.iterator().next();
             }
-            if(ticks>495&&stairWalker==null&&walkerId!=null){var entity=server.getLevel(ChallengeArena.DIMENSION).getEntity(walkerId);if(entity instanceof Zombie z){stairWalker=z;stairWalker.teleportTo(40.5,65,11.5);stairWalker.setOnGround(true);stairWalker.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0.30);/* Accelerated traversal fixture; production 0.12 was asserted above. */}}
+            if(ticks>495&&stairWalker==null&&walkerId!=null){var entity=server.getLevel(ChallengeArena.DIMENSION).getEntity(walkerId);if(entity instanceof Zombie z){stairWalker=z;stairWalker.teleportTo(40.5,65,11.5);stairWalker.setOnGround(true);stairWalker.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0.30);/* Accelerated traversal fixture; production 0.21 was asserted above. */}}
             if(ticks>495&&stairWalker!=null&&stairWalker.getY()>=84.5&&stairWalker.distanceToSqr(p)<9){check("live zombie physically climbs two stair flights to the player",true);feature.leave(p,"route complete");finish(server,null);}
             if(ticks>495&&ticks%100==0&&stairWalker!=null){var path=stairWalker.getNavigation().getPath();System.err.println("STAIR WALK tick="+ticks+" pos="+stairWalker.position()+" target="+p.position()+" pathEnd="+(path==null?"none":path.getEndNode())+" velocity="+stairWalker.getDeltaMovement());}
             if(ticks>2550)throw new AssertionError("stair walk timeout, position="+(stairWalker==null?"none":stairWalker.position()));

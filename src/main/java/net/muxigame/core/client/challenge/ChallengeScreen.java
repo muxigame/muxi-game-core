@@ -81,7 +81,7 @@ public final class ChallengeScreen extends Screen {
                 if(!text(r,"phase").equals("LOBBY")&&!text(r,"phase").equals("BUILDING")){
                     g.drawString(font,"波次 "+number(r,"wave")+"/"+number(r,"total")+" · 本波剩余 "+number(r,"remaining")+" · "+number(r,"seconds")+" 秒",left,top+55,0xFFE6EBEF);
                     g.drawString(font,ChallengeClient.batchStatus(r),left,top+68,0xFFE1BA7C);
-                    g.drawWordWrap(font,Component.literal(text(r,"phase").equals("RUNNING")?"按B打开战术购买轮盘；购买不扣结算分。\n整波所有敌人清空才换波，Boss存活不断增援。":"全员加载后准备30秒。柜旁按住R 3秒补弹，松开取消。"),left,top+84,360,0xFFA1AAB6);
+                    g.drawWordWrap(font,Component.literal(text(r,"phase").equals("RUNNING")?"按B打开战术购买轮盘；购买不扣结算分。\n整波所有敌人清空才换波，Boss存活不断增援。":"全员加载后准备30秒。补给点按住R 0.5秒，松开取消。"),left,top+84,360,0xFFA1AAB6);
                 }
                 else g.drawString(font,"房主邀请在线玩家：",left,top+78,0xFFA1AAB6);
             }
@@ -112,7 +112,7 @@ public final class ChallengeScreen extends Screen {
                 }
             }
         }else{
-            String text="研究所：81×81 / 三层 / "+ChallengeArena.ROOMS.size()+" 间大小房间\n一层：零号封锁门、接待后勤，主尸群入口\n二层：中央实验翼、环形绕行通道、观察病房\n三层：西侧通道、横向机房、隔离翼与维护厅\n\n北侧单梯上二层，绕中央翼至西侧单梯上三层。\n破损房间可向下跳一层，下方黄色标记缓冲区。\n一层大量出怪，第8波开放二层，第15波开放三层。\n零号封锁门每波激活，红灯爆闪预告零散入口。\n三层可连续跳落，沿走廊到一层唯一弹药柜。\n5格内按住R 3秒补弹，松开取消，冷却10秒。\n饥饿锁定；两瓶治疗II；最多两主武器＋一手枪。\n普通僵尸慢速压场；幼尸、苦力怕、猪人构成威胁。\nBoss波铁傀儡→装配傀儡→坚守者，存活时不断增援。\n极限25波，大Boss与小Boss同时出现。\nB分类轮盘：独立战术点购买，不扣结算分。\n每批10–20只动态施压，上限96只/房间。";
+            String text="研究所：81×81 / 三层 / "+ChallengeArena.ROOMS.size()+" 间大小房间\n一层：零号封锁门、接待后勤，主尸群入口\n二层：中央实验翼、环形绕行通道、观察病房\n三层：西侧通道、横向机房、隔离翼与维护厅\n\n北侧单梯上二层，绕中央翼至西侧单梯上三层。\n破损房间可向下跳一层，下方黄色标记缓冲区。\n一层大量出怪，第8波开放二层，第15波开放三层。\n零号封锁门每波激活，红灯爆闪预告零散入口。\n三层可连续跳落，沿走廊到一层唯一弹药点。\n5格内按住R 0.5秒补弹，松开取消，冷却10秒。\n饥饿锁定；两瓶治疗II；最多两主武器＋一手枪。\n普通僵尸略慢于自然僵尸；幼尸、苦力怕、猪人构成威胁。\nBoss波铁傀儡→装配傀儡→坚守者，存活时不断增援。\n极限25波，大Boss与小Boss同时出现。\nB分类轮盘：独立战术点购买，不扣结算分。\n每批10–20只动态施压，上限96只/房间。";
             g.drawWordWrap(font,Component.literal(text),left,top,365,0xFFE6EBEF);
         }
         String notice=text(state,"notice");if(!notice.isEmpty())g.drawString(font,font.plainSubstrByWidth(notice,370),left,height-16,0xFFE1BA7C);

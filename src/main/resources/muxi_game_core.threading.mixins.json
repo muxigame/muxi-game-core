@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.muxigame.core.threading.mixin",
+  "plugin": "net.muxigame.core.threading.ThreadingMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["LevelOwnerAccess", "ChunkOwnerAccess", "ServerTimingAccess", "ServerThreadingMixin", "LevelLoaderMixin", "NoiseExecutorMixin", "BiomeExecutorMixin", "ChunkPipelineMixin", "ChunkGuardMixin", "TravelAdmissionMixin", "WorldMutationGuardMixin", "EntityOwnerGuardMixin", "PortalBarrierMixin", "TransferBarrierMixin", "RedstoneThreadMixin", "BlockDropsThreadMixin", "SeasonMapsThreadMixin", "SableVoxelCacheThreadMixin"],
+  "injectors": {"defaultRequire": 1}
+}

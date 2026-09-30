@@ -75,6 +75,12 @@ public final class TaskClientSmoke {
                      "rooms":[{"id":"qa-room","host":"other","name":"研究所突击队","difficulty":"HARD","phase":"LOBBY","wave":0,"total":10,"count":2,"mine":false,"invited":true}],
                      "players":[],"tasks":[{"title":"首次防线：完成一次挑战","ready":true,"claimed":false},{"title":"清剿行动：累计击败 100 只入侵僵尸","ready":true,"claimed":true},{"title":"精英防线：完成困难及以上挑战","ready":true,"claimed":false}]}
                     """).getAsJsonObject();
+                var challengeState=net.muxigame.core.client.challenge.ChallengeClient.state;
+                challengeState.addProperty("ammoCooldown",0);
+                if(!net.muxigame.core.client.challenge.ChallengeClient.supplyLabel(challengeState).equals("弹药补给点"))throw new AssertionError("idle ammo label has extra text");
+                challengeState.addProperty("ammoCooldown",4);
+                if(!net.muxigame.core.client.challenge.ChallengeClient.supplyLabel(challengeState).equals("弹药补给点 冷却 4 秒"))throw new AssertionError("cooldown label missing player-specific time");
+                challengeState.addProperty("ammoCooldown",0);
                 challenge.init(minecraft,width,height);
                 Class<?> boxType=Class.forName("net.muxigame.core.client.tasks.DailyTasksClient$Box");
                 Constructor<?> ctor=boxType.getDeclaredConstructor(int.class,int.class,int.class,int.class,int.class);
@@ -118,11 +124,11 @@ public final class TaskClientSmoke {
                     if(frames<280)challenge.render(g,16,228,delta);else compact.invoke(null,g,box,-1,-1,false);
                 }
                 else{
-                    if(frames==300){var state=net.muxigame.core.client.challenge.ChallengeClient.state;state.addProperty("locked",true);state.addProperty("earned",720);state.addProperty("tactical",1800);state.addProperty("coins",24);state.addProperty("battleRevision",2);state.add("battleShop",com.google.gson.JsonParser.parseString("""
+                    if(frames==300){var state=net.muxigame.core.client.challenge.ChallengeClient.state;state.addProperty("locked",true);state.addProperty("earned",720);state.addProperty("tactical",1800);state.addProperty("coins",24);state.addProperty("battleRevision",2);state.addProperty("ammoHoldTicks",10);state.add("battleShop",com.google.gson.JsonParser.parseString("""
                         [{"id":"glock_17","title":"格洛克17","category":"手枪","gun":"tacz:glock_17","cost":350,"coins":0,"burstDps":40,"sustainedDps":24,"magazine":17},{"id":"deagle","title":"沙漠之鹰","category":"手枪","gun":"tacz:deagle","cost":850,"coins":0,"burstDps":60,"sustainedDps":30,"magazine":7},{"id":"heal","title":"治疗药剂II","category":"补给","gun":"","cost":250,"coins":2}]
                         """).getAsJsonArray());wheel.init(minecraft,width,height);}
                     if(frames==320){var category=wheel.getClass().getDeclaredField("category");category.setAccessible(true);category.set(wheel,"手枪");var slot=wheel.getClass().getDeclaredField("slot");slot.setAccessible(true);slot.set(wheel,2);var rebuild=wheel.getClass().getDeclaredMethod("rebuild");rebuild.setAccessible(true);rebuild.invoke(wheel);}
-                    if(frames<340)wheel.render(g,width/2,height/2,delta);else{var state=net.muxigame.core.client.challenge.ChallengeClient.state;state.addProperty("ammoHolding",true);state.addProperty("ammoProgress",30);net.muxigame.core.client.challenge.ChallengeClient.renderCombat(g);}
+                    if(frames<340)wheel.render(g,width/2,height/2,delta);else{var state=net.muxigame.core.client.challenge.ChallengeClient.state;state.addProperty("ammoHolding",true);state.addProperty("ammoProgress",5);net.muxigame.core.client.challenge.ChallengeClient.renderCombat(g);}
                 }
                 Component note=Component.literal("本地界面测试 · 示例任务");
                 g.drawString(font,note,width-font.width(note)-12,height-18,0xFF81909C,true);

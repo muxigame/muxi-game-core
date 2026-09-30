@@ -15,14 +15,14 @@ public final class ChallengeClient {
     private static boolean holding;
     private static int holdTicks;
     private static final net.minecraft.client.KeyMapping WHEEL=new net.minecraft.client.KeyMapping("key.muxi_game_core.challenge_wheel",com.mojang.blaze3d.platform.InputConstants.KEY_B,"key.categories.muxi_game_core");
-    public static void register(IEventBus modBus,IEventBus bus){ChallengeNetwork.receiver(s->{try{state=JsonParser.parseString(s).getAsJsonObject();if(!holding){state.addProperty("ammoHolding",false);state.addProperty("ammoProgress",0);}}catch(RuntimeException ignored){}});bus.addListener(ChallengeClient::logout);bus.addListener(ChallengeClient::tick);
+    public static void register(IEventBus modBus,IEventBus bus){ChallengeNetwork.receiver(s->{try{state=JsonParser.parseString(s).getAsJsonObject();if(!holding){state.addProperty("ammoHolding",false);state.addProperty("ammoProgress",0);}}catch(RuntimeException ignored){}});bus.addListener(ChallengeClient::logout);bus.addListener(ChallengeClient::tick);bus.addListener(ChallengeClient::renderSupplyLabel);
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent e)->e.register(WHEEL));
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterGuiLayersEvent e)->e.registerAboveAll(net.minecraft.resources.ResourceLocation.parse("muxi_game_core:challenge_combat"),(g,delta)->{var mc=Minecraft.getInstance();if(mc.player!=null&&mc.screen==null&&!mc.options.hideGui&&flag(state,"locked"))renderCombat(g);}));
     }
     private static void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event){
         var mc=Minecraft.getInstance();ticks++;if(mc.player==null||mc.level==null){holding=false;return;}
         while(WHEEL.consumeClick())if(mc.screen==null&&flag(state,"locked")){cancelRefill();mc.setScreen(new ChallengeWheelScreen());}
-        if(holding){if(mc.screen!=null||!mc.isWindowActive()||!com.tacz.guns.client.input.ReloadKey.RELOAD_KEY.isDown()||!nearSupply()||number(state,"ammoCooldown")>0)cancelRefill();else{holdTicks++;if(ticks%5==0){action("ammoHold","");if(holdTicks>=60)action("ammoFinish","");}}}
+        if(holding){if(mc.screen!=null||!mc.isWindowActive()||!com.tacz.guns.client.input.ReloadKey.RELOAD_KEY.isDown()||!nearSupply()||number(state,"ammoCooldown")>0)cancelRefill();else{holdTicks++;if(ticks%5==0)action("ammoHold","");if(holdTicks>=net.muxigame.core.feature.challenge.ChallengeRules.AMMO_HOLD&&ticks%2==0)action("ammoFinish","");}}
         if(ticks%20!=0)return;
         var r=mine();if(r!=null&&text(r,"phase").equals("LOADING")&&mc.level.dimension().equals(net.muxigame.core.feature.challenge.ChallengeArena.DIMENSION)&&mc.level.hasChunkAt(mc.player.blockPosition())&&!(mc.screen instanceof net.minecraft.client.gui.screens.ReceivingLevelScreen))action("ready","");
     }
@@ -36,7 +36,18 @@ public final class ChallengeClient {
         var font=Minecraft.getInstance().font;String balance="结算分 "+number(state,"earned")+"  |  战术点 "+number(state,"tactical")+"  |  兑换币 "+number(state,"coins");
         g.drawString(font,balance,Math.max(4,g.guiWidth()-font.width(balance)-8),8,0xFF8AF0A8);
         g.drawString(font,"B 战术轮盘 · 主1 / 主2 / 手枪",Math.max(4,g.guiWidth()-font.width("B 战术轮盘 · 主1 / 主2 / 手枪")-8),20,0xFFCCD5DE);
-        if(holding||flag(state,"ammoHolding")){int x=g.guiWidth()/2-90,y=g.guiHeight()-72;double fraction=Math.min(1,(double)(holding?holdTicks:number(state,"ammoProgress"))/60);g.fill(x-3,y-14,x+183,y+10,0xDD101720);g.drawCenteredString(font,"按住换弹键补给 · 松开取消",g.guiWidth()/2,y-11,0xFFE6EBEF);g.fill(x,y,x+180,y+6,0xFF354253);g.fill(x,y,x+(int)(180*fraction),y+6,0xFF8AF0A8);}
+        if(holding||flag(state,"ammoHolding")){int x=g.guiWidth()/2-90,y=g.guiHeight()-72;double fraction=Math.min(1,(double)(holding?holdTicks:number(state,"ammoProgress"))/net.muxigame.core.feature.challenge.ChallengeRules.AMMO_HOLD);g.fill(x-3,y-3,x+183,y+10,0xDD101720);g.fill(x,y,x+180,y+6,0xFF354253);g.fill(x,y,x+(int)(180*fraction),y+6,0xFF8AF0A8);}
+    }
+    public static String supplyLabel(JsonObject snapshot){int cooldown=number(snapshot,"ammoCooldown");return cooldown>0?"弹药补给点 冷却 "+cooldown+" 秒":"弹药补给点";}
+    private static void renderSupplyLabel(net.neoforged.neoforge.client.event.RenderLevelStageEvent event){
+        if(event.getStage()!=net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.AFTER_ENTITIES)return;
+        var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null||!flag(state,"locked")||number(state,"arenaVersion")!=4||!mc.level.dimension().equals(net.muxigame.core.feature.challenge.ChallengeArena.DIMENSION))return;
+        var station=new net.minecraft.core.BlockPos(number(state,"arenaOrigin")+40,65,36);
+        var place=station.getCenter().add(0,2.7,0);var camera=event.getCamera().getPosition();
+        if(camera.distanceToSqr(place)>48*48)return;
+        var label=supplyLabel(state);var pose=event.getPoseStack();pose.pushPose();pose.translate(place.x-camera.x,place.y-camera.y,place.z-camera.z);
+        pose.mulPose(mc.getEntityRenderDispatcher().cameraOrientation());pose.scale(-0.025f,-0.025f,0.025f);
+        var buffers=mc.renderBuffers().bufferSource();mc.font.drawInBatch(label,-mc.font.width(label)/2f,0,0xFFFFE28A,false,pose.last().pose(),buffers,net.minecraft.client.gui.Font.DisplayMode.NORMAL,0,15728880);buffers.endBatch();pose.popPose();
     }
     private static void logout(ClientPlayerNetworkEvent.LoggingOut e){state=new JsonObject();holding=false;holdTicks=0;}
     public static boolean supported(){var c=Minecraft.getInstance().getConnection();return c!=null && NetworkRegistry.hasChannel(c,ChallengeNetwork.Action.TYPE.id());}

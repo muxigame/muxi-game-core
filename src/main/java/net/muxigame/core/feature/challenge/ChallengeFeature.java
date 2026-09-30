@@ -215,7 +215,7 @@ public final class ChallengeFeature implements ServerFeature {
     }
     public void clientReady(ServerPlayer p){Room r=room(p.getUUID());if(r==null||r.phase!=Phase.LOADING||!locked(p)||!dimension(p.level())||!r.alive.contains(p.getUUID()))return;r.ready.add(p.getUUID());if(r.ready.containsAll(r.alive)){r.phase=Phase.COUNTDOWN;r.timer=server.getTickCount()+600;planWave(r,1);notice(r,"地图加载完成，首波将在 30 秒后开始。红色爆闪灯标示已激活刷怪口，可提前布防。");}}
     public void resupply(ServerPlayer p){
-        Room r=room(p.getUUID());AmmoHold hold=r==null?null:r.holds.get(p.getUUID());require(hold!=null&&server.getTickCount()-hold.started>=ChallengeRules.AMMO_HOLD&&server.getTickCount()-hold.heartbeat<=8,"请在柜旁持续按住换弹键3秒，松开取消");
+        Room r=room(p.getUUID());AmmoHold hold=r==null?null:r.holds.get(p.getUUID());require(hold!=null&&server.getTickCount()-hold.started>=ChallengeRules.AMMO_HOLD&&server.getTickCount()-hold.heartbeat<=8,"请在补给点持续按住换弹键0.5秒，松开取消");
         checkSupply(p);
         ChallengeGuns.refill(p);r.supplies.put(p.getUUID()+":ammo",server.getTickCount());r.holds.remove(p.getUUID());send(p,"弹药补满");
     }
@@ -471,7 +471,7 @@ public final class ChallengeFeature implements ServerFeature {
         if(!(e.getEntity() instanceof ServerPlayer p) || !dimension(p.level()))return;
         e.setCanceled(true);Room r=room(p.getUUID());if(r==null || !r.alive.contains(p.getUUID()) || p.distanceToSqr(e.getPos().getCenter())>36)return;
         BlockPos pos=e.getPos();
-        if(pos.distSqr(r.arena.ammoStation(0))<=2)tell(p,"在柜旁按住换弹键3秒补弹，松开取消；完成后冷却10秒");
+        // The station label and personal cooldown are rendered on each client, never in shared world text.
     }
     private void entityInteract(PlayerInteractEvent.EntityInteract e){if(e.getEntity() instanceof ServerPlayer p && locked(p))e.setCanceled(true);}
     private void travel(net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent e){

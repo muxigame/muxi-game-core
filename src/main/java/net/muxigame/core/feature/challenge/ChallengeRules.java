@@ -6,7 +6,7 @@ import java.util.*;
 public final class ChallengeRules {
     private ChallengeRules() {}
     public static final int MAX_ROOMS=4, MAX_PLAYERS=4, WAVE_SECONDS=300;
-    public static final int BATCH_SECONDS=20, MAX_LIVING=96, AMMO_COOLDOWN=200, AMMO_HOLD=60, EXCHANGE_RATE=500;
+    public static final int BATCH_SECONDS=20, MAX_LIVING=96, AMMO_COOLDOWN=200, AMMO_HOLD=10, EXCHANGE_RATE=500;
     public enum Difficulty {
         NORMAL("普通",5,1.0,1.0,1), HARD("困难",10,1.5,1.3,2),
         EXPERT("专家",15,2.1,1.7,3), NIGHTMARE("噩梦",20,2.8,2.1,4), EXTREME("极限",25,3.4,2.5,5);
@@ -29,7 +29,7 @@ public final class ChallengeRules {
     public static double adaptTempo(double previous,int elapsed,int expected,boolean cleared){double ratio=(double)elapsed/Math.max(1,expected);double desired=previous*(cleared?(ratio<0.75?0.8:0.95):1.1);return Math.max(0.55,Math.min(1.1,previous*0.6+desired*0.4));}
     public static int spawnFloor(int wave,int ordinal){int roll=Math.floorMod(ordinal*37,100);return wave>=15&&roll>=95?2:wave>=8&&roll>=75?1:0;}
     public enum Enemy {
-        ZOMBIE("感染尸群",20,3,0.12,false), RUNNER("疾行幼尸",14,3,0.23,false),
+        ZOMBIE("感染尸群",20,3,0.21,false), RUNNER("疾行幼尸",14,3,0.30,false),
         CREEPER("爆破感染者",20,0,0.17,false), PIGLIN("狂暴猪人",32,8,0.16,false),
         IRON("失控铁傀儡",160,9,0.15,true), MODULAR("装配重型傀儡",320,12,0.15,true), WARDEN("深层坚守者",480,16,0.17,true);
         public final String title;public final double health,damage,speed;public final boolean boss;

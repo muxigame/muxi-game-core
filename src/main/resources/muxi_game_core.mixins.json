@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "ChampionSpawnHandlerMixin",
-    "NaturalSpawnerMixin"
+    "NaturalSpawnerMixin",
+    "DimensionFirePortalMixin"
   ],
   "injectors": {
     "defaultRequire": 1

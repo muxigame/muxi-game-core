@@ -28,6 +28,9 @@ public final class MuxiGameCore {
     private final List<ServerFeature> features = new ArrayList<>();
 
     public MuxiGameCore(IEventBus modBus) {
+        net.muxigame.core.threading.DimensionThreads.validate();
+        net.muxigame.core.threading.ChunkTravel.register(NeoForge.EVENT_BUS);
+        net.muxigame.core.feature.dimensions.WorldPortals.register(modBus);
         TaskNetwork.register(modBus);
         net.muxigame.core.feature.challenge.ChallengeNetwork.register(modBus);
         CoreConfig config = CoreConfig.load(Path.of(CoreConfig.FILE));
@@ -43,6 +46,7 @@ public final class MuxiGameCore {
         // 普通聊天按 Tab 也能补在线玩家的昵称（原版只补 UID）；只发原版的补全包，不需要配置。
         if (ModList.get().isLoaded("simplenicknames")) register(new ChatCompletionFeature());
         register(new DailyTasksFeature());
+        register(new net.muxigame.core.feature.dimensions.DimensionsFeature());
         register(new net.muxigame.core.feature.challenge.ChallengeFeature());
         NeoForge.EVENT_BUS.addListener(this::onStopped);
         LOG.info("muxi Game Core loaded; enabled features: {}", features.stream().map(ServerFeature::id).toList());
