@@ -6,7 +6,8 @@
   "mixins": [
     "ChampionSpawnHandlerMixin",
     "NaturalSpawnerMixin",
-    "DimensionFirePortalMixin"
+    "DimensionFirePortalMixin",
+    "InitialPlayerSpawnMixin"
   ],
   "injectors": {
     "defaultRequire": 1

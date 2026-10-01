@@ -59,6 +59,24 @@ public final class DimensionsSmoke {
         var ids = net.minecraft.server.players.PlayerList.class.getDeclaredField("playersByUUID"); ids.setAccessible(true);
         ((Map<UUID,ServerPlayer>)ids.get(server.getPlayerList())).put(player.getUUID(), player);
         server.overworld().addNewPlayer(player);
+        CompoundTag persisted = player.getPersistentData().getCompound("PlayerPersisted");
+        persisted.putBoolean("muxiFirstJoinBook", true);
+        player.getPersistentData().put("PlayerPersisted", persisted);
+        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
+        return player;
+    }
+    @SuppressWarnings("unchecked")
+    private ServerPlayer newcomer(MinecraftServer server, GameProfile profile) throws Exception {
+        ServerPlayer player = new ServerPlayer(server, server.overworld(), profile, ClientInformation.createDefault());
+        Connection transport = new Connection(PacketFlow.SERVERBOUND); new EmbeddedChannel(transport);
+        player.connection = new ServerGamePacketListenerImpl(server, transport, player, CommonListenerCookie.createInitial(profile, false)) {
+            @Override public void send(Packet<?> packet) {}
+        };
+        var players = net.minecraft.server.players.PlayerList.class.getDeclaredField("players"); players.setAccessible(true);
+        ((List<ServerPlayer>)players.get(server.getPlayerList())).add(player);
+        var ids = net.minecraft.server.players.PlayerList.class.getDeclaredField("playersByUUID"); ids.setAccessible(true);
+        ((Map<UUID,ServerPlayer>)ids.get(server.getPlayerList())).put(player.getUUID(), player);
+        server.overworld().addNewPlayer(player);
         NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
         return player;
     }
@@ -69,18 +87,51 @@ public final class DimensionsSmoke {
     private void exercise(MinecraftServer server) throws Exception {
         var home = server.overworld();
         var world = server.getLevel(WorldDimensions.OVERWORLD);
+        var adventure = server.getLevel(WorldDimensions.ADVENTURE);
         check("home retains minecraft:overworld identity", home.dimension().equals(Level.OVERWORLD));
         check("home display name", WorldDimensions.name(home.dimension()).equals("家园"));
         check("survival dimension loaded", world != null && world != home);
+        check("adventure dimension loaded", adventure != null && adventure != home && adventure != world);
+        check("adventure display name", WorldDimensions.name(adventure.dimension()).equals("冒险世界"));
+        check("both custom worlds inherit overworld behavior", WorldDimensions.exploration(world.dimension()) && WorldDimensions.exploration(adventure.dimension()));
+        check("only survival world is resettable", WorldDimensions.resettable(world.dimension()) && !WorldDimensions.resettable(adventure.dimension()) && !WorldDimensions.resettable(home.dimension()));
         check("eternal night not registered",server.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,net.minecraft.resources.ResourceLocation.parse("muxi_game_core:eternal_night")))==null);
         check("unrelated Nether and End retained", server.getLevel(Level.NETHER) != null && server.getLevel(Level.END) != null);
         check("new overworld has normal time", !world.dimensionType().hasFixedTime());
+        check("adventure has normal time", !adventure.dimensionType().hasFixedTime());
+        check("survival and adventure share the world seed", world.getSeed()==adventure.getSeed() && world.getSeed()==home.getSeed());
+        check("survival and adventure use the same generator kind", world.getChunkSource().getGenerator().getClass().equals(adventure.getChunkSource().getGenerator().getClass()));
         BlockPos base = new BlockPos(0, 180, 0);
-        for (var level : List.of(home, world)) { pad(level, base); level.setDefaultSpawnPos(base, 0); }
+        for (var level : List.of(home, world, adventure)) { pad(level, base); level.setDefaultSpawnPos(base, 0); }
         home.setBlockAndUpdate(base.offset(4,0,0), Blocks.DIAMOND_BLOCK.defaultBlockState());
         check("generated normal terrain in new world", !world.getBlockState(new BlockPos(0,-60,0)).isAir());
+        check("generated normal terrain in adventure world", !adventure.getBlockState(new BlockPos(0,-60,0)).isAir());
+        var newProfile = new GameProfile(UUID.randomUUID(), "FirstJoinQA");
+        ServerPlayer newcomer = newcomer(server, newProfile);
+        check("new player is marked for initial survival spawn",
+            DimensionsFeature.needsInitialSurvival(newcomer));
+        BlockPos initial = DimensionsFeature.findInitialSurvivalLanding(world,newcomer);
+        check("random initial survival landing exists", initial != null);
+        check("random initial survival landing is safe", DimensionsFeature.safeInitialSpawn(world,initial));
+        long spawnDistance = (long)initial.getX() * initial.getX() + (long)initial.getZ() * initial.getZ();
+        check("new player spawn is within 10000-block radius", spawnDistance <= 10000L * 10000L);
+        check("new player spawn is not ocean", !world.getBiome(initial).is(net.minecraft.tags.BiomeTags.IS_OCEAN));
+        check("new player spawn has two-block air headroom", world.isEmptyBlock(initial) && world.isEmptyBlock(initial.above()));
+        check("new player spawn has no fluid", world.getFluidState(initial).isEmpty() && world.getFluidState(initial.above()).isEmpty());
+        newcomer.setServerLevel(world);
+        DimensionsFeature.applyInitialSurvivalSpawn(newcomer,initial);
+        check("new player receives survival position", newcomer.level() == world && newcomer.blockPosition().equals(initial));
+        check("new player initial respawn stays in survival", newcomer.getRespawnDimension().equals(WorldDimensions.OVERWORLD));
+        check("new player initial respawn position matches landing", newcomer.getRespawnPosition().equals(newcomer.blockPosition()));
+        check("successful onboarding is one-shot",
+            newcomer.getPersistentData().getCompound("PlayerPersisted").getBoolean("muxiInitialSurvivalDone")
+                && !newcomer.getPersistentData().getCompound("PlayerPersisted").getBoolean("muxiInitialSurvivalPending")
+                && !DimensionsFeature.needsInitialSurvival(newcomer));
         var profile = new GameProfile(UUID.randomUUID(), "DimensionQA");
         ServerPlayer p = player(server, profile); p.setPos(0.5,180,0.5);
+        check("existing player is not migrated by new onboarding",
+            !p.getPersistentData().getCompound("PlayerPersisted").getBoolean("muxiInitialSurvivalPending")
+                && !DimensionsFeature.needsInitialSurvival(p));
         p.getInventory().setItem(0, new ItemStack(Items.DIAMOND, 23)); p.giveExperienceLevels(7);
         check("admin can see debug menu", command(p, "") == 1);
         check("unknown world denied", throwsCommand(p, "quarantine"));
@@ -91,6 +142,11 @@ public final class DimensionsSmoke {
         ready(p);
         check("returns to original home", command(p, "home") == 1 && p.level() == home && p.blockPosition().equals(base));
         check("same dimension rejected", command(p,"home")==0);
+        ready(p);
+        check("admin debug travel enters adventure", command(p, "adventure") == 1 && p.level() == adventure);
+        check("inventory and xp shared with adventure", p.getInventory().getItem(0).getCount() == 23 && p.experienceLevel == 7);
+        ready(p);
+        check("adventure returns home", command(p, "home") == 1 && p.level() == home);
         check("existing home blocks unchanged", home.getBlockState(base.offset(4,0,0)).is(Blocks.DIAMOND_BLOCK));
         ready(p); p.getPersistentData().put(ChallengeInventory.KEY, new CompoundTag());
         check("challenge return snapshot blocks escape", command(p, "overworld") == 0 && p.level() == home);
@@ -127,6 +183,7 @@ public final class DimensionsSmoke {
         Path root = server.getWorldPath(LevelResource.ROOT);
         check("old overworld remains in region folder", Files.isDirectory(root.resolve("region")));
         check("new world uses separate region folder", Files.isDirectory(root.resolve("dimensions/muxi_game_core/overworld/region")));
+        check("adventure uses separate persistent region folder", Files.isDirectory(root.resolve("dimensions/muxi_game_core/adventure/region")));
     }
     private boolean throwsCommand(ServerPlayer player, String command) {
         try { command(player, command); return false; } catch (Exception expected) { return true; }

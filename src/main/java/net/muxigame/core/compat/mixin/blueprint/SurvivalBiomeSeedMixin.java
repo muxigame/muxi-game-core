@@ -12,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.*;
 public abstract class SurvivalBiomeSeedMixin {
     @Redirect(method="onServerAboutToStart",at=@At(value="INVOKE",target="Lnet/minecraft/resources/ResourceLocation;hashCode()I"))
     private static int muxi$worldgenSalt(ResourceLocation location) {
-        return (location.equals(WorldDimensions.OVERWORLD.location())?Level.OVERWORLD.location():location).hashCode();
+        return (WorldDimensions.exploration(location)?Level.OVERWORLD.location():location).hashCode();
     }
     @ModifyArg(method="onServerAboutToStart",at=@At(value="INVOKE",target="Lnet/minecraft/core/Registry;getData(Lnet/neoforged/neoforge/registries/datamaps/DataMapType;Lnet/minecraft/resources/ResourceKey;)Ljava/lang/Object;"),index=1)
     private static ResourceKey<?> muxi$sliceSize(ResourceKey<?> key) {
-        return key.location().equals(WorldDimensions.OVERWORLD.location())?ResourceKey.create(Registries.LEVEL_STEM,Level.OVERWORLD.location()):key;
+        return WorldDimensions.exploration(key.location())?ResourceKey.create(Registries.LEVEL_STEM,Level.OVERWORLD.location()):key;
     }
 }

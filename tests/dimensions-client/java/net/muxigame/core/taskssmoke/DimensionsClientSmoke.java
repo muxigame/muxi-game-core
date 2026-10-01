@@ -93,6 +93,7 @@ public final class DimensionsClientSmoke {
             if(stage==1) {
                 check("real client joined home",mc.level.dimension().equals(Level.OVERWORLD));items(mc,"home");
                 check("new overworld registry synchronized",mc.getConnection().levels().contains(WorldDimensions.OVERWORLD));
+                check("adventure registry synchronized",mc.getConnection().levels().contains(WorldDimensions.ADVENTURE));
                 check("eternal night not registered",mc.getConnection().levels().stream().noneMatch(k->k.location().toString().equals("muxi_game_core:eternal_night")));
                 // Verify the installed Xaero mixin method actually exists and only replaces visible labels.
                 var method=Arrays.stream(xaero.map.gui.GuiMapSwitching.class.getDeclaredMethods())
@@ -101,6 +102,7 @@ public final class DimensionsClientSmoke {
                 var instance=new xaero.map.gui.GuiMapSwitching(null);
                 check("Xaero home label patched",method.invoke(instance,Level.OVERWORLD.location()).equals("家园"));
                 check("Xaero survival label patched",method.invoke(instance,WorldDimensions.OVERWORLD.location()).equals("生存世界"));
+                check("Xaero adventure label patched",method.invoke(instance,WorldDimensions.ADVENTURE.location()).equals("冒险世界"));
                 check("Xaero unrelated dimension name unchanged",method.invoke(instance,Level.NETHER.location()).equals("minecraft:the_nether"));
                 screenshot(mc,"home");near(mc,2);stage=2;
             } else if(stage==2) {
