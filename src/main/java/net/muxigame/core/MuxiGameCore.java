@@ -33,6 +33,7 @@ public final class MuxiGameCore {
         net.muxigame.core.threading.ChunkTravel.register(NeoForge.EVENT_BUS);
         net.muxigame.core.feature.dimensions.WorldPortals.register(modBus);
         TaskNetwork.register(modBus);
+        net.muxigame.core.feature.login.TerminalPassportNetwork.register(modBus);
         WaystoneMapNetwork.register(modBus);
         net.muxigame.core.feature.challenge.ChallengeNetwork.register(modBus);
         CoreConfig config = CoreConfig.load(Path.of(CoreConfig.FILE));

@@ -73,7 +73,7 @@ public final class CoreSelfTest {
         check("twilight forest left alone", SpawnCategoryRules.leftAlone("twilightforest"));
         check("nether filtered", !SpawnCategoryRules.leftAlone("minecraft"));
         // 客户端兼容各块的纯逻辑测试各自一个类，互不干扰。
-        passed += MapsSelfTest.run() + CommandsSelfTest.run() + DisplaysSelfTest.run() + TasksSelfTest.run()
+        passed += ConnectionAdmissionsSelfTest.run() + MapsSelfTest.run() + CommandsSelfTest.run() + DisplaysSelfTest.run() + TasksSelfTest.run()
             + MainlineTasksSelfTest.run() + TaskHudSettingsSelfTest.run() + ChallengeRulesSelfTest.run();
         System.out.println("Game Core Java self-tests: " + passed + " passed");
     }

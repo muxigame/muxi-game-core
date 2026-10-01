@@ -1,5 +1,20 @@
 # muxi Game Core
 
+## Terminal platform SSO (isolated implementation)
+
+The optional passport channel requires LoginGate admission on the exact transport
+connection, plus an independently authenticated launcher/native PKCE proof. The
+client never supplies the authoritative UID, platform role or return target.
+Admission evidence is monotonic, connection-bound and consumed once; logout and
+server stop clear it. Passport requests are rate-limited per admitted connection,
+and asynchronous replies are discarded after disconnect/reconnect.
+
+The native PKCE verifier and restricted launcher credential do not traverse the
+game connection. Only short single-use proof/ticket values do. Missing auth/Core
+support falls back to normal platform login. The feature does not change OP,
+platform admin, game bans, task state or gameplay permissions. Rollout requires
+updated launcher/client/server code and separately enabled auth/platform gates.
+
 muxigame 整合包的**功能集成模组**：服务端功能（登录核验、昵称同步、玩法规则），以及客户端的显示兼容（到处显示昵称而不是 UID）。
 
 - 模组 ID：`muxi_game_core`
