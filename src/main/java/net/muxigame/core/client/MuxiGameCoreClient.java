@@ -25,9 +25,6 @@ public final class MuxiGameCoreClient {
         net.muxigame.core.feature.dimensions.WorldPortals.register(modBus);
         TaskNetwork.register(modBus);
         WaystoneMapNetwork.register(modBus);
-        net.muxigame.core.feature.challenge.ChallengeNetwork.register(modBus);
-        new net.muxigame.core.feature.challenge.ChallengeFeature().register(NeoForge.EVENT_BUS);
-        net.muxigame.core.client.challenge.ChallengeClient.register(modBus,NeoForge.EVENT_BUS);
         new DailyTasksFeature().register(NeoForge.EVENT_BUS);
         new net.muxigame.core.feature.dimensions.DimensionsFeature().register(NeoForge.EVENT_BUS);
         DailyTasksClient.register(modBus,NeoForge.EVENT_BUS);

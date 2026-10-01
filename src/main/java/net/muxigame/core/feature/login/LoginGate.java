@@ -154,7 +154,7 @@ public final class LoginGate implements ServerFeature {
     /** 兜底：negotiation 那一步万一没拦住，进世界的瞬间再核一次名单。 */
     private void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || player instanceof FakePlayer) return;
-        if (admitted.remove(player.getUUID()) != null) return;
+        if (admitted.remove(player.getUUID()) != null) { net.muxigame.minigames.TrustedAccounts.admit(player); return; }
         LOG.warn("UID {} reached login without a verified join grant; disconnecting late",
             player.getGameProfile().getName());
         player.connection.disconnect(NO_GRANT);

@@ -60,6 +60,12 @@ def main() -> None:
         if len(server_cores)!=1:raise ValueError('Expected one core JAR in the paired isolated server')
         core=server_cores[0]
     shutil.copy2(core,lab/'mods'/core.name)
+    minigame_jars=[]
+    for module in ('muxi-minigames','muxi-zombie-challenge'):
+        meta=json.loads((ROOT.parent/module/'build/release.json').read_text(encoding='utf-8'))
+        jar=ROOT.parent/module/'build/libs'/meta['artifact']
+        minigame_jars.append(jar);shutil.copy2(jar,lab/'mods'/jar.name)
+
     # Game Core 1.12+ has a real Waystones/Xaero integration. Keep these in the
     # minimal native smoke fixture so required dependencies and map mixin targets
     # are exercised instead of only being compile-checked.

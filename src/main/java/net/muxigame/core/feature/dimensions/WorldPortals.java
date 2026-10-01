@@ -13,7 +13,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.network.chat.Component;
-import net.muxigame.core.feature.challenge.ChallengeFeature;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
@@ -94,9 +93,8 @@ public final class WorldPortals {
         message(player,"通往"+WorldDimensions.ALL.get(destination).name()+"的门已开启，走入门内即可传送");
     }
     private static boolean canTravel(ServerPlayer player) {
-        var challenge=ChallengeFeature.active(player.server);
         if(!player.isAlive()||player.isSleeping()||player.isPassenger()||player.isVehicle()
-            ||ChallengeFeature.locked(player)||(challenge!=null&&challenge.room(player.getUUID())!=null))return false;
+            ||net.muxigame.minigames.GameRuntime.blocksWorldTravel(player))return false;
         return player.containerMenu==player.inventoryMenu&&player.containerMenu.getCarried().isEmpty();
     }
     private static void message(ServerPlayer player,String text) {player.displayClientMessage(Component.literal(text),true);}

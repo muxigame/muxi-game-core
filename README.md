@@ -1,3 +1,5 @@
+> 小游戏拆分迁移：僵尸枪战已迁出本模组，由独立 `muxi_zombie_challenge` 注册；Core 仅提供既有可信账号证明和通用参与状态查询。旧挑战章节属于历史资料，现行安装与回归说明见 `../muxi-minigames/docs/migration.md`。运行必须配套新版 `muxi_minigames`；禁止与旧 Core 混用。
+
 # muxi Game Core
 
 muxigame 整合包的**功能集成模组**：服务端功能（登录核验、昵称同步、玩法规则），以及客户端的显示兼容（到处显示昵称而不是 UID）。

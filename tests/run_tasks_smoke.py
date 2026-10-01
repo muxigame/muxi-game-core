@@ -59,6 +59,12 @@ def run() -> None:
     lab.mkdir(parents=True, exist_ok=False)
     (lab / 'mods').mkdir(); (lab / 'config').mkdir()
     shutil.copy2(core, lab / 'mods' / core.name)
+    minigame_jars=[]
+    for module in ('muxi-minigames','muxi-zombie-challenge'):
+        meta=json.loads((ROOT.parent/module/'build/release.json').read_text(encoding='utf-8'))
+        jar=ROOT.parent/module/'build/libs'/meta['artifact']
+        minigame_jars.append(jar);shutil.copy2(jar,lab/'mods'/jar.name)
+
     omitted=[]
     if args.full_pack:
         for mod in (server/'mods').glob('*.jar'):
@@ -127,9 +133,9 @@ def run() -> None:
     mapped = next(p for p in jars if p.name == 'server-1.21.1-20240808.144430-srg.jar')
     nested=lab/'compile-nested'; nested.mkdir()
     extra=[p for jar in dependencies for p in core_build.nested_jars(jar,nested)]
-    cp = os.pathsep.join(str(p) for p in [core, neo, mapped, *jars, *dependencies, *extra])
+    cp = os.pathsep.join(str(p) for p in [core, *minigame_jars, neo, mapped, *jars, *dependencies, *extra])
     classes = lab / 'test-classes'
-    sources='tests/portals-smoke/java' if args.portals else 'tests/dimensions-smoke/java' if args.dimensions else 'tests/challenge-smoke/java' if args.challenge else 'tests/extended-smoke/java' if args.extended else 'tests/integration-smoke/java' if args.integrations else 'tests/smoke/java'
+    sources='tests/portals-smoke/java' if args.portals else 'tests/dimensions-smoke/java' if args.dimensions else '../muxi-zombie-challenge/tests/challenge-smoke/java' if args.challenge else 'tests/extended-smoke/java' if args.extended else 'tests/integration-smoke/java' if args.integrations else 'tests/smoke/java'
     if args.worldgen_audit: sources='tests/worldgen-audit/java'
     if args.travel: sources='tests/travel-smoke/java'
     core_build.compile_java(compiler, sorted((ROOT / sources).rglob('*.java')) + sorted((ROOT / 'tests/smoke-common/java').rglob('*.java')), classes, cp, lab / 'compile.args')

@@ -19,7 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
 import net.muxigame.core.feature.dimensions.*;
-import net.muxigame.core.feature.challenge.ChallengeInventory;
+import net.muxigame.zombie.challenge.ChallengeInventory;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
