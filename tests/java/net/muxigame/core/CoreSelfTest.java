@@ -16,6 +16,7 @@ public final class CoreSelfTest {
         catch (IllegalArgumentException error) { check("no secret in errors", !error.getMessage().contains("test-secret")); }
     }
     public static void main(String[] args) {
+        passed += OpSyncSelfTest.run();
         check("UID numeric", IdentityRules.validUid("10000"));
         check("reject username", !IdentityRules.validUid("Roc"));
         check("reject leading zero", !IdentityRules.validUid("010000"));

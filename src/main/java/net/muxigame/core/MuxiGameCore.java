@@ -41,7 +41,7 @@ public final class MuxiGameCore {
         if (config.identity().enabled()) {
             if (!ModList.get().isLoaded("simplenicknames"))
                 throw new IllegalStateException("Game Core identity is enabled but Simple Nicknames 0.8.x is not installed.");
-            register(new IdentityFeature(config.identity()));
+            register(new IdentityFeature(config.identity(), config.opSync()));
         }
         // 玩法规则，不需要密钥和网络，装了 Champions 就生效；新生成的拦截在 ChampionSpawnHandlerMixin。
         if (ModList.get().isLoaded("champions")) register(new ChampionsFeature());

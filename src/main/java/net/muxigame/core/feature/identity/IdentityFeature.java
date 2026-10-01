@@ -32,6 +32,7 @@ public final class IdentityFeature implements ServerFeature {
     private static final Logger LOG = LoggerFactory.getLogger("muxi-game-core/identity");
     private static final Set<String> NICK_COMMANDS = Set.of("nick", "setnick", "randomnick", "unnick");
     private final HttpClient http;
+    private final GameOpSync opSync;
     private final CoreConfig.Identity config;
     private final Set<UUID> pending = ConcurrentHashMap.newKeySet();
     private final ConcurrentLinkedQueue<Result> completed = new ConcurrentLinkedQueue<>();
@@ -39,13 +40,16 @@ public final class IdentityFeature implements ServerFeature {
     private volatile boolean stopped;
     private record Result(ServerPlayer player, String uid, int status, String body) {}
 
-    public IdentityFeature(CoreConfig.Identity config) {
+    public IdentityFeature(CoreConfig.Identity config) { this(config, CoreConfig.disabled().opSync()); }
+    public IdentityFeature(CoreConfig.Identity config, CoreConfig.OpSync ops) {
         this.config = config;
         http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(4)).followRedirects(HttpClient.Redirect.NEVER).build();
+        opSync = ops.enabled() ? new GameOpSync(http, ops) : null;
     }
     @Override public String id() { return "identity"; }
     @Override public void register(IEventBus gameBus) {
         gameBus.addListener(this::onLogin);
+        if (opSync != null) gameBus.addListener(opSync::registerCommands);
         gameBus.addListener(this::onTick);
         gameBus.addListener(this::onCommand);
         LOG.info("Platform UID / nickname integration enabled; refresh every {}s", config.refreshSeconds());
@@ -88,6 +92,7 @@ public final class IdentityFeature implements ServerFeature {
     private void onTick(ServerTickEvent.Post event) {
         if (stopped || ++ticks % 20 != 0) return;
         MinecraftServer server = event.getServer();
+        if (opSync != null) opSync.tick(server, ticks == 20 || ticks % (config.refreshSeconds() * 20L) == 0);
         Result result;
         while ((result = completed.poll()) != null) {
             pending.remove(result.player().getUUID());
@@ -131,6 +136,7 @@ public final class IdentityFeature implements ServerFeature {
     }
     @Override public void close() {
         stopped = true;
+        if (opSync != null) opSync.close();
         http.shutdownNow();
         pending.clear();
         completed.clear();

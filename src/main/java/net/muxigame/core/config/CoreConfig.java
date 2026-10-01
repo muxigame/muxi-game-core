@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /** Private runtime configuration lives in the server, never in this repository. */
-public record CoreConfig(Identity identity, Login login) {
+public record CoreConfig(Identity identity, Login login, OpSync opSync) {
     public static final String FILE = "config/muxi-game-core.json";
     public static final String DEFAULT_ENDPOINT = "https://account.muxigame.com/api/internal/minecraft/identity/";
     public static final String DEFAULT_JOIN_ENDPOINT = "https://account.muxigame.com/api/internal/minecraft/join/";
@@ -26,6 +26,10 @@ public record CoreConfig(Identity identity, Login login) {
         }
     }
 
+    public record OpSync(boolean enabled, String endpoint, String serverKey) {
+        @Override public String toString() { return "OpSync[enabled=" + enabled + ", serverKey=<redacted>]"; }
+    }
+
     public static CoreConfig load(Path file) {
         try {
             if (!Files.exists(file)) return disabled();
@@ -39,7 +43,7 @@ public record CoreConfig(Identity identity, Login login) {
 
     public static CoreConfig disabled() {
         return new CoreConfig(new Identity(false, DEFAULT_ENDPOINT, "", 60),
-                              new Login(false, DEFAULT_JOIN_ENDPOINT, "", 6));
+                              new Login(false, DEFAULT_JOIN_ENDPOINT, "", 6), new OpSync(false, "", ""));
     }
 
     public static CoreConfig parse(String json) {
@@ -52,7 +56,12 @@ public record CoreConfig(Identity identity, Login login) {
             JsonObject features = root.getAsJsonObject("features");
             // 两节各自独立：只配 login 不配 identity 也要能用，反过来同理。
             // 早先这里是"没有 identity 就整份配置作废"，加第二个功能时必须拆开。
-            return new CoreConfig(identity(features), login(features));
+            Identity identity = identity(features);
+            Login login = login(features);
+            OpSync opSync = opSync(features);
+            // A UID-shaped client profile alone is not authentication. Require the join gate.
+            if (opSync.enabled() && (!identity.enabled() || !login.enabled())) throw new IllegalArgumentException();
+            return new CoreConfig(identity, login, opSync);
         } catch (Exception ignored) {
             throw new IllegalArgumentException("Invalid Game Core configuration (values redacted)");
         }
@@ -66,6 +75,16 @@ public record CoreConfig(Identity identity, Login login) {
         int seconds = boundedInt(source, "refreshSeconds", 60, 10, 600);
         checkEndpointAndKey(endpoint, key);
         return new Identity(true, endpoint, key, seconds);
+    }
+
+    private static OpSync opSync(JsonObject features) {
+        JsonObject source = section(features, "opSync");
+        if (source == null) return disabled().opSync();
+        String endpoint = source.get("endpoint").getAsString();
+        String key = source.get("serverKey").getAsString();
+        checkEndpointAndKey(endpoint, key);
+        if (!"/api/internal/game/ops-sync/".equals(URI.create(endpoint).getPath())) throw new IllegalArgumentException();
+        return new OpSync(true, endpoint, key);
     }
 
     private static Login login(JsonObject features) {
