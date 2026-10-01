@@ -47,6 +47,7 @@ public final class MuxiGameCore {
         // 普通聊天按 Tab 也能补在线玩家的昵称（原版只补 UID）；只发原版的补全包，不需要配置。
         if (ModList.get().isLoaded("simplenicknames")) register(new ChatCompletionFeature());
         register(new net.muxigame.core.feature.rules.CreeperTerrainProtection());
+        register(new net.muxigame.core.feature.spawning.HomeSpawningFeature());
         register(new net.muxigame.core.feature.teleport.TpaFeature());
         register(new DailyTasksFeature());
         register(new net.muxigame.core.feature.dimensions.DimensionsFeature());

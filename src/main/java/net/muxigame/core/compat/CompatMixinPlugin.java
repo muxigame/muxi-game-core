@@ -19,6 +19,7 @@ public final class CompatMixinPlugin implements IMixinConfigPlugin {
     private static final String PREFIX = "net.muxigame.core.compat.mixin.";
     private static final Map<String, String> REQUIRED_MOD = Map.ofEntries(
         Map.entry("minecraft", "minecraft"),
+        Map.entry("customskinloader", "customskinloader"),
         Map.entry("twilightforest", "twilightforest"),
         Map.entry("blueprint", "blueprint"),
         Map.entry("mowziesmobs", "mowziesmobs"),

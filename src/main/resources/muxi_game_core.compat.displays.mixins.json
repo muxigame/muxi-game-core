@@ -6,6 +6,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
+    "customskinloader.SkinManagerProfileMixin",
     "jade.AnimalOwnerTooltipMixin",
     "yigd.GraveTextMixin",
     "yigd.GraveSelectionTitleMixin",
