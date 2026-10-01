@@ -2,12 +2,13 @@
   "source_repo": "C:\\Users\\Administrator\\WorkSpace\\muxigame\\muxi-game-core",
   "source_head": "d265d82",
   "source_snapshot_hashes": {
-    "src/main/java/net/muxigame/core/feature/dimensions/WorldPortals.java": "2c4173618b54711992fa54b7696c2ea64e37b6eea2150c5f6c5684712288c9bf",
+    "src/main/java/net/muxigame/core/feature/dimensions/WorldPortals.java": "3eb91718dff7dcafe7ac65ec4319ca27542ee09ef08c7f389793e33c8e25823b",
     "src/main/java/net/muxigame/core/feature/dimensions/PortalLinks.java": "94dfe6dbdaaa19a0f2f701a1af3e3b116ba21fd32aaf70d9e14e689a77270435",
     "tests/portals-smoke/java/net/muxigame/core/taskssmoke/PortalSmoke.java": "804335c9b0539596dd03c40f79ec87160d8bd91845473e4907fbf0388ffd4f4b",
     "build.py": "ca85650b231b91270a45cb34c3f25814feda63812a96e76f0aca0329fba0e3ab",
     "tests/run_tasks_smoke.py": "321a8229a2d4a785b6b087907b29dd20540a0c41719f67e9a0694f9e9cd0362e",
     "dependencies.json": "3c686926d9b6b5c352a0cd1a30c765ddcd31180edb711f2f6f80199e8cfc87be"
   },
-  "production_jar_sha256": "56cdb297d0a0de3f6bc745fcc94914bb90dd4f06e078b2c15fd40b010eb9f59d"
+  "production_jar_sha256": "56cdb297d0a0de3f6bc745fcc94914bb90dd4f06e078b2c15fd40b010eb9f59d",
+  "portal_source_repo": "C:\\Users\\Administrator\\WorkSpace\\muxigame\\.minigames-refactor-20261001-task2-v3\\muxi-game-core"
 }
