@@ -36,6 +36,13 @@ def main():
     (lab/'server.properties').write_text(f'server-ip=127.0.0.1\nserver-port={port}\nonline-mode=false\nlevel-name=qa-world\nlevel-seed=12345\nview-distance=2\nsimulation-distance=2\nmax-players=1\nenable-rcon=false\nenable-query=false\nspawn-protection=0\nmax-tick-time=120000\n',encoding='utf-8')
     release=json.loads((ROOT/'build/release.json').read_text(encoding='utf-8'))
     core=ROOT/'build/libs'/release['artifact'];shutil.copy2(core,lab/'mods'/core.name)
+    # Core's current release has a real server-side Waystones integration, so the
+    # disposable server must mirror those mandatory runtime dependencies too.
+    for pattern in ('balm-neoforge*.jar','waystones-neoforge*.jar'):
+        matches=list((server/'mods').glob(pattern))
+        if len(matches)!=1:
+            raise RuntimeError(f'Expected exactly one runtime dependency for {pattern}, got {matches}')
+        shutil.copy2(matches[0],lab/'mods'/matches[0].name)
     compiler,runtime=core_build.java_tools(args.java_home.resolve())
     jars=sorted((server/'libraries').rglob('*.jar'))
     neo=server/'libraries/net/neoforged/neoforge/21.1.250/neoforge-21.1.250-server.jar'
