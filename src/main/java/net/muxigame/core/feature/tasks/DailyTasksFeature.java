@@ -55,6 +55,7 @@ public final class DailyTasksFeature implements ServerFeature {
     private MinecraftServer server;
     private TaskCatalog catalog;
     private int ticks;
+    private TaskPointsBridge points;
 
     public static DailyTasksFeature active(MinecraftServer server) { return ACTIVE.get(server); }
     @Override public String id() { return "daily-tasks"; }
@@ -69,6 +70,7 @@ public final class DailyTasksFeature implements ServerFeature {
     }
     private void onStarted(ServerStartedEvent event) {
         close(); server=event.getServer(); ACTIVE.put(server,this);
+        points=new TaskPointsBridge(server);
         try { reload(); }
         catch(Exception e) { catalog=null; LOG.error("Daily tasks disabled; check public task configuration",e); }
     }
@@ -103,6 +105,11 @@ public final class DailyTasksFeature implements ServerFeature {
         // A combat event can arrive before the next one-second HUD update. Preserve that progress too.
         if(event.getOriginal() instanceof ServerPlayer original && sessions.containsKey(original.getUUID()))
             persist(original,sessions.get(original.getUUID()));
+        String pendingPoints=event.getOriginal().getPersistentData().getCompound(PERSISTED).getString(TaskPointsBridge.KEY);
+        if(!pendingPoints.isEmpty()) {
+            CompoundTag root=event.getEntity().getPersistentData(), tag=root.getCompound(PERSISTED);
+            tag.putString(TaskPointsBridge.KEY,pendingPoints); root.put(PERSISTED,tag);
+        }
         String state=event.getOriginal().getPersistentData().getCompound(PERSISTED).getString(STATE);
         if(!state.isEmpty()) {
             CompoundTag root=event.getEntity().getPersistentData(); CompoundTag tag=root.getCompound(PERSISTED);
@@ -116,6 +123,8 @@ public final class DailyTasksFeature implements ServerFeature {
         if(event.getServer()!=server || !enabled()) return;
         drainDeaths(); gathering.flush();
         if(++ticks%20!=0) return;
+        if(ticks%600==0 && points!=null) for(ServerPlayer p:server.getPlayerList().getPlayers())
+            if(!(p instanceof FakePlayer)) points.pump(p);
         for(ServerPlayer p:server.getPlayerList().getPlayers()) if(!(p instanceof FakePlayer))
             update(p,ticks%600==0,false,"");
     }
@@ -337,7 +346,9 @@ public final class DailyTasksFeature implements ServerFeature {
         var plan=RewardPacking.plan(slots,additions);
         if(plan.isEmpty()) { send(player,state,false,"背包空间不足；腾出位置后再领取"); return; }
         // No work is deferred between validation and grant; the server thread owns this transaction.
+        if(points!=null && !points.canQueue(player)) { send(player,state,false,"积分同步队列不可用，请联系管理员"); return; }
         if(!state.markClaimed(day,id)) return;
+        if(points!=null) points.enqueue(player,state,entry.definition);
         List<RewardPacking.Slot<Integer>> packed=plan.get();
         for(int i=0;i<packed.size();i++) {
             var slot=packed.get(i);
@@ -391,6 +402,7 @@ public final class DailyTasksFeature implements ServerFeature {
             }))));
     }
     @Override public void close() {
+        if(points!=null) points.close(); points=null;
         if(server!=null) ACTIVE.remove(server); server=null; catalog=null; ticks=0;
         sessions.clear(); requests.clear(); resolved.clear(); blocked.clear(); dirty.clear(); pendingDeaths.clear(); countedDeaths.clear();
         if(tacz!=null) tacz.clear();
