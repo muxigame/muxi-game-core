@@ -11,9 +11,10 @@ either option in a production launcher or change server teleport permissions.
 
 Enable only after validating the matching runtime and the intended shader pack,
 driver, resource refresh and login flow. The options are independent. Current
-native Veil OFF/ON measurements kept binary caching **on in both phases**;
-Veil-only native operation and a fresh-process first login with Veil enabled
-remain additional validation configurations. Driver-warm native linking can
+earlier native Veil OFF/ON measurements kept binary caching **on in both
+phases**. The exact committed candidate now also passed binary OFF / Veil OFF
+and binary OFF / Veil ON native transfers. A fresh-process first login with
+Veil enabled remains an additional validation configuration. Driver-warm native linking can
 already be fast, so binary caching has no guaranteed whole-transfer benefit.
 
 ## Compatibility and native fallback
@@ -25,6 +26,9 @@ Missing/changed providers bypass their optional adapter. Unsupported transformed
 program calls (separable programs, transform feedback, indexed fragment binding)
 also retain native linking. Version changes require a new audit; never update
 the pins merely to bypass a mismatch.
+Pins cover public original class bytes and unsupported calls inspected in the
+adapted target nodes. They do not establish compatibility with arbitrary
+third-party transformations outside those call sites; validate the full runtime.
 
 Binary identity includes actual compiled shader sources and stages, attribute
 and fragment-output bindings, dimension, selected pack content, options, actual
@@ -77,6 +81,22 @@ Only the landing chunk was explicitly pregenerated; surrounding chunks were
 uncontrolled. The original trace did not reopen its route window for same-
 dimension teleport, so stale route labels do not establish landing network time.
 Regex/material/stage experiments are excluded from this candidate.
+
+On the exact candidate built from `99f4503`, binary caching stayed off for ten
+successful native transfers, with Veil off for four and on for six. Warm cross-
+transfer medians were 6.28 seconds off and 0.78 seconds on (two samples per
+group); phase order was fixed. Native shaders remained enabled without fallback,
+movement reached the server, and the client exited normally with RAM, weak
+scope and binding metadata all zero. This separately validates Veil-only use.
+
+New private probes measured 5.52 seconds in JEI item collection, including 139
+creative-tab mod-event dispatches totaling 5.37 seconds. This is nested elapsed
+time, not exclusive listener or log-filter CPU cost. No creative-event or JEI
+optimization is included. A 16,384-block first landing took 0.51 seconds, with
+the target chunk received at about 58 ms; the return took 57 ms. Shader rebuild
+did not occur. The earlier 29-second far tail was not reproduced and remains
+unexplained. The detailed span limit was reached, so interval coverage is
+partial; cumulative stage counters and target packet markers continued.
 
 Run CPU checks with Java 21:
 
