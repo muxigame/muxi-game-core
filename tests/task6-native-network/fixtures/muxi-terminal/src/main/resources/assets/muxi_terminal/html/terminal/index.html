@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>玩家终端</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./app-transition.css" />
+  <link rel="stylesheet" href="./apps/minigames/app.css" />
+  <link rel="stylesheet" href="./camera-app.css" />
+  <link rel="stylesheet" href="./album-app.css" />
+  <link rel="stylesheet" href="./friends-app.css" />
+  <link rel="stylesheet" href="./settings.css" />
+</head>
+<body>
+  <main id="app" class="shell">
+    <header class="statusbar">
+      <div class="brand"><span class="brand-dot"></span>玩家终端</div>
+      <div class="status-right"><span id="statusText">本地模式</span><span id="clock">00:00</span></div>
+    </header>
+
+    <div id="app-content">
+    <section id="home" class="page page-active">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">PLAYER TERMINAL</div>
+          <h1>玩家终端</h1>
+          <p>任务、指南、玩家账户与更多服务器服务，都可以从这里进入。</p>
+        </div>
+        <div class="cover-frame"><img src="./cover.png" alt="玩家终端"></div>
+      </div>
+
+      <div class="section-title"><span>应用</span><small id="installedAppCount">4 个已安装</small></div>
+      <div class="app-grid">
+        <button class="app-card" data-open="guide">
+          <span class="app-icon guide-icon"><i></i><i></i><i></i></span>
+          <span class="app-name">游戏指南</span>
+          <span class="app-desc">模组手册与玩法指引</span>
+        </button>
+        <button class="app-card" data-open="tasks">
+          <span class="app-icon task-icon"><i></i><i></i><i></i></span>
+          <span class="app-name">任务</span>
+          <span class="app-desc">每日、主线与追踪</span>
+        </button>
+        <button class="app-card" id="passportApp">
+          <span class="app-icon passport-icon"><i></i></span>
+          <span class="app-name">玩家账户</span>
+          <span class="app-desc">昵称与账户资料</span>
+        </button>
+        <button class="app-card" data-open="games">
+          <span class="app-icon minigames-icon"><i></i><i></i><i></i></span>
+          <span class="app-name">小游戏</span><span class="app-desc">大厅、队伍与玩法商店</span>
+        </button>
+        <button class="app-card" data-open="music">
+          <span class="app-icon music-icon" aria-hidden="true"><i></i></span>
+          <span class="app-name">音乐</span><span class="app-desc">游戏音乐 · 本地曲库</span>
+        </button>
+      </div>
+
+      <div class="section-title"><span>我的网页应用</span><button id="addWebApp" class="secondary">＋ 添加网页</button></div>
+      <div id="webApps" class="web-app-list"></div>
+      <p id="webAppsError" class="web-error" role="alert"></p>
+      <form id="webAppForm" class="web-app-form" hidden>
+        <h3 id="webFormTitle">添加网页应用</h3>
+        <input id="webAppId" type="hidden">
+        <label>网页链接<input id="webAppUrl" type="url" placeholder="https://example.com" required maxlength="4096" autocomplete="off"></label>
+        <label>名称（可编辑）<input id="webAppName" type="text" maxlength="80" placeholder="留空使用域名" autocomplete="off"></label>
+        <p id="webTarget" class="web-target">只支持 http / https</p>
+        <p id="webFormError" class="web-error" role="alert"></p>
+        <div class="detail-actions"><button class="primary" type="submit">保存</button><button id="cancelWebApp" class="secondary" type="button">取消</button></div>
+      </form>
+      <div class="dock-hint">网页快捷应用保存在当前启动器账户的本地配置中。外站不能读取游戏任务或账户票据；下载和设备权限默认不授权。</div>
+    </section>
+
+    <section id="guide" class="page">
+      <div class="toolbar">
+        <button class="back" data-open="home" aria-label="返回">‹</button>
+        <div>
+          <div class="eyebrow">APP / GAME GUIDE</div>
+          <h2>游戏指南</h2>
+        </div>
+        <label class="search-wrap"><input id="guideSearch" type="search" placeholder="搜索模组或玩法" /><span></span></label>
+      </div>
+
+      <div class="guide-intro">
+        <strong>不知道从哪里开始？</strong>
+        <span>先选一个你感兴趣的玩法。指南只介绍真正有用的第一步，不把 Wiki 全搬进来。</span>
+      </div>
+      <div id="guideList" class="guide-list"></div>
+    </section>
+
+    <section id="guideDetail" class="page">
+      <div class="toolbar">
+        <button class="back" data-open="guide" aria-label="返回">‹</button>
+        <div>
+          <div class="eyebrow">GAME GUIDE</div>
+          <h2 id="detailTitle">模组</h2>
+        </div>
+      </div>
+      <article class="detail-card">
+        <div class="detail-head">
+          <div id="detailIcon" class="mod-icon"></div>
+          <div><div id="detailCategory" class="pill"></div><p id="detailSummary"></p></div>
+        </div>
+        <div class="detail-section"><h3>先做什么</h3><div id="detailSteps" class="steps"></div></div>
+        <div class="detail-section"><h3>为什么值得玩</h3><p id="detailWhy"></p></div>
+        <div class="detail-actions">
+          <button id="openManual" class="primary" hidden>打开游戏内手册</button>
+          <button data-open="guide" class="secondary">返回指南</button>
+        </div>
+        <p id="manualHint" class="manual-hint"></p>
+      </article>
+    </section>
+
+    <section id="tasks" class="page">
+      <div class="toolbar">
+        <button class="back" data-open="home" aria-label="返回">‹</button>
+        <div>
+          <div class="eyebrow">APP / TASKS</div>
+          <h2>任务</h2>
+        </div>
+        <div id="taskMeta" class="task-meta">正在连接任务服务…</div>
+      </div>
+
+      <div class="task-tabs">
+        <button class="task-tab task-tab-active" data-task-tab="daily">每日任务</button>
+        <button class="task-tab" data-task-tab="mainline">主线任务</button>
+      </div>
+
+      <div id="dailyTasksPanel">
+        <div class="task-intro">
+          <div><strong>每日委托</strong><span id="taskCountdown">等待服务器数据</span></div>
+          <div id="rerollAllowance" class="task-allowance"></div>
+        </div>
+        <div id="taskList" class="task-list"></div>
+      </div>
+
+      <div id="mainlineTasksPanel" hidden>
+        <div class="task-intro"><div><strong>主线任务</strong><span>长期推进目标</span></div></div>
+        <div id="mainlineList" class="task-list"></div>
+      </div>
+    </section>
+    <section id="games" class="page minigames-app" aria-label="小游戏 APP">
+      <div class="toolbar"><button id="mg-back" class="back" aria-label="返回大厅">‹</button><div><div class="eyebrow">APP / MINIGAMES</div><h2>小游戏</h2></div><button id="mg-refresh" class="secondary">刷新</button></div>
+      <nav class="task-tabs" aria-label="小游戏页面"><button class="task-tab task-tab-active" data-mg-page="lobby" aria-pressed="true">大厅与队伍</button><button class="task-tab" data-mg-page="shop" aria-pressed="false">商店与兑换</button></nav>
+      <p id="mg-notice" class="guide-intro mg-notice" role="status" aria-live="polite">正在读取小游戏服务…</p>
+      <div id="mg-platform" class="task-intro mg-platform"></div>
+      <div id="mg-stepbar" class="mg-stepbar" aria-label="房间步骤"></div>
+      <div id="mg-games" class="guide-list mg-mode-list" aria-label="模式选择"></div>
+      <div id="mg-currencies" class="mg-currencies"></div><div id="mg-content" class="mg-content"></div>
+      <div id="mg-confirm" class="mg-confirm" hidden><div class="detail-card" role="dialog" aria-modal="true" aria-labelledby="mg-confirm-text"><h3>确认操作</h3><p id="mg-confirm-text"></p><div class="detail-actions"><button id="mg-confirm-cancel" class="secondary">取消</button><button id="mg-confirm-ok" class="primary">继续</button></div></div></div>
+    </section>
+    <section id="music" class="page"></section>
+    </div>
+  </main>
+  <script src="./app-transition.js"></script>
+  <script src="./app.js"></script>
+  <script src="./native-map-app.js"></script>
+  <script src="./app-container.js"></script>
+  <script src="./camera-controller.js"></script>
+  <script src="./camera-app.js"></script>
+  <script src="./album-controller.js"></script>
+  <script src="./album-app.js"></script>
+  <script src="./web-apps.js"></script>
+  <script src="./settings.js"></script>
+  <script src="./music-app.js"></script>
+  <script src="./friends-controller.js"></script>
+  <script src="./friends-app.js"></script>
+  <script src="./apps/minigames/model.js"></script>
+  <script src="./apps/minigames/app.js"></script>
+  <script src="./friends-invites-controller.js"></script>
+  <script src="./friends-invites.js"></script>
+</body>
+</html>
+
