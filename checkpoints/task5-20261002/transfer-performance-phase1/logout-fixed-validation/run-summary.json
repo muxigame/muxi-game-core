@@ -1,0 +1,107 @@
+{
+  "method": "actual 1.4.27 pack with dev Core/Terminal; integrated private server; actual changeDimension, loading screen, Iris/Euphoria/Sodium; synthetic fixed platforms",
+  "seed": 172943,
+  "landingChunkPreGenerated": true,
+  "prepare_minecraft:overworld_ms": 90.6129,
+  "prepare_muxi_game_core:adventure_ms": 269.3949,
+  "prepare_minecraft:the_nether_ms": 4171.1496,
+  "prepare_minecraft:the_end_ms": 2142.164,
+  "samples": [
+    {
+      "index": 0,
+      "source": "minecraft:overworld",
+      "target": "muxi_game_core:adventure",
+      "coldFirstTargetInProcess": true,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:57:28.288663500Z",
+      "firstCompiledWorldFrameMs": 21399.6364,
+      "visibleAndInputUnblockedMs": 21440.8543,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 21448.2024,
+      "serverObservedMovement": true,
+      "serverQueueMs": 0.1912,
+      "serverChangeDimensionMs": 10.2307,
+      "jitCompilationDeltaMs": 14877,
+      "gcCollectionDeltaMs": 341,
+      "postTransferObservationMs": 5052.5067,
+      "worstFrameGapMs": 20653.4905,
+      "renderedCompiledFrames": 258,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "managedShaderTransition": true,
+      "dimensionShaderSwap": {
+        "parsedPacks": 2,
+        "cachedParsedPack": false,
+        "dimension": "muxi_game_core:adventure",
+        "pipelineDestroyMs": 0.1413,
+        "packRefreshMs": 590.9419,
+        "dimensionMacro": "CURRENT_EUPHORIA_PATCHES_DIMENSION_MUXI_GAME_CORE_ADVENTURE"
+      }
+    },
+    {
+      "index": 1,
+      "source": "muxi_game_core:adventure",
+      "target": "minecraft:overworld",
+      "coldFirstTargetInProcess": false,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:57:59.790275Z",
+      "firstCompiledWorldFrameMs": 19921.9342,
+      "visibleAndInputUnblockedMs": 19953.6708,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 19966.2481,
+      "serverObservedMovement": true,
+      "serverQueueMs": 0.3815,
+      "serverChangeDimensionMs": 17.5498,
+      "jitCompilationDeltaMs": 3742,
+      "gcCollectionDeltaMs": 200,
+      "postTransferObservationMs": 5081.7493,
+      "worstFrameGapMs": 19274.0322,
+      "renderedCompiledFrames": 302,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "managedShaderTransition": true,
+      "dimensionShaderSwap": {
+        "parsedPacks": 2,
+        "cachedParsedPack": true,
+        "dimension": "minecraft:overworld",
+        "pipelineDestroyMs": 0.0157,
+        "packRefreshMs": 0.1897,
+        "dimensionMacro": "CURRENT_EUPHORIA_PATCHES_DIMENSION_OVERWORLD"
+      }
+    }
+  ],
+  "shaderSceneScreenshot": "shader-scene.png",
+  "shaderStateAtScene": {
+    "enabled": true,
+    "pack": "Better MC - Low",
+    "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+    "fallback": false
+  },
+  "shaderCacheAfterLogout": {
+    "pendingLevel": false,
+    "parsedPacks": 0,
+    "capturedPackRoot": false
+  },
+  "normalLogout": true,
+  "success": true,
+  "exitCode": 0,
+  "lab": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\transfer-lab\\native-on-fix-final-validation-20261002-135115-5897edfb"
+}

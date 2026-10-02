@@ -1,0 +1,269 @@
+{
+  "method": "actual 1.4.27 pack with dev Core/Terminal; integrated private server; actual changeDimension, loading screen, Iris/Euphoria/Sodium; synthetic fixed platforms",
+  "seed": 172943,
+  "landingChunkPreGenerated": true,
+  "prepare_minecraft:overworld_ms": 22.1054,
+  "prepare_muxi_game_core:adventure_ms": 133.0825,
+  "prepare_muxi_game_core:overworld_ms": 9.3977,
+  "samples": [
+    {
+      "index": 0,
+      "source": "minecraft:overworld",
+      "target": "muxi_game_core:adventure",
+      "coldFirstTargetInProcess": true,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:27:22.543947700Z",
+      "firstCompiledWorldFrameMs": 40839.5035,
+      "visibleAndInputUnblockedMs": 40875.4208,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 40900.8738,
+      "serverObservedMovement": true,
+      "serverQueueMs": 76.0703,
+      "serverChangeDimensionMs": 124.8089,
+      "jitCompilationDeltaMs": 20821,
+      "gcCollectionDeltaMs": 633,
+      "postTransferObservationMs": 5055.5195,
+      "worstFrameGapMs": 20298.38,
+      "renderedCompiledFrames": 298,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      }
+    },
+    {
+      "index": 1,
+      "source": "muxi_game_core:adventure",
+      "target": "minecraft:overworld",
+      "coldFirstTargetInProcess": false,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:28:13.502565900Z",
+      "firstCompiledWorldFrameMs": 42152.2581,
+      "visibleAndInputUnblockedMs": 42182.2319,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 42189.9866,
+      "serverObservedMovement": true,
+      "serverQueueMs": 29.2318,
+      "serverChangeDimensionMs": 8.5592,
+      "jitCompilationDeltaMs": 7163,
+      "gcCollectionDeltaMs": 329,
+      "postTransferObservationMs": 5058.1924,
+      "worstFrameGapMs": 41343.7931,
+      "renderedCompiledFrames": 276,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      }
+    },
+    {
+      "index": 2,
+      "source": "minecraft:overworld",
+      "target": "muxi_game_core:adventure",
+      "coldFirstTargetInProcess": false,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:29:05.750289300Z",
+      "firstCompiledWorldFrameMs": 40931.5659,
+      "visibleAndInputUnblockedMs": 40959.4905,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 40999.2653,
+      "serverObservedMovement": true,
+      "serverQueueMs": 0.2015,
+      "serverChangeDimensionMs": 6.9046,
+      "jitCompilationDeltaMs": 4461,
+      "gcCollectionDeltaMs": 345,
+      "postTransferObservationMs": 5095.9367,
+      "worstFrameGapMs": 20260.2488,
+      "renderedCompiledFrames": 305,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      }
+    },
+    {
+      "index": 3,
+      "source": "muxi_game_core:adventure",
+      "target": "minecraft:overworld",
+      "coldFirstTargetInProcess": false,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:29:56.846704700Z",
+      "firstCompiledWorldFrameMs": 39973.1245,
+      "visibleAndInputUnblockedMs": 39998.7448,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 40005.6335,
+      "serverObservedMovement": true,
+      "serverQueueMs": 0.0223,
+      "serverChangeDimensionMs": 6.7787,
+      "jitCompilationDeltaMs": 2269,
+      "gcCollectionDeltaMs": 246,
+      "postTransferObservationMs": 5095.3486,
+      "worstFrameGapMs": 19921.0332,
+      "renderedCompiledFrames": 280,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      }
+    },
+    {
+      "index": 4,
+      "source": "minecraft:overworld",
+      "target": "muxi_game_core:adventure",
+      "coldFirstTargetInProcess": false,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:30:46.947910700Z",
+      "firstCompiledWorldFrameMs": 40530.6577,
+      "visibleAndInputUnblockedMs": 40556.5901,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 40597.4143,
+      "serverObservedMovement": true,
+      "serverQueueMs": 0.1165,
+      "serverChangeDimensionMs": 7.152,
+      "jitCompilationDeltaMs": 2660,
+      "gcCollectionDeltaMs": 362,
+      "postTransferObservationMs": 5089.7356,
+      "worstFrameGapMs": 20078.4259,
+      "renderedCompiledFrames": 304,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      }
+    },
+    {
+      "index": 5,
+      "source": "muxi_game_core:adventure",
+      "target": "minecraft:overworld",
+      "coldFirstTargetInProcess": false,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:31:37.642500Z",
+      "firstCompiledWorldFrameMs": 40305.8193,
+      "visibleAndInputUnblockedMs": 40330.5654,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 40355.4679,
+      "serverObservedMovement": true,
+      "serverQueueMs": 0.0248,
+      "serverChangeDimensionMs": 9.382,
+      "jitCompilationDeltaMs": 3661,
+      "gcCollectionDeltaMs": 261,
+      "postTransferObservationMs": 5087.7137,
+      "worstFrameGapMs": 19970.5596,
+      "renderedCompiledFrames": 306,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      }
+    },
+    {
+      "index": 6,
+      "source": "minecraft:overworld",
+      "target": "muxi_game_core:adventure",
+      "coldFirstTargetInProcess": false,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:32:28.084003100Z",
+      "firstCompiledWorldFrameMs": 40434.2655,
+      "visibleAndInputUnblockedMs": 40460.4317,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 40466.1123,
+      "serverObservedMovement": true,
+      "serverQueueMs": 0.0215,
+      "serverChangeDimensionMs": 7.0847,
+      "jitCompilationDeltaMs": 2411,
+      "gcCollectionDeltaMs": 337,
+      "postTransferObservationMs": 5083.7431,
+      "worstFrameGapMs": 19947.2627,
+      "renderedCompiledFrames": 306,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      }
+    },
+    {
+      "index": 7,
+      "source": "muxi_game_core:adventure",
+      "target": "minecraft:overworld",
+      "coldFirstTargetInProcess": false,
+      "shaderExpected": true,
+      "requestedUtc": "2026-10-02T13:33:18.641945400Z",
+      "firstCompiledWorldFrameMs": 39802.5606,
+      "visibleAndInputUnblockedMs": 39825.9005,
+      "shaderState": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      },
+      "movementResponseMs": 39849.2495,
+      "serverObservedMovement": true,
+      "serverQueueMs": 0.0292,
+      "serverChangeDimensionMs": 8.1168,
+      "jitCompilationDeltaMs": 1125,
+      "gcCollectionDeltaMs": 242,
+      "postTransferObservationMs": 5096.1456,
+      "worstFrameGapMs": 19856.2018,
+      "renderedCompiledFrames": 287,
+      "shaderStateAfterObservation": {
+        "enabled": true,
+        "pack": "Better MC - Low",
+        "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+        "fallback": false
+      }
+    }
+  ],
+  "shaderSceneScreenshot": "shader-scene.png",
+  "shaderStateAtScene": {
+    "enabled": true,
+    "pack": "Better MC - Low",
+    "pipeline": "net.irisshaders.iris.pipeline.IrisRenderingPipeline",
+    "fallback": false
+  },
+  "normalLogout": true,
+  "success": true,
+  "exitCode": 0,
+  "lab": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\transfer-lab\\native-on-baseline-control-20261002-125654-66c733ed"
+}

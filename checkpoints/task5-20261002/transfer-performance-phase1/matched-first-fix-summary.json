@@ -1,0 +1,310 @@
+{
+  "on-baseline-control": {
+    "visibleWarm": {
+      "medianMs": 40460.4317,
+      "p95NearestRankMs": 42182.2319,
+      "minMs": 39825.9005,
+      "maxMs": 42182.2319,
+      "n": 7
+    },
+    "coldVisibleMs": 40875.4208,
+    "pipelineSpans": [],
+    "reloadSpans": [],
+    "perTransfer": [
+      {
+        "index": 0,
+        "visibleMs": 40875.4208,
+        "irisPipelineMs": [
+          19374.285600000003,
+          19429.69320000001
+        ],
+        "irisReloadMs": [
+          20001.61870000002
+        ],
+        "sodiumResetMs": [
+          6.692899999994552,
+          0.6577999999863096,
+          2.38379999998142,
+          2.937999999994645,
+          2.531300000002375
+        ],
+        "jitCompilationMs": 20821,
+        "gcCollectionMs": 633
+      },
+      {
+        "index": 1,
+        "visibleMs": 42182.2319,
+        "irisPipelineMs": [
+          19798.550600000017,
+          19996.4283
+        ],
+        "irisReloadMs": [
+          20637.061600000015
+        ],
+        "sodiumResetMs": [
+          6.504699999990407,
+          0.6027999999932945,
+          13.048600000009174,
+          25.233399999997346
+        ],
+        "jitCompilationMs": 7163,
+        "gcCollectionMs": 329
+      },
+      {
+        "index": 2,
+        "visibleMs": 40959.4905,
+        "irisPipelineMs": [
+          19650.313599999994,
+          19432.60970000003
+        ],
+        "irisReloadMs": [
+          19957.33070000005
+        ],
+        "sodiumResetMs": [
+          5.289000000047963,
+          0.6507000000565313,
+          3.8976999999722466,
+          5.347600000037346,
+          5.022300000011455
+        ],
+        "jitCompilationMs": 4461,
+        "gcCollectionMs": 345
+      },
+      {
+        "index": 3,
+        "visibleMs": 39998.7448,
+        "irisPipelineMs": [
+          19137.243000000017,
+          19095.177999999956
+        ],
+        "irisReloadMs": [
+          19646.681500000006
+        ],
+        "sodiumResetMs": [
+          4.996800000022631,
+          0.5021999999880791,
+          3.660199999983888,
+          4.487100000027567,
+          4.541499999992084
+        ],
+        "jitCompilationMs": 2269,
+        "gcCollectionMs": 246
+      },
+      {
+        "index": 4,
+        "visibleMs": 40556.5901,
+        "irisPipelineMs": [
+          19482.13260000001,
+          19180.380799999984
+        ],
+        "irisReloadMs": [
+          19778.6483
+        ],
+        "sodiumResetMs": [
+          4.86189999995986,
+          0.5897000000113621,
+          3.98320000001695,
+          4.506400000012945,
+          4.975299999990966
+        ],
+        "jitCompilationMs": 2660,
+        "gcCollectionMs": 362
+      },
+      {
+        "index": 5,
+        "visibleMs": 40330.5654,
+        "irisPipelineMs": [
+          19432.62540000002,
+          19101.77549999999
+        ],
+        "irisReloadMs": [
+          19702.053799999994
+        ],
+        "sodiumResetMs": [
+          5.249499999976251,
+          0.6259999999892898,
+          3.7493999999715015,
+          4.227899999998044,
+          4.492700000002515
+        ],
+        "jitCompilationMs": 3661,
+        "gcCollectionMs": 261
+      },
+      {
+        "index": 6,
+        "visibleMs": 40460.4317,
+        "irisPipelineMs": [
+          19528.849999999977,
+          19098.376000000047
+        ],
+        "irisReloadMs": [
+          19613.261200000008
+        ],
+        "sodiumResetMs": [
+          5.40300000004936,
+          0.6011000000289641,
+          4.06339999998454,
+          4.613499999977648,
+          10.404399999999441
+        ],
+        "jitCompilationMs": 2411,
+        "gcCollectionMs": 337
+      },
+      {
+        "index": 7,
+        "visibleMs": 39825.9005,
+        "irisPipelineMs": [
+          18965.24449999997,
+          18913.982799999998
+        ],
+        "irisReloadMs": [
+          19523.305799999973
+        ],
+        "sodiumResetMs": [
+          12.612599999993108,
+          0.7001000000163913,
+          4.679699999978766,
+          4.376599999959581,
+          5.628299999982119
+        ],
+        "jitCompilationMs": 1125,
+        "gcCollectionMs": 242
+      }
+    ]
+  },
+  "on-fix-extended": {
+    "visibleWarm": {
+      "medianMs": 22980.6827,
+      "p95NearestRankMs": 38297.26,
+      "minMs": 19506.3483,
+      "maxMs": 38297.26,
+      "n": 7
+    },
+    "coldVisibleMs": 29443.5714,
+    "pipelineSpans": [],
+    "reloadSpans": [],
+    "perTransfer": [
+      {
+        "index": 0,
+        "visibleMs": 29443.5714,
+        "irisPipelineMs": [
+          27118.964100000012
+        ],
+        "irisReloadMs": [],
+        "sodiumResetMs": [
+          337.6492000000144,
+          10.136399999988498,
+          41.62380000000121
+        ],
+        "jitCompilationMs": 12900,
+        "gcCollectionMs": 262
+      },
+      {
+        "index": 1,
+        "visibleMs": 23055.703,
+        "irisPipelineMs": [
+          21581.92300000001
+        ],
+        "irisReloadMs": [],
+        "sodiumResetMs": [
+          6.8752000000094995,
+          0.7679000000061933,
+          12.833400000003166
+        ],
+        "jitCompilationMs": 4824,
+        "gcCollectionMs": 74
+      },
+      {
+        "index": 2,
+        "visibleMs": 31328.2468,
+        "irisPipelineMs": [
+          29475.050300000003
+        ],
+        "irisReloadMs": [],
+        "sodiumResetMs": [
+          5.8809000000183005,
+          0.7275000000081491,
+          204.92819999999483
+        ],
+        "jitCompilationMs": 10738,
+        "gcCollectionMs": 224
+      },
+      {
+        "index": 3,
+        "visibleMs": 38297.26,
+        "irisPipelineMs": [
+          35960.389599999995
+        ],
+        "irisReloadMs": [],
+        "sodiumResetMs": [
+          262.9603000000352,
+          57.98540000000503,
+          4.9452999999630265
+        ],
+        "jitCompilationMs": 4215,
+        "gcCollectionMs": 162
+      },
+      {
+        "index": 4,
+        "visibleMs": 22980.6827,
+        "irisPipelineMs": [
+          21634.97589999996
+        ],
+        "irisReloadMs": [],
+        "sodiumResetMs": [
+          6.233000000007451,
+          0.6278000000165775,
+          83.1469999999972
+        ],
+        "jitCompilationMs": 6068,
+        "gcCollectionMs": 260
+      },
+      {
+        "index": 5,
+        "visibleMs": 19999.7473,
+        "irisPipelineMs": [
+          18820.94889999996
+        ],
+        "irisReloadMs": [],
+        "sodiumResetMs": [
+          5.347799999988638,
+          0.5460000000311993,
+          3.853000000002794
+        ],
+        "jitCompilationMs": 1179,
+        "gcCollectionMs": 91
+      },
+      {
+        "index": 6,
+        "visibleMs": 20804.0601,
+        "irisPipelineMs": [
+          19719.529099999985
+        ],
+        "irisReloadMs": [],
+        "sodiumResetMs": [
+          9.894499999994878,
+          0.7705000000423752,
+          4.645100000023376
+        ],
+        "jitCompilationMs": 1900,
+        "gcCollectionMs": 129
+      },
+      {
+        "index": 7,
+        "visibleMs": 19506.3483,
+        "irisPipelineMs": [
+          18578.25290000002
+        ],
+        "irisReloadMs": [],
+        "sodiumResetMs": [
+          4.715200000035111,
+          0.5889000000315718,
+          3.6460000000079162
+        ],
+        "jitCompilationMs": 2029,
+        "gcCollectionMs": 94
+      }
+    ]
+  },
+  "visibleWarmReductionPercent": 43.202082295132804
+}

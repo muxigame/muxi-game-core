@@ -1,0 +1,7 @@
+ProbeWindowTest passed: 272 checks; no Minecraft started
+NoiseBudgetTest: late shader spans survive 10000 batches; window still bounded
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK
