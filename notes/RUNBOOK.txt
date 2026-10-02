@@ -1,0 +1,61 @@
+Scope (final user instruction): online BLOCK-ONLY clone, including air and blockentities,
+from minecraft:overworld to muxi_game_core:adventure at the same coordinates.
+Exact inclusive bounds: X2251..2485, Z-606..-420, Y-64..319.
+235 x 187 x 384 = 16,874,880 block positions. Biomes and entities are not cloned.
+192 intersecting chunks, 6 vertical slices per chunk, 1152 commands maximum.
+Each full slice is 16 x 16 x 64 = 16384 blocks, below unchanged limit 32768.
+Edge tiles are clipped to the exact requested rectangle.
+
+PRIMARY ORIGINAL BACKUP (never use postpilot/postcompletion copies as preoperation originals):
+online-backup-20261001-preclone/world/
+manifest.json records hashes for terrain, POI, entities and empty Sable sublevel
+regions of source and target. Files were read after save-off + forced save-all flush,
+copied with stable-byte checks. Automatic saving and command feedback are restored
+in finally. This is an affected-region snapshot, not a full-world backup.
+
+The backups include outside-region records for evidence and recovery. NEVER copy
+these whole region files over the live save. Do not overwrite live region files.
+Do not revert balances, playerdata, dimension-global data or unrelated entities.
+
+Recovery options if later requested:
+1. From the original backup, extract only block states and blockentity NBT inside
+   the exact rectangle into vanilla structure templates (<=48 in each dimension),
+   with an empty entities list and explicit air entries. Load through supported
+   vanilla template placement in a coordinated online recovery with the same
+   individual-chunk ticket limits. This requires installing the generated
+   templates in the world/generated namespace and explicit recovery coordination.
+2. During an explicitly authorized offline recovery, merge only those exact
+   original block states/blockentity records into CURRENT target chunks, keeping
+   current outside columns, entity region files and global/mod data; rebuild
+   lighting/heightmaps/POI as appropriate. Do not restore entire old regions.
+No recovery commands or region installations are implemented or executed here.
+
+Execution:
+py online_clone.py plan
+py -m unittest test_online_clone test_verify_clone -v
+py online_clone.py backup --output <NEW_WORKSPACE_DIRECTORY>
+py online_clone.py run --backup online-backup-20261001-preclone --chunk-limit 1
+py online_clone.py run --backup online-backup-20261001-preclone
+
+Only tickets this script added are removed; preexisting tickets are preserved.
+No more than one chunk per dimension is explicitly forced at a time. The engine
+may load neighboring chunks needed for normal ticking; this is not a bulk
+forceload operation. Commands are spaced 0.5 seconds, TPS/MSPT checked per chunk.
+Stops before next chunk if TPS<19 or MSPT>40; stops if a clone command takes >2s.
+Every clone success requires the server's exact full expected block count.
+RCON fragmented replies are fully collected using a read-only list delimiter.
+Ambiguous failures prevent automatic resume. Journals permit confirmed-batch resume.
+Admin chat feedback is suppressed temporarily and restored; command limit unchanged.
+
+Verification:
+py online_clone.py backup --output <NEW_POSTCOMPLETION_DIRECTORY>
+py verify_clone.py --snapshot-world <NEW_POSTCOMPLETION_DIRECTORY>/world
+Compare every block state including air and complete blockentity NBT within bounds.
+Normal vanilla block updates, fluids, gravity and active blockentity ticks can make
+saved target state differ after successful cloning. These differences are reported,
+not automatically patched away. Source uses normal clone mode, never move.
+
+chunk_sync.py is an unused earlier complete-chunk staging proposal and the NBT/
+Anvil read utility. Its stage command has not been run. Do not use it for this
+final block-only online request: whole-chunk sync would also replace entities,
+biomes, adjacent edge columns and other chunk metadata contrary to current scope.

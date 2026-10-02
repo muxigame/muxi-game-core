@@ -1,0 +1,18 @@
+[
+  {
+    "project": "forgematica",
+    "release": "0.4.2+mc1.21.1",
+    "context_commit": "ee533ce46b8de4f0ffd5e3f8bc93fcbdd70f718d",
+    "source_context_url": "https://codeload.github.com/CagayakeGirls/litematica-neoforge/zip/ee533ce46b8de4f0ffd5e3f8bc93fcbdd70f718d",
+    "sha256": "6504510d694369cf8bfc1024473138c914e71502ee8ea06814fde8aba66b0b7b",
+    "note": "Latest official 1.21.1 branch commit before release; contextual build files, not a claim of reproducible binary provenance. Exact published source JAR is retained separately."
+  },
+  {
+    "project": "mafglib",
+    "release": "0.4.3+mc1.21.1",
+    "context_commit": "d580b1d9471186839aeb30a3ac2460c644b667c1",
+    "source_context_url": "https://codeload.github.com/CagayakeGirls/malilib-neoforge/zip/d580b1d9471186839aeb30a3ac2460c644b667c1",
+    "sha256": "a9a3ba5dada6c06b9ccab8b59739559b9003ee49110540bfbc645447497368c0",
+    "note": "Latest official 1.21.1 branch commit before release; contextual build files, not a claim of reproducible binary provenance. Exact published source JAR is retained separately."
+  }
+]

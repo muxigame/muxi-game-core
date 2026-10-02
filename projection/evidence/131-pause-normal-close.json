@@ -1,0 +1,5 @@
+{
+  "returncode": 0,
+  "stdout": "{\r\n    \"lab\":  \"C:\\\\Users\\\\ranzh\\\\Documents\\\\Codex\\\\schematic-task23-20261002\\\\runs\\\\projection-20261002-053523-f39cfd49\",\r\n    \"normalExitRequested\":  true,\r\n    \"pid\":  4204,\r\n    \"time\":  \"2026-10-02T05:55:40.8316258+00:00\",\r\n    \"forcedTermination\":  false,\r\n    \"exited\":  false,\r\n    \"otherProcessesTouched\":  false\r\n}\r\n",
+  "stderr": ""
+}

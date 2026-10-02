@@ -1,0 +1,17 @@
+Client schematic overlay — upstream notices
+
+Forgematica 0.4.2+mc1.21.1 and MaFgLib 0.4.3+mc1.21.1 are distributed as unchanged official release JARs.
+Original work: masa. NeoForge ports: TexTrue / CagayakeGirls.
+Both official project listings specify LGPL-3.0-only. These notices do not replace their licenses.
+Copies of LGPL-3.0 and GPL-3.0 are in licenses/. Preserve upstream authorship, licensing, and corresponding sources when distributing this overlay in a modpack.
+Exact published source JARs are in sources/. Source-context/ includes official upstream repository snapshots and build files from the latest 1.21.1 branch commit preceding each release, plus properties confirming the intended versions. They provide build context; no reproducible-build claim is made.
+The two embedded API modules in MaFgLib are part of the original upstream JAR and retain their own notices and terms. They are not independently modified or repackaged. Their JAR metadata states Apache-2.0. Credits in that metadata: ThinkingStudio, Sinytra, FabricMC. A copy of Apache-2.0 is included in licenses/. Module sources: https://github.com/ThinkingStudios/ForgifiedFabricAPI and https://github.com/Sinytra/ForgifiedFabricAPI .
+No new exclusive distribution terms or approval gate were found. Do not strip the source/license folder from the distributable ZIP.
+
+Official release and source locations:
+https://modrinth.com/mod/forgematica/version/71jxaAwz
+https://modrinth.com/mod/mafglib/version/CgDQ0u0Q
+https://github.com/CagayakeGirls/litematica-neoforge
+https://github.com/CagayakeGirls/malilib-neoforge
+
+Local additions: litematica.json config seed and task23-test-floor.litematic render fixture, created by Task23 on 2026-10-02. The fixture is only nine ordinary stone blocks and contains no entities, block entities, commands or scripts.

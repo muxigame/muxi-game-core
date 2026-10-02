@@ -1,0 +1,14 @@
+{
+  "lab": "C:\\Users\\ranzh\\Documents\\Codex\\schematic-task23-20261002\\runs\\projection-20261002-053523-f39cfd49",
+  "startedUtc": "2026-10-02T05:46:17.700147Z",
+  "session": 2,
+  "computer": "JBC_FCRL",
+  "user": "JBC-1",
+  "testWorld": "schematic-task23-local-only",
+  "productionOrTask14Mutation": false,
+  "qaHash": "76de1fe5ca4022ebdc826caa8a1c707c29e7b17b1c6e3c2497cbc143a15ae628",
+  "processStillRunning": true,
+  "globalKeyboardMouseAutomationUsed": false,
+  "normalShutdownOnly": true,
+  "pid": 4204
+}

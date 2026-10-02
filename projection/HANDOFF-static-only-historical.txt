@@ -1,0 +1,45 @@
+Task23 客户端建筑投影候选 / 2026-10-02
+
+状态：独立本地 overlay 已备妥；静态核对通过后仍须 task14 实机验收。不是正式部署，也不是完整可启动客户端。
+基线：正式整合包 1.4.26，Minecraft 1.21.1，NeoForge 21.1.250。
+当前 131 客户端由 task14 独占测试。本任务未启动 Minecraft、未写入其目录、未更改服务器、正式包或冻结候选。
+
+安装内容：
+- 官方 Forgematica 0.4.2+mc1.21.1（version ID 71jxaAwz）。客户端建筑投影及材料清单；Litematica 的非官方 NeoForge 移植，由原项目发布渠道提供。
+- 官方 MaFgLib 0.4.3+mc1.21.1（version ID CgDQ0u0Q）。必须依赖。JAR 声明 >=0.4；Forge/Fabric 的 MaLiLib 不可代替。
+- 仅增加以上两个客户端 JAR。保留其内嵌依赖；不另装 BadPackets、Fabric Loader、ServuxForged 或服务端投影模组。
+- config/litematica.json 是按精确源码核对的 seed：关闭 easyPlaceMode / easyPlaceHoldEnabled，清空 easyPlaceUseKey / easyPlaceFirst / easyPlaceToggle / executeOperation 快捷键。其余设置保持官方默认。
+- schematics/task23-test-floor.litematic：自制 3×1×3 石头平台，9 个方块，格式 v7，MC DataVersion 3955；NBT、调色板和压缩格式已经静态校验，未在游戏中加载。
+
+来源 / 许可证：
+https://modrinth.com/mod/forgematica/version/71jxaAwz
+https://modrinth.com/mod/mafglib/version/CgDQ0u0Q
+下载通过官方 Modrinth API / CDN，两个二进制和两个精确源码 JAR 的 SHA-1、SHA-512 均与发布记录一致。
+download-receipt.json 另记 SHA-256。所有二进制保持官方原字节，未注入补丁。
+LGPL-3.0-only；ZIP 自带许可证、署名、对应源码和官方源码构建上下文。整个 third-party-notices/schematic 目录应随整合包分发，源码 JAR 不放入 mods。
+
+静态兼容结果及边界：
+- NeoForge JAR 元数据：javafml >=4，NeoForge >=21，MC >=1.21，MaFgLib >=0.4。所选版本精确发布目标是 1.21.1 / NeoForge，满足当前基线。
+- MaFgLib 内嵌 org.sinytra.forgified-fabric-api 的 fabric-api-base 0.4.42+d1308ded19，与正式 Forgified Fabric API 里的模块版本和全部类文件一致；仅 META-INF/neoforge.mods.toml 不同，因此不是整个内嵌 JAR 同字节。内嵌 networking 4.3.0+6db6dff919 是开放下界，现有 4.3.1+7e3d421f19 满足。实际 JarJar 选择、联网 ABI 仍需 FML 实测。
+- Forgematica 定义两个 modId（forgematica、litematica stub）；MaFgLib 定义 mafglib、malilib stub。正式包未发现这些已装 ID，不要另装另一份同类移植。
+- 官方安全公告 #11 指定本次 0.4.2+mc1.21.1 是修复版，不降级至 0.4.1： https://github.com/CagayakeGirls/litematica-neoforge/issues/11
+- 官方加载投影崩溃报告 #13 涉及 BufferBuilder.building 未开放： https://github.com/CagayakeGirls/litematica-neoforge/issues/13
+  本次官方 JAR 的确仅保留 AW，未包含原生 AT；但正式基线 AzureLib / EMF / ETF / GeckoLib / ImmediatelyFast 的 JAR 已有 public com.mojang.blaze3d.vertex.BufferBuilder building 原生 AT，且读取的这些依赖 SHA-1 都与正式 manifest 一致。按 NeoForge AT 规则应覆盖该访问限制。只属于静态预期，仍把投影加载/卸载崩溃纳入实测。
+- Iris / Sodium：官方说明 1.21.3+ 光影渲染不可靠；较早版本取决于光影包，并建议 Sodium + Iris。本基线 1.21.1 不在 1.21.3+ 限制之内，但不构成对当前 Iris 1.8.14-beta.1、Sodium 0.8.13、Sable 2.0.5 与 BetterMC-Low 的兼容保证。
+  https://www.curseforge.com/minecraft/mc-mods/forgematica
+- YSM 2.6.5：没有找到官方针对该组合的兼容保证，需测试人物模型、菜单输入及第三人称渲染。没有默认关闭光影或更改 YSM / Iris / Sodium 配置。
+- 默认主菜单 M、配置 M+C、材料清单 M+L、放置管理 M+P。可能与地图或其他按键冲突，验收时确认，再在该模组配置页单独调整；此候选不改全局 options.txt。
+
+task14 最小实测（在现有独占客户端任务结束之后，由 task14 安排一个新客户端副本）：
+1. 复制完整待测客户端为独立副本，再把 schematic-client-overlay-task23-qa.zip 解压到该副本游戏根目录。不要解压到服务端、正式客户端、冻结候选、正在运行的 QA 目录。旧 config/litematica.json 若存在，先保留，按本次 seed 项合并，不直接覆盖个人设置。
+2. 用现有 Java / NeoForge / 资源包、光影与渲染模组启动，留完整 latest.log / debug.log / crash-reports。确认 four IDs 正常、JarJar 选择无 duplicate / dependency / NoSuchMethod / Mixin 错误。
+3. 使用临时本地世界或已授权测试环境，M 打开菜单，加载自制 test-floor 并创建仅渲染的 placement，查看 9 石材料清单。验证平移/旋转/层显示、遮挡和透明度。卸载、再次加载、换世界后重载，检查 #13 / 缓冲区释放路径。
+4. 生存模式手工放一块石头后材料计数/投影缺块提示更新；确认 easyPlaceMode=false、无自动连放、无执行/粘贴快捷键。不要执行粘贴、填充、删除、克隆、命令导出或自动建造。
+5. 用当前光影开启状态测一轮，再仅在测试副本关闭光影比较。测第一/第三人称、YSM 可见人物、持物、地图菜单与 M 组合键。测试投影后正常退出客户端。通过后再独立决定是否加入正式发布，不混入此前冻结候选。
+
+交付清单：
+client/：仅运行时新增文件（两个 JAR、配置 seed、一个测试蓝图）。
+client-additions.json：正式 1.4.26 上的新增文件候选 delta，managed JAR / seed 配置与蓝图；不是已发布 manifest，也没有上传 URL。
+schematic-client-overlay-task23-qa.zip：可移植独立客户端 overlay，含 sources/licenses/署名。
+static-verification.json、download-receipt.json、source-context-receipt.json、overlay-receipt.json：审核证据与哈希。
+运行记录：尚无。runtime_verified=false，promotable=false；不宣称启动或投影实测成功。

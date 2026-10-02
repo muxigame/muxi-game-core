@@ -1,0 +1,179 @@
+{
+  "base_pack": "1.4.26",
+  "base_manifest_sha256": "5dd3a0217d51769ebe8c8d9cc1da57bc67eb80d785f97f069b9b9fb69933cdb9",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.250",
+  "official_artifacts_verified": true,
+  "mods": [
+    {
+      "project": "forgematica",
+      "version": "0.4.2+mc1.21.1",
+      "mod_ids": [
+        "forgematica",
+        "litematica"
+      ],
+      "dependencies": [
+        {
+          "modId": "neoforge",
+          "type": "required",
+          "versionRange": "[21,)",
+          "ordering": "NONE",
+          "side": "BOTH"
+        },
+        {
+          "modId": "minecraft",
+          "type": "required",
+          "versionRange": "[1.21,)",
+          "ordering": "NONE",
+          "side": "BOTH"
+        },
+        {
+          "modId": "mafglib",
+          "type": "required",
+          "versionRange": "[0.4,)",
+          "ordering": "NONE",
+          "side": "BOTH"
+        }
+      ],
+      "loader_range": "[4,)",
+      "license": "LGPLv3",
+      "native_access_transformer_present": false
+    },
+    {
+      "project": "mafglib",
+      "version": "0.4.3+mc1.21.1",
+      "mod_ids": [
+        "mafglib",
+        "malilib"
+      ],
+      "dependencies": [
+        {
+          "modId": "neoforge",
+          "type": "required",
+          "versionRange": "[21,)",
+          "ordering": "NONE",
+          "side": "BOTH"
+        },
+        {
+          "modId": "minecraft",
+          "type": "required",
+          "versionRange": "[1.21,)",
+          "ordering": "NONE",
+          "side": "BOTH"
+        }
+      ],
+      "loader_range": "[4,)",
+      "license": "LGPLv3",
+      "native_access_transformer_present": false
+    }
+  ],
+  "embedded_dependencies": [
+    {
+      "identifier": {
+        "group": "org.sinytra.forgified-fabric-api",
+        "artifact": "fabric-api-base"
+      },
+      "requested": {
+        "range": "[0.4.42+d1308ded19,)",
+        "artifactVersion": "0.4.42+d1308ded19"
+      },
+      "existing": {
+        "range": "[0.4.42+d1308ded19,)",
+        "artifactVersion": "0.4.42+d1308ded19"
+      },
+      "binary_identical": false,
+      "different_entries": [
+        "META-INF/neoforge.mods.toml"
+      ],
+      "all_class_entries_identical": true,
+      "range_check": "Existing version satisfies published minimum (static); FML selection and ABI require runtime verification."
+    },
+    {
+      "identifier": {
+        "group": "org.sinytra.forgified-fabric-api",
+        "artifact": "fabric-networking-api-v1"
+      },
+      "requested": {
+        "range": "[4.3.0+6db6dff919,)",
+        "artifactVersion": "4.3.0+6db6dff919"
+      },
+      "existing": {
+        "range": "[4.3.1+7e3d421f19,)",
+        "artifactVersion": "4.3.1+7e3d421f19"
+      },
+      "binary_identical": false,
+      "different_entries": [
+        "META-INF/MANIFEST.MF",
+        "META-INF/architectury-loom-nesting-metadata.json",
+        "META-INF/neoforge.mods.toml",
+        "net/fabricmc/fabric/impl/networking/UntrackedNetworkHandler.class",
+        "net/fabricmc/fabric/mixin/networking/client/ClientPlayNetworkHandlerMixin.class",
+        "org/sinytra/fabric/networking_api/NeoNetworkRegistrar$NeoPayloadHandler.class",
+        "org/sinytra/fabric/networking_api/NeoNetworkRegistrar$NeoSubHandler.class",
+        "org/sinytra/fabric/networking_api/NeoNetworkRegistrar.class",
+        "org/sinytra/fabric/networking_api/NetworkingEventHooks.class"
+      ],
+      "all_class_entries_identical": false,
+      "range_check": "Existing version satisfies published minimum (static); FML selection and ABI require runtime verification."
+    }
+  ],
+  "existing_api_hash_matches_formal": true,
+  "existing_buffer_builder_at": [
+    {
+      "file": "azurelib-neo-1.21.1-3.1.11.jar",
+      "at": "META-INF/accesstransformer.cfg",
+      "lines": [
+        "public com.mojang.blaze3d.vertex.BufferBuilder building # building"
+      ],
+      "formal_sha1_matches": true
+    },
+    {
+      "file": "entity_model_features-3.3.5-1.21-neoforge.jar",
+      "at": "META-INF/accesstransformer.cfg",
+      "lines": [
+        "public com.mojang.blaze3d.vertex.BufferBuilder building"
+      ],
+      "formal_sha1_matches": true
+    },
+    {
+      "file": "entity_texture_features-7.2.1-1.21-neoforge.jar",
+      "at": "META-INF/accesstransformer.cfg",
+      "lines": [
+        "public com.mojang.blaze3d.vertex.BufferBuilder building"
+      ],
+      "formal_sha1_matches": true
+    },
+    {
+      "file": "geckolib-neoforge-1.21.1-4.9.2.jar",
+      "at": "META-INF/accesstransformer.cfg",
+      "lines": [
+        "public com.mojang.blaze3d.vertex.BufferBuilder building"
+      ],
+      "formal_sha1_matches": true
+    },
+    {
+      "file": "ImmediatelyFast-NeoForge-1.6.13+1.21.1.jar",
+      "at": "META-INF/accesstransformer.cfg",
+      "lines": [
+        "public com.mojang.blaze3d.vertex.BufferBuilder building"
+      ],
+      "formal_sha1_matches": true
+    }
+  ],
+  "config_schema_checked_against_exact_source": true,
+  "fixture": {
+    "version": 7,
+    "data_version": 3955,
+    "size": [
+      3,
+      1,
+      3
+    ],
+    "palette_decoded": true,
+    "blocks": 9,
+    "entities": 0
+  },
+  "runtime_started": false,
+  "runtime_verified": false,
+  "formal_or_task14_or_131_mutation": false
+}

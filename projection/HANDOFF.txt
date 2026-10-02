@@ -1,0 +1,28 @@
+Task23 projection runtime handoff — 2026-10-02 05:35 UTC
+
+NOT PASSED / NOT PROMOTABLE. Task23 owns runtime tests. Task14 alone owns shared MuxiDesktopQA entry/action settings; only trigger our fixed entry. Formal1.4.27 does not include projection and was not modified.
+
+First actual run: 131 Session2 JBC-1 PID33816 started 04:50:08.860628 UTC.
+Lab: C:\Users\ranzh\Documents\Codex\schematic-task23-20261002\runs\projection-20261002-044944-d9394440
+Actual ForgeMatica0.4.2, MaFgLib0.4.3, Iris1.8.14-beta.1, Sodium0.8.13, YSM2.6.5, MC1.21.1/NeoForge21.1.250 loaded, RTX4090, Easy Place false.
+Failed stage1: ghosts=0, actual=0, drawnChunks=0. Only baseline PNG captured. World muxi_game_core:overworld, fixture platform absent from image; no projection/UI/material/render pass yet.
+WMI QA mixin already sets GlobalConfig.OSHI_UTIL_WMI_TIMEOUT=2000 before SystemReport.putHardware and checks read-back. This run entered its world; later stop was not WMI.
+Normal close waited because driver omitted explicit integrated-server stop. Temporary agent verified PID33816/exact private directory/exact QA world then called standard MinecraftServer.halt(false). No forced termination. Logs confirm all dimensions saved and Minecraft Stopping; PID absent at05:35:06UTC. Original launcher timed out; final exit code unavailable, never claim code0.
+Receipts: 131-resumed-active.json, 131-own-hang-inspection.json, 131-hang-specific.json, 131-standard-normal-close.json, 131-after-standard-stop-inspection.json, 131-final-old-exit.json. All remote evidence retained. active-run processStillRunning=false.
+
+Retry PREPARED, not started:
+C:\Users\ranzh\Documents\Codex\schematic-task23-20261002\runs\projection-20261002-053523-f39cfd49
+prepared-run consumed=false/runtimeStarted=false.
+QA SHA256: 76de1fe5ca4022ebdc826caa8a1c707c29e7b17b1c6e3c2497cbc143a15ae628
+Receipt: 131-retry-prepared.json, runtime-build/build-receipt.json.
+Fixes: wait actual stable dimension and loaded player chunk, nearby platform same dimension, require blue-wool platform visible in client state, verify parsed nine stones, richer diagnostics and bounded readiness, normal player useItemOn stone placement/material refresh (Easy Place off), explicit own server halt/save before disconnect, exit reentry guard. Physical keyboard/mouse hand-placement unverified and never claimed.
+
+COORDINATION: entry owner trigger ONCE after task6 focus period; use coordinated Parallel policy and restore original shared action afterward. Task23 does not write shared task settings or create new persistent tasks.
+Fixed script (no args): C:\Users\ranzh\Documents\Codex\schematic-task23-20261002\start-visible-task23.ps1
+Equivalent, choose one: C:\Python38\pythonw.exe -B "C:\Users\ranzh\Documents\Codex\schematic-task23-20261002\start_visible_131.py"
+131 Session2 only; SSH Session0 rejected. Fresh copy ready. Startup focus ~20sec, then no global input automation. Task23 owns ghost/UI/material/move/rotate/unload/reload/Iris off-on/YSM/world-save/title/client-exit assertions; never touch task6 clients.
+
+Official overlay unchanged SHA25610b7cd94fadfec82ec6c76eebd1b08babd1c9da1d8346a5e05b2e707c6cce2c1; runtime_verified=false/promotable=false.
+QA helper and recovery agent must never enter release overlay. Original official binaries/licenses/sources/hashes retained.
+Official versions: https://modrinth.com/mod/forgematica/version/71jxaAwz https://modrinth.com/mod/mafglib/version/CgDQ0u0Q
+HANDOFF-static-only-historical.txt preserves previous notes; their task14 test ownership/no-runtime statements are superseded.

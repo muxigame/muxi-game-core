@@ -1,0 +1,46 @@
+跨维度加载耗时：后续独立修复与诊断交接
+
+用户目标：实际缩短任意维度切换的 10～20 多秒等待。伤害保护不是性能解释，本次没有实现保护功能。
+
+本轮更具体的原因候选
+
+1. 当前正式 Iris 1.8.14-beta.1：Minecraft.updateLevelInEngines 的维度切换钩子先 destroyPipeline，清空按维度的管线 map，再 preparePipeline。
+2. 当前正式 EuphoriaPatcher 1.10.0-r5.9：setLevel RETURN 的 onDimensionChange 在首次设置之后，每次都会安排 findAndScheduleReload，甚至没有比较 lastDimension 与 currentDimension 是否相同。
+3. IrisReloadManager.checkPendingReload 在主线程反射调用 Iris.reload；该函数重新初始化配置、destroyEverything、loadShaderpack，随后再 preparePipeline。
+4. 因而一次常规维度切换可能包含一次原生目标管线构建和一次额外完整光影包重载／管线构建。这是已确认的正式字节码路径；若用户开启光影，是目前最值得首先定量验证的耗时来源。尚未收到用户对光影是否开启的补充。
+5. Sodium 0.8.13：重置 RenderSectionManager 会 shutdown 构建器，shutdownThreads 使用无参数 Thread.join，客户端主线程需要等旧构建线程真正退出。额外重建可能重复触发这一段。
+6. 落点区块数据收到之后，还需 section 构建通过 isSectionBuilt 才能满足普通加载界面就绪判断。这一段与光影重载、线程退出、服务端发送限速必须分开量化。
+
+并非固定等 20 秒：实际 ReceivingLevelScreen 的兜底条件为创建后超过 30000ms，在客户端 tick 才检查。仅把兜底改小不能修复上述工作量。本轮没有绕过区段就绪，也没有改变该条件。
+
+基线
+
+Iris、Euphoria、Sodium、Sable 的已用 JAR 与正式 1.4.26 manifest SHA1 相符。较早本机客户端日志以及 131 task14 QA 日志均不是用户投诉现场；没有拿它们证明正式传送具体耗时。正式 Core 1.12.2 与未上线统一候选保持区分。
+
+已落地交付
+
+独立仓库：task23/transfer-probe，分支 diagnosis/transfer-latency。
+候选：transfer-probe/build/muxi-transfer-probe-0.1.0-task23-diag.jar。
+包含客户端世界切换、管线重建／完整重载、Sodium 线程退出／渲染器重建、落点区块、section 就绪和界面退出计时；服务端包含传送包、ACK、落点区块派发和发送队列每秒采样。
+诊断默认关闭；对照开关默认关闭，只在 Core 三世界之间从 Euphoria 的维度回调路径移除额外完整重载，不改变原生 Iris 的维度管线处理或手动重载。
+没有改写第三方 JAR，没有发包，没有加入 task14 冻结候选。
+
+允许的低资源验证已执行
+
+- 纯 Java 边界检查通过 272 项，覆盖日志窗口／预算、终点记录保留、维度／调用来源范围和默认关闭。
+- 日志分析器 4 项测试通过：分离重复和嵌套重载、缺失结束事件、两端独立时钟、日志提取。
+- 64 MiB 回放实际正式 Euphoria 原始回调字节码，以依赖计数桩替代引擎：8 次 callback 请求 8 次额外重载；对照策略去掉其中 6 次 Core 三世界间请求，留下同维度及 Nether 路径 2 次。
+- 离线读取真实引擎／Iris／Euphoria／Sodium 类字节核对注入方法、参数、返回类型及 Shadow 字段；结果见 target-signature-receipt.json。
+
+回放只证明原始请求路径存在且对照策略可去掉对应调用次数，没有运行 GPU 着色器或 Minecraft，不能伪称已节省具体秒数。运行时 Mixin 应用仍需实际启动检查。
+
+修复的实际边界
+
+Euphoria 重载会刷新维度相关预处理宏；贸然永久删掉全部重载可能改变部分光影／模组世界表现。因此当前是范围受限、默认关闭的 A/B 修复候选。需在相同路径下验证当前光影效果，再形成最终生产修复。当前候选不覆盖 Nether/End 等其他世界，不声称已经修好所有维度。
+若实际关闭光影，或基线完整重载占比很小，立即以 trace 确认的 Sodium／区块／section 阶段为下一主因；不以当前候选替代根因测量。
+
+剩余需要父级协调的唯一实测阶段
+
+保持正式 1.4.26 / Core 1.12.2 基线和用户光影设置，在隔离副本中启动诊断客户端／服务端，先抓一次往返，再加 skipExtraDimensionReload 开关重复同一路径。记录 total_client_transfer_ms、完整 iris_reload、sodium_shutdown、chunk_to_section 等阶段，中位数和范围；同时核对画面和错误日志。
+131 的内存清理与发布任务客户端控制仍由父级处理，本任务未抢占客户端、未启动 Minecraft、未结束远端进程。没有修改生产或冻结候选。
+具体开关、日志含义和可执行解析命令见 transfer-probe/README.md。

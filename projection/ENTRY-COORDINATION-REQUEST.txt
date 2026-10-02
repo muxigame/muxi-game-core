@@ -1,0 +1,25 @@
+Task23 独立投影测试桌面入口协调需求（2026-10-02）
+
+【已被父级协调方案取代】现在采用 task14 唯一管理的已有并行入口，不要求新建持久任务。固定启动参数和约 20 秒窗口请看 EXISTING-ENTRY-PARAMETERS.txt。以下仅保留历史提案，register-independent-entry.review.ps1 不需要执行。
+
+本任务的实机功能/UI/退出验证由 task23 自己负责；不移交 task14 做验收。父级只需要协调桌面启动路线和短时焦点资源。
+用户已明确允许 131 同时 3～4 个隔离 MC 实例。当前已观察 Session 2 PID 8848；本任务不操作这个 PID，也不修改原 MuxiDesktopQA。
+
+已准备独立目录：C:\Users\ranzh\Documents\Codex\schematic-task23-20261002
+具体入口脚本：C:\Users\ranzh\Documents\Codex\schematic-task23-20261002\start-visible-task23.ps1
+脚本仅在 JBC_FCRL / Session 2 工作，启动一个 task23 Java 客户端；每次都有新 runs/projection-时间-随机值 目录、日志、离线用户和独立测试世界。
+不会连接多人服务器、开启 LAN、创建测试 HTTP 监听器或操作其他进程。MC 自带集成世界使用本实例连接，不共享外部端口。
+通过 Minecraft/模组自己的界面 API 自动加载真实投影、材料 UI、光影开关和第一/第三人称；通过真正的 RenderFrameEvent + framebuffer 截图取证；只观察实际 renderer 返回的渲染块数量。
+不发送全局键盘/鼠标、不调用抢焦点 API。不过正常 MC 新窗口启动可能取得焦点，所以需安排约 20 秒启动窗口；完成后可在后台自动验收。
+
+优先路线：由父级指出已经支持的 Session 2 独立交互命令入口，执行以上脚本即可。不能把原 MuxiDesktopQA 的 action/script 改成这个脚本。
+如果现有入口只能固定运行 task14，则需要父级审批/协调一个新入口。最小拟议设置：
+  独立任务名：MuxiSchematicTask23QA
+  程序：C:\Python38\pythonw.exe
+  参数：-B "C:\Users\ranzh\Documents\Codex\schematic-task23-20261002\start_visible_131.py"
+  不使用 ExecutionPolicy Bypass；Python helper 和 Java 控制台隐藏，MC 自身窗口正常可见。pythonw 的输出写入本任务 receipts/python-entry.log。
+  运行用户：当前 Session 2 用户 JBC-1；InteractiveToken，仅用户登录时运行；最低权限，不以 SYSTEM/最高权限运行，不保存密码。
+  触发器：无，仅按需启动；单实例；禁止硬终止。调度器不设置强制超时；脚本自身等待上限 25 分钟，到时记录未完成并要求正常关闭自己的 MC，不强杀进程树。
+本任务尚未创建/修改/运行任何计划任务。此文件是具体、可审核的入口需求，不是对新增持久权限的自行授权。
+
+测试结束后 task23 自己读取真实截图/游戏日志/exitCode 并决定结果，QA helper 仅测试副本使用，不加入可发布投影 overlay。

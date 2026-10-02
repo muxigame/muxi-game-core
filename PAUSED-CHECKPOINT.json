@@ -1,0 +1,39 @@
+{
+  "savedUtc": "2026-10-02T06:01:17.107646+00:00",
+  "task": "task23",
+  "purpose": "Pause-period source checkpoint; not a tested/promotable release",
+  "testingPaused": true,
+  "newTestsBuildsOrProcessesStarted": false,
+  "pushPerformed": false,
+  "firstRun": {
+    "pid": 33816,
+    "lab": "C:\\Users\\ranzh\\Documents\\Codex\\schematic-task23-20261002\\runs\\projection-20261002-044944-d9394440",
+    "result": "Stage1 failed, ghosts/actual/drawnChunks zero; normal saved exit observed, exit code unavailable"
+  },
+  "retry": {
+    "pid": 4204,
+    "session": 2,
+    "startedUtc": "2026-10-02T05:46:17.700147Z",
+    "lab": "C:\\Users\\ranzh\\Documents\\Codex\\schematic-task23-20261002\\runs\\projection-20261002-053523-f39cfd49",
+    "lastObservedUtc": "2026-10-02T05:55:40.8316258Z",
+    "lastObservedAlive": true,
+    "stage": "World initialization, server awaiting PasterDream lamp-shadow chunk; not WMI",
+    "normalExitRequested": true,
+    "normalExitConfirmed": false,
+    "latestUserReport": "User interrupted test. Launcher receipt confirms process exit0 at05:55:57.777219UTC, driver incomplete. No repeat kill, runtime test, or launch.",
+    "processStillRunning": false,
+    "exitCode": 0,
+    "finishedUtc": "2026-10-02T05:55:57.777219Z",
+    "driverCompleted": false,
+    "normalStopRequested": false,
+    "cleanExit": false,
+    "exitReceiptSaved": true,
+    "currentPidNotRecheckedAfterUserInterruption": true
+  },
+  "runtimeVerified": false,
+  "promotable": false,
+  "productionMutation": false,
+  "resume": "After parent authorization on131, first verify old PID/active-run/normal-exit flag and preserve evidence. Do not repeat kill or launch. Diagnose initialization if still alive, then resume Task23 projection/UI/material/Iris-Sodium-YSM/normal-exit validation in own instance.",
+  "rawEvidence": "Original logs/receipts/screenshots stay in task23 schematic-client-candidate and exact private131 runs; raw logs not committed to avoid credentials/player/production data.",
+  "pendingExcluded": "Generated JAR/class/ZIP artifacts, official dependency binaries/source JARs, caches, backup worlds, production/player snapshots and raw logs excluded from source Git checkpoint."
+}

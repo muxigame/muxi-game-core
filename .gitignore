@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.class
+*.jar
+*.zip
+*.bundle
+.env*

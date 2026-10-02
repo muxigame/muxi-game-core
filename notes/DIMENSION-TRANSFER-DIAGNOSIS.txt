@@ -1,0 +1,112 @@
+跨维度加载与到达保护：独立只读诊断
+范围：正式整合包 1.4.26 / Core 1.12.2 / Minecraft 1.21.1 / NeoForge 21.1.250。
+状态：未部署、未启动 Minecraft、未重启服务器、未改配置或存档、未修改 task14 冻结候选。
+
+结论与证据强度
+
+1. 已确认：传送位置确认不代表客户端加载完成。
+   实际 NeoForge 补丁后的 ServerPlayer.changeDimension 先发送 respawn，切换玩家所属世界，发送位置，随后 sendLevelInfo 发送 LEVEL_CHUNKS_LOAD_START。
+   ClientPacketListener.handleMovePlayer 处理位置后立即发送 ServerboundAcceptTeleportationPacket，随后发送 PosRot。这里不检查 LevelLoadStatusManager.levelReady，也不等待区块网格构建。
+   服务端 handleAcceptTeleportPacket 对匹配的 teleport id 调用 hasChangedDimension，清除 isChangingDimension。ServerPlayer.isInvulnerableTo 中的跨维度保护就此结束。
+   所以玩家仍看着加载界面时，服务端可以已经恢复普通伤害处理。这是代码确定的保护空档；本轮没有复现用户那次死亡，不能断言该空档是每次死亡的唯一原因。
+
+2. 已确认：普通加载界面没有固定等待 20 秒。
+   ReceivingLevelScreen.tick 在 levelReceived 为真或创建后超过 30000ms 时关闭。这个检查依赖客户端继续 tick；线程卡顿时并非严格的 30 秒墙钟上限。
+   LevelLoadStatusManager 初始等待 LEVEL_CHUNKS_LOAD_START，收到后等待玩家当前 BlockPos 所在区段 isSectionCompiled。越界、旁观者或死亡另有放行条件。
+   不要求整个视距区块全部就绪。区块数据到达也不等于区段已经构建。
+   Sodium 的实际嵌套代码将该判断落到 SodiumWorldRenderer.isSectionReady -> RenderSectionManager.isSectionBuilt。
+   Sable 的 Sodium 兼容钩子在子世界范围内查询对应子世界区段，否则继续查普通 Sodium 区段。
+   这些机制能解释“服务端已到达但画面仍加载”，尚不能定位用户的 10～20 秒消耗在哪一段。
+
+3. 已确认：已有 Loading Protection 不覆盖新发起的跨维度过程。
+   正式 loadingprotection-1.0.2-1.21.1.jar 的 ProtectionHandler 仅在 PlayerLoggedInEvent 建立状态，配置 protectionDuration=30。
+   其伤害和怪物目标处理只查询该已有登录状态，没有 PlayerChangedDimensionEvent 建立新状态的处理。
+   此结论不是“服务器完全没有加载保护”：刚登录时既有保护可能仍有效，也可能因移动或时间到期解除。
+   跨维度后是否恰好仍处于登录保护，应由运行记录判定。
+
+4. 已确认但未定责：正式区块发送确实限速。
+   chunksending.json：每人最大 15 chunks/tick、全服最大 80、未确认批次数 5、客户端需求倍率 0.8、prioritizeDirection=true。
+   实际 PlayerChunkSender 有 pending 队列、批次配额和 ACK 门槛；模组钩子修改这些量。
+   方向优先以视线前方约 3 区块作为排序中心，并保留距离二级排序；不能据此声称落点会无序排到全部区块末尾。
+   平均 TPS 正常也不能排除某次生成、发送排队、客户端处理或网格构建耗时。
+   未采样用户传送期间的队列长度、实际发送速率、批次 ACK、目标区块生成或客户端构建耗时，不能把限速直接定为 20 秒根因。
+   lazychunkload-common.toml 的存在不足以证明对应模块在本次运行生效；未据此归因。
+
+5. 已核对相关显示钩子：
+   Better World Loading 1.0 的已查 mixin 改加载画面显示和控件，没有所述固定延迟。
+   FancyMenu 的已查 LevelLoadStatusManager 钩子在就绪后通知 WorldSessionTracker；ReceivingLevelScreen 钩子替换文字显示。
+   正式 Zombie Challenge 的 ready 上报是玩法状态，要求已收到落点区块且不在 ReceivingLevelScreen；不能当作所有传送的通用加载完成协议。
+   未声称排除了整合包所有客户端钩子或某次 GPU/着色器卡顿。
+
+基线与日志限制
+
+正式服务端 Core 的 SHA256 为 56cdb297d0a0de3f6bc745fcc94914bb90dd4f06e078b2c15fd40b010eb9f59d。
+本轮使用实际 neoforge-21.1.250-server.jar / client.jar 的补丁类，未以未补丁的 Minecraft srg.jar 代替行为证据。
+本机 _client_test 日志是较早会话，不能冒充用户正式 1.4.26 的问题现场。其 Sodium、Sable、Better World Loading、FancyMenu、Chunk Sending、Loading Protection JAR 已逐个用正式发布 manifest 的 SHA1 核对相同，因而可用于相应代码判断。旧 Core 1.12.0 未作为正式 Core 行为依据。
+131 通过现有授权 SSH 只读访问成功。定位了既有 task14 QA 目录、日志元数据及计时符号筛查；它们是 QA 会话，不能代表用户那次正式跨维度操作。
+没有进行新的游戏复现，没有结束任何远端 PowerShell，没有做内存清理。
+现有证据没有同时记录同一次传送的服务端阶段与客户端区块/渲染阶段，因此具体延迟根因仍未闭环。
+统一候选包含精确坐标传送改动，但未上线；不能用候选行为解释正式 Core 1.12.2 的投诉。
+
+最小计时方案：下一次独立候选复现用，尚未安装
+
+每条 JSONL 使用 session、transfer、side、event、mono_ms；按进程使用单调时钟。服务端生成 transfer nonce，并绑定玩家连接、目标世界及当前 teleport id。普通世界加载不产生额外维度修改。
+不要直接减服务端与客户端的 mono_ms；两台进程时钟原点不同。关联 nonce 只用于对齐事件，无法自动消除时钟偏差。
+保留一次会话、有限事件数量，不记录令牌、聊天、服务器密码或不必要的精确坐标。
+
+服务端单次事件及钩子：
+ request：接受实际传送请求，分别记录 portal、命令/技能等路径类型。
+ target_ready：落点必要区块/碰撞校验完成，单独区分寻找传送门、生成及排队等待。
+ respawn_send / position_send / load_start_send：实际 send 包入口，记录包类型和 teleport id。
+ teleport_ack：实际匹配 ACK，附 isChangingDimension 前后值。
+ landing_chunk_enqueue / landing_chunk_send：目标落点区块入发送队列及真正发出，附 pending 数、unacked、批次 quota 和发送速率。
+ ready_hint_receive：如增加诊断用完成消息，仅在合法当前 transfer 下记录收到的时间；诊断版不因此改伤害规则。
+ damage_attempt：单次限量记录伤害来源类别、保护状态及是否取消，不记录完整 NBT。
+
+客户端单次事件及钩子：
+ respawn_receive / screen_open：新 ClientLevel 与实际 screen 类建立。
+ position_receive / teleport_ack_send：位置处理与 ACK 发出，分别计时。
+ load_start_receive：LEVEL_CHUNKS_LOAD_START；缺失时明确标记。
+ landing_chunk_receive：玩家实际落点区块数据应用结束，记录玩家区段是否存在。
+ section_ready：第一次通过实际 renderer 的就绪判断，同时记普通区段/子世界路径。
+ screen_close：实际退出加载界面，注明 ready、timeout、dead/spectator 或自定义 screen 关闭原因。
+ 只在状态边沿记录，避免每 tick 刷大量日志。
+
+判读：
+ request -> target_ready 长：查服务端目标准备/生成/传送门搜索。
+ position_send -> landing_chunk_send 长：查服务端发送排队、批次 ACK 和目标区块就绪。
+ 客户端 respawn_receive -> landing_chunk_receive 长：结合服务端发送时点和包处理，区分传输与客户端接收排队；不直接称为网络慢。
+ landing_chunk_receive -> section_ready 长：查客户端网格构建、邻区块依赖、Sodium/Sable/着色器资源及 CPU/GPU/GC。
+ section_ready -> screen_close 长：查自定义加载界面钩子。
+ load_start_receive 缺失：优先查包是否发送、接收和新 manager 的建立顺序。
+ 原生 ACK 到达很早而合法 ready_hint_receive 很晚：量化服务端侧保护空档。
+
+独立复现矩阵：
+ 同一正式 pack 的隔离副本，对比已生成暖区块和未生成区块，家园/生存/冒险双向各一次；区分普通指令传送和 Core 传送门。
+ 同一客户端至少两次重复路径，收齐上述事件后再决定是否需要改变发送策略或区段构建优先级。
+ 全部保持正式参数做第一轮，之后只在隔离候选中做单变量对照。131 内存占用问题解决并获得后续具体测试安排前，本任务不主动启动 Minecraft。
+ 不通过删区块、改视距、清缓存或更换正式 JAR 来代替计时。
+
+最小到达保护设计：方案，不是已实现功能
+
+服务端仅在已接受的真实跨维度过程中创建 ArrivalGuard，绑定连接、目标维度、当前传送序号和随机 nonce。客户端消息不能创建或延长保护。
+保护状态置于独立内存 map，不写 Invulnerable NBT、不修改游戏模式，不复用/覆盖登录保护模组的状态。
+开始到结束仅覆盖普通战斗与落点危险伤害/怪物目标；死亡、断线、注销立即清理；管理 kill/虚空等特殊规则需要明确策略，不盲目全部取消。
+候选硬上限 30 秒：从第一次服务端接受传送算单调墙钟期限，伤害处理与 tick 都检查。tick 卡顿也不能靠延迟清理无限保护。该数值是待隔离验证的设计值，不是确认能覆盖所有客户端卡顿。
+正常完成要求当前 nonce、维度、teleport id 均匹配，位置 ACK 已接受且落点区块已实际发出，再接收客户端 section_ready/screen_close 的当前完成提示；提示只允许提前结束，不能续期。
+不要把自动发送的第一条 MovePlayer/PosRot 当成用户已经可以操作。
+重复、旧序号、重放、其他维度和缺失服务端上下文的 ready 消息不生效。
+连续传送更新 epoch 时保留本次持续加载窗口最初的硬期限，不因反复换维度无上限刷新。未完成控制恢复的超时窗口不得被客户端请求重开。
+保护期间禁止由该玩家发起有效攻击；主动战斗操作按服务器策略先结束保护，避免获得可攻击别人却不受伤的优势。
+超时强制销毁状态并记录原因/提示玩家加载失败；不能无限等客户端，也不能承诺超时后仍安全。可由独立产品决策选择提示重连或经授权的安全落点方案，最小补丁不隐式自动转移存档或世界角色。
+只有通过隔离测试后才能形成可部署候选：正常 ready、丢失/重复/伪造 ready、过期/连续传送、logout/death、同维度移动、登录保护并存、超时及 PvP 方向限制均需验证。
+保护补丁解决暴露空档，不等于修好了加载耗时；两者必须分别验收。
+
+交付
+
+transfer-formal-baseline-hashes.json：正式 manifest 与已读本地 JAR 的哈希证据。
+transfer-*.txt：实际引擎与相关模组反汇编证据。
+transfer-mod-loading-hook-inventory.json：相关符号扫描清单，不等价于运行钩子全量排除。
+transfer-131-*.json：远端只读查询记录，明确 QA 范围。
+transfer_trace_analyzer.py：离线读取计时 JSONL，仅计算同一 side 的单调时间差；未接入游戏。
+test_transfer_trace_analyzer.py：4 项合成格式测试通过，不是 Minecraft 实测。

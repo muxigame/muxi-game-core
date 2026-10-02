@@ -1,0 +1,47 @@
+冒险世界NPC与睡眠：只读检查点（2026-10-02 UTC）
+
+一、NPC不攻击敌怪：反馈已定位，实体身份尚未定位
+
+正式服latest.log第16044行，2026-10-01本机09:16:09，原文为：
+<MUHEHEHEHEHEHE> 冒险世界里的守卫NPC不攻击怪物
+因此“棕绿NPC”是转写歧义，日志确认为“守卫NPC”；这仍不足以确定模组或实体。
+
+本轮RCON无人在线，冒险维度No entities found。未强制加载、生成、攻击或传送任何实体。
+只读解码冒险entities目录的保存记录，读取2405个实体、无解析错误：候选家族有16个原版村民、1个原版铁傀儡、10个touhou_little_maid:fairy；没有CustomNPCs或Easy NPC实体。村民职业为15个none、1个nitwit；铁傀儡Health=100、PlayerCreated=0、位置(-795.56,64,318.45)。这些候选均未显式保存NoAI=true，但这不等于已经验证目标NPC的攻击AI正常。
+仅凭外观“守卫”不能把问题归因到其中任一实体。存档快照也不能排除已消失、未保存、或现场其他维度中的NPC。现有日志未提供NPC名字/实体ID或攻击目标ID，尚无已证实的NPC故障原因。
+
+可信程度：原始反馈定位高；故障实体与原因未确定。
+最小所需信息：该守卫的游戏内名字或一张能辨认NPC的截图，最好同时看到敌怪；模组名/实体ID若已知即可代替截图。已发出名字/模组名的文本澄清请求。确认后再只读检查其攻击目标规则、阵营/雇佣/工作状态、距离和寻路、目标怪物是否被白名单排除。若是原版村民，不能把它当成默认有守卫攻击AI；若是铁傀儡，需考虑具体目标种类（例如苦力怕）；这些只是条件分支，不是对本反馈的身份或原因判断。
+
+二、睡觉不能跳夜：高可信代码缺陷机制，未现场复现
+
+同一日志第16043行，09:16:00原文为：
+<MUHEHEHEHEHEHE> 冒险世界睡觉了也不会跳过夜晚
+
+运行基线：正式1.4.26、Core1.12.2、NeoForge21.1.250。读取的是已安装Core和实际NeoForge patched ServerLevel、MinecraftServer、DerivedLevelData、SleepStatus字节码，不把未上线统一候选当正式行为。
+
+确认事实：
+- 冒险type为minecraft:overworld，bed_works=true、natural=true，不是固定夜晚类型。
+- 当前playersSleepingPercentage=100、doDaylightCycle=true。三维度查询值相同。
+- 第一组daytime为家园9928、生存9930、冒险9930；后续查询家园与冒险都为14099。时间在正常推进、三维度共享主时钟，不是昼夜循环被关或冒险时间冻结。
+- ServerLevel的sleepStatus用本维度players列表更新，SleepStatus排除spectator并按ceil(activePlayers×percentage/100)计算。100%要求同维度有效玩家都睡；代码并不直接把其他维度所有玩家算进冒险人数。投诉当时实际人数和深睡时长未知。
+
+代码链：
+1) MinecraftServer为附加维度创建DerivedLevelData，包裹主世界ServerLevelData。
+2) DerivedLevelData.getDayTime读取共享主时钟，但当前NeoForge版本的setDayTime(long)直接return，没有写入。
+3) patched ServerLevel.tick达到睡眠人数/深睡条件后，先通过EventHooks.onSleepFinished算新时间，再对当前ServerLevel调用setDayTime，随后wakeUpAllPlayers。
+4) 对冒险，这个setter落入上面的空实现。因此具备“睡眠达标并被唤醒，但共享时钟没跳到下一天”的确定代码路径。
+
+模组覆盖：
+- 已安装LetMeSleep，其ServerLevel mixin修改传入同一个setDayTime的wakeUpTime参数；当前wake_up_time=0、instant_sleeping=false。没有把该写入转发到主世界，因此不解决附加维度的空setter。
+- Comforts通过SleepFinishedTimeEvent调整唤醒时间，当前偏移均0，restrictSleeping=false。配置hammockUse=DAY、sleepingBagUse=NIGHT；若反馈使用吊床，需另区分白天睡眠与普通床/睡袋。读取的事件处理没有主世界时钟写入桥接。
+- 正式Core实际JAR未发现SleepFinishedTimeEvent、setDayTime或DerivedLevelData桥接引用；源码搜索也未发现睡眠跳夜处理。这里只确认相关三个模组及实际引擎链，未逐个证明所有第三方模组完全没有别的睡眠干预。
+
+可信程度：附加维度共享时钟/空setter/睡眠写入链为已证实机制，解释该反馈的可信程度高；由于现在无人在线，未观测本次真实玩家的睡眠达标、唤醒和时间变化，不能排除同时存在人数未达标或床具条件问题。
+
+最小修复建议（仅建议，未改代码/配置）：
+对Core管理的生存/冒险维度，在“睡眠完成后的那一次时间写入”中，将经过NeoForge与LetMeSleep/Comforts计算的最终目标时间写到server.overworld()的可写时钟。保留现有100%阈值和深睡检查，不全局改变所有DerivedLevelData setter、不用生产time set命令绕过。
+由于当前三维度共享时钟，修复会让某维度达标睡眠推进整个共享昼夜；这是需明确的行为，不应假装只改变冒险天空。它可作为独立小修复，不依赖大迁移；即使生存后来成为Root，冒险仍是附加维度，该问题不会自动消失。
+隔离验证建议覆盖：1人/多人、其他维度有人醒着、本维度未达100%、spectator、普通床/睡袋/吊床、LetMeSleep与Comforts同时安装、doDaylightCycle=false、同tick多维度睡眠不连续跳多天。正式服本轮未变夜晚、人数规则或睡眠状态。
+
+支持证据：npc-sleep-live.json、sleep-time-followup.json、npc-adventure-saved-entities.json、npc-adventure-ai-fields.json，sleep-patched-*.txt及sleep-mod-*.txt。APP统一候选保持冻结；未重启或修改正式服。

@@ -1,0 +1,10 @@
+{
+  "jar": "muxi-schematic-qa-0.1.0-task23-test-only.jar",
+  "sha256": "76de1fe5ca4022ebdc826caa8a1c707c29e7b17b1c6e3c2497cbc143a15ae628",
+  "sourceFiles": 4,
+  "classFiles": 4,
+  "javaRelease": 21,
+  "minecraftLaunchedOn008": false,
+  "productionArtifact": false,
+  "scope": "Task23 independent client only; actual rendering observation and local fixture, no global input or other client control."
+}
