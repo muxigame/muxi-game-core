@@ -6,6 +6,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "customnpcs.MarkDataConcurrentMapMixin",
+    "hotbath.HotBathSplashSyncHandlerMixin",
     "goblintraders.GoblinDespawnMixin",
     "goblintraders.SurvivalGoblinSpawnerMixin",
     "twilightforest.TwilightPortalCreationMixin",

@@ -25,6 +25,7 @@ public final class CompatMixinPlugin implements IMixinConfigPlugin {
         Map.entry("mowziesmobs", "mowziesmobs"),
         Map.entry("sereneseasons", "sereneseasons"),
         Map.entry("pasterdream", "pasterdream"),
+        Map.entry("hotbath", "hotbath"),
         Map.entry("xaerominimap", "xaerominimap"),
         Map.entry("xaeroworldmap", "xaeroworldmap"),
         Map.entry("waystones", "waystones"),
