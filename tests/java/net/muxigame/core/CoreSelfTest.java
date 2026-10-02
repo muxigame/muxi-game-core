@@ -17,6 +17,7 @@ public final class CoreSelfTest {
     }
     public static void main(String[] args) {
         passed += OpSyncSelfTest.run();
+        passed += MinigameTravelSelfTest.run();
         check("UID numeric", IdentityRules.validUid("10000"));
         check("reject username", !IdentityRules.validUid("Roc"));
         check("reject leading zero", !IdentityRules.validUid("010000"));
