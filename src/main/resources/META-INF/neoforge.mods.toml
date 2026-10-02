@@ -67,3 +67,6 @@ side="BOTH"
 
 [[mixins]]
 config="muxi_game_core.compat.shaders.mixins.json"
+
+[[mixins]]
+config="muxi_game_core.program_binary.mixins.json"

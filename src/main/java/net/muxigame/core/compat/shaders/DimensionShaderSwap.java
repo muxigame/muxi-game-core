@@ -62,10 +62,12 @@ public final class DimensionShaderSwap {
     private static boolean refresh(){
         long begin=System.nanoTime();
         try{
-            if(root==null||packClass==null||!euphoriaPack())return false;
-            Class<?> iris=iris();Object config=invoke(iris,"getIrisConfig");
-            if(!(Boolean)config.getClass().getMethod("areShadersEnabled").invoke(config))return false;
+            Class<?> iris=iris();
             Field field=iris.getDeclaredField("currentPack");field.setAccessible(true);Object current=field.get(null);
+            if(root==null&&current instanceof ShaderPackSourceCarrier carrier){var source=carrier.muxi$shaderPackSource();if(source!=null){root=source.root();options=new HashMap<>(source.options());zipped=source.zipped();packClass=current.getClass();}}
+            if(root==null||packClass==null||!euphoriaPack())return false;
+            Object config=invoke(iris,"getIrisConfig");
+            if(!(Boolean)config.getClass().getMethod("areShadersEnabled").invoke(config))return false;
             if(current==null)return false;
             boolean cached=PACKS.containsKey(pendingDimension);Object target=PACKS.get(pendingDimension);
             String dimensionMacro="CURRENT_EUPHORIA_PATCHES_DIMENSION_"+String.valueOf(invoke(Class.forName("com.euphoriapatches.euphoria_patcher.util.mod.ModLoaderSpecifics"),"getCurrentDimensionStatic")).toUpperCase(Locale.ROOT);
