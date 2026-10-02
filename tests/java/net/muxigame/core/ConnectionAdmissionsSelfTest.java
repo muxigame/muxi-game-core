@@ -23,6 +23,13 @@ final class ConnectionAdmissionsSelfTest {
         check("shutdown removes proof",!evidence.consume(a));
         evidence.record(a);evidence.record(b);
         check("different connections retain separate proof",evidence.consume(a)&&evidence.consume(b));
+        evidence.record(a,"10000");
+        check("same connection cannot change verified identity",!evidence.consume(a,"10001"));
+        check("identity mismatch consumes evidence",!evidence.consume(a,"10000"));
+        evidence.record(a,"10000");
+        check("connection and value identity match",evidence.consume(a,new String("10000")));
+        evidence.record(a,"10000");
+        check("unscoped consumer cannot use scoped evidence",!evidence.consume(a));
         return passed;
     }
 }

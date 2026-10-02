@@ -1,0 +1,70 @@
+{
+  "owner": "131",
+  "scope": "Core join-grant admission lifecycle only; no MC run in this phase",
+  "repository": "muxi-game-core",
+  "branch": "dev",
+  "parentCommit": "159e30e0a28099dc660f16df29aaa1af7c9e70ba",
+  "blockerEvidence": ["task/core-real-login-gate-blocker.json", "task/minigames-ui-handoff-20261002.json"],
+  "rootCause": "LoginGate subscribed to PlayerNegotiationEvent on the game bus. Installed NeoForge 21.1.250 posts RegisterConfigurationTasksEvent through ModLoader in ServerConfigurationPacketListenerImpl.addOptionalTasks; the event is IModBusEvent. The old verification callback did not run before actual player login.",
+  "primaryApiInspection": {
+    "source": "Installed NeoForge 21.1.250 universal and patched server jars, javap public API and bytecode; no guessed APIs",
+    "event": "net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent",
+    "profile": "ServerConfigurationPacketListenerImpl.getOwner()",
+    "connection": "ServerConfigurationPacketListenerImpl.getConnection()",
+    "completion": "getMainThreadEventLoop().execute -> finishCurrentTask(ConfigurationTask.Type)",
+    "ordering": "Registered optional tasks precede JoinWorldTask"
+  },
+  "changes": [
+    "Register join-grant configuration tasks on the mod bus when LoginGate is enabled; remove the old negotiation event subscription.",
+    "Consume the existing Auth one-use grant only when the configuration task starts, after local UID/offline UUID checks.",
+    "Finish configuration only after HTTP 200 with matching uid, loginName and offlineUuid; keep all error paths fail closed.",
+    "Process response and task completion on the listener's server event loop; ignore disconnected or superseded configuration listeners.",
+    "Carry one-use monotonic TTL evidence bound to the exact raw Connection plus verified UID and UUID to PlayerLoggedInEvent.",
+    "Bind normal TrustedAccounts only after consuming that evidence. Social-only trust never substitutes for a join grant. Preserve logout revocation and shutdown clearing."
+  ],
+  "validation": {
+    "fullSourceCompile": "pass against installed Minecraft 1.21.1 / NeoForge 21.1.250, Java 21",
+    "coreJavaSelfTestAssertions": 6946,
+    "loginGateHttpLifecycleFixtureAssertions": 117,
+    "fixtureSources": "Actual LoginGate, CoreConfig, IdentityRules, ConnectionAdmissions and current sibling TrustedAccounts; fixture MC/event objects and real loopback HTTP",
+    "fixtureCoverage": [
+      "two distinct UID connections, task defers HTTP until start, duplicate start never consumes twice",
+      "HTTP contract and successful server-thread finish followed by normal TrustedAccounts admission",
+      "409 absent/expired grant, 404 unknown UID, 403 service key denial, 503 failure, 302 redirect",
+      "malformed response and UID/loginName/offline UUID mismatches",
+      "invalid local UID or UUID never sends HTTP",
+      "same UID on another connection refused; same raw connection with changed UID/UUID refused",
+      "socialUid alone refused; consumed evidence cannot replay; logout revokes normal trust",
+      "disconnected or superseded listener callback ignored, task finish failure discards evidence",
+      "HTTP timeout, feature shutdown and subsequent task start refuse admission"
+    ],
+    "fixtureCommand": "python tests/run_login_gate_configuration_tests.py --java-home <JDK21> --gson <installed-gson-2.10.1.jar> --trusted-source ../muxi-minigames/src/main/java/net/muxigame/minigames/TrustedAccounts.java",
+    "buildCommand": "python build.py --test --server <existing-readonly-server> --java-home <JDK21> --client-game <existing-client-game> --pack-mods <existing-pack-mods>",
+    "gitDiffCheck": "pass",
+    "actualMinecraftAcceptance": "pending; this phase launched no server or client and made no broker, MCEF, room or ledger acceptance claim"
+  },
+  "artifact": {
+    "relativePath": "build/libs/muxi-game-core-1.12.3-task14-qa.1.jar",
+    "sha256": "92a2a83e90ad326124318171a92efd3ed6c8641687622c8e564a21a4c07e4c12",
+    "size": 394556,
+    "versionMetadataChanged": false,
+    "deployed": false
+  },
+  "actualDualClientRetestHandoff": [
+    "The existing backend manager must restart expired isolated Auth/Web through its existing entrypoint. Never read/share private ready files or move service keys between machines.",
+    "Coordinate with the hall QA owner before another actual MC window. Use its private runlab and original entrypoints. Compare Core artifact SHA above on dedicated server and both clients; retain Terminal and framework version alignment checks.",
+    "Leave LoginGate enabled and keep original private service-key wiring. Through each actual RpcHost/access-bearer account flow, obtain a fresh join grant immediately before that client's connection; collect sanitized HTTP status 200. Minting before an eight-minute pack boot is insufficient for the existing 180-second grant TTL. Auth restart loses older in-memory grants.",
+    "Require actual Auth internal join-consume 200, Core valid-join-grant log for each UID, and active normal TrustedAccounts for the actual ServerPlayer/listener. Mere mint invocation, player appearance or terminal social trust is insufficient.",
+    "Only after both normal admissions succeed, resume room create/invite/join/start/leave/restore and real-game settlement/reconnect acceptance with the hall/minigames owners.",
+    "Check an isolated no-fresh-grant/replay connection fails with no normal trust. For every later connection, issue a new actual grant. Retain per-round logs, exit receipts and final own server/client counts zero."
+  ],
+  "preservation": {
+    "otherOwnerCoreCommits": ["159e30e", "2bdcbac", "0f35cea"],
+    "branchesOrWorktreesChanged": false,
+    "productionChanged": false,
+    "secretsReadOrTransferred": false,
+    "loginGateDisabledForBypass": false,
+    "trustedAccountsOrSocialSsoPolicyChanged": false,
+    "pushTagDeploy": false
+  }
+}

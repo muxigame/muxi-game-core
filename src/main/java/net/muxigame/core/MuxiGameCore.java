@@ -37,7 +37,11 @@ public final class MuxiGameCore {
         WaystoneMapNetwork.register(modBus);
         CoreConfig config = CoreConfig.load(Path.of(CoreConfig.FILE));
         // 先注册进服核验：它是这台服务器唯一的身份关口，出问题要第一时间在日志里看见。
-        if (config.login().enabled()) register(new LoginGate(config.login()));
+        if (config.login().enabled()) {
+            LoginGate login = new LoginGate(config.login());
+            login.registerConfigurationTasks(modBus);
+            register(login);
+        }
         if (config.terminalSso().enabled()) register(new net.muxigame.core.feature.login.TerminalPassportFeature(config.terminalSso()));
         if (config.identity().enabled()) {
             if (!ModList.get().isLoaded("simplenicknames"))

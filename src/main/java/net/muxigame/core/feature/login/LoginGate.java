@@ -8,7 +8,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.event.entity.player.PlayerNegotiationEvent;
+import net.minecraft.server.network.ConfigurationTask;
+import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
+import net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +22,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  * 而且没有任何人会发现。代价是 muxi-auth 一挂全服就进不来，运维上用
  * {@code features.login.enabled=false} 手动放行。
  *
- * <p>拒绝走两道：negotiation 阶段断连，以及万一那一步没拦住，在
+ * <p>拒绝走两道：configuration 阶段断连，以及万一那一步没拦住，在
  * {@link PlayerEvent.PlayerLoggedInEvent} 再踢一次。第二道是兜底——第一道要是在某个
  * NeoForge 版本上不生效，这个功能会**静默失效**，而不是报错，那是安全控制最糟的失败
  * 方式。多这十几行，失效就变成"进来一下又被踢"，看得见。
@@ -62,6 +64,7 @@ public final class LoginGate implements ServerFeature {
     private final CoreConfig.Login config;
     /** 已经核验通过、但还没走完登录流程的人。值是 monotonic 毫秒，用来清扫掉队的条目。 */
     private final ConnectionAdmissions<Connection> admitted = new ConnectionAdmissions<>(ADMISSION_TTL_MS*1_000_000L,System::nanoTime);
+    private record VerifiedIdentity(String uid,UUID id) {}
     private volatile boolean stopped;
 
     public LoginGate(CoreConfig.Login config) {
@@ -73,37 +76,51 @@ public final class LoginGate implements ServerFeature {
     @Override public String id() { return "login"; }
 
     @Override public void register(IEventBus gameBus) {
-        gameBus.addListener(this::onNegotiate);
         gameBus.addListener(this::onLoggedIn);
         gameBus.addListener(this::onLoggedOut);
         LOG.info("Join-grant verification enabled; unverified logins are refused (timeout {}s)", config.timeoutSeconds());
     }
 
-    /**
-     * NeoForge 会一直等到这里交回去的 future 完成才让登录往下走，所以核验可以是异步的，
-     * 玩家那边看到的是"正在登录"而不是被打断。
-     */
-    private void onNegotiate(PlayerNegotiationEvent event) {
-        Connection connection = event.getConnection();
-        String uid = event.getProfile().getName();
-        UUID id = event.getProfile().getId();
-
-        if (stopped) { refuse(connection, UNAVAILABLE, uid, "feature stopped"); return; }
-        if (!IdentityRules.validUid(uid)) {
-            refuse(connection, Component.literal("请使用最新版 muxi 启动器。游戏登录身份为平台 UID。"), uid, "not a UID");
-            return;
-        }
-        // UUID 必须是这个 UID 算出来的那一个。对不上说明客户端在自造身份，
-        // 而存档是按 UUID 存的——放过去就是拿着别人的 UUID 开别人的背包。
-        if (id == null || !id.equals(IdentityRules.offlineUuid(uid))) {
-            refuse(connection, Component.literal("游戏 UUID 与平台 UID 不匹配。"), uid, "UUID mismatch");
-            return;
-        }
-        event.enqueueWork(verify(connection, uid, id));
+    /** NeoForge 21.1 posts configuration tasks on the mod bus, before JoinWorldTask. */
+    public void registerConfigurationTasks(IEventBus modBus) {
+        modBus.addListener(this::onConfiguration);
     }
 
-    private CompletableFuture<Void> verify(Connection connection, String uid, UUID id) {
-        CompletableFuture<Void> gate = new CompletableFuture<>();
+    private void onConfiguration(RegisterConfigurationTasksEvent event) {
+        if (!(event.getListener() instanceof ServerConfigurationPacketListenerImpl listener)) {
+            refuse(event.getListener().getConnection(), UNAVAILABLE, "unknown", "unsupported configuration listener");
+            return;
+        }
+        event.register(new ConfigurationTask() {
+            private final Type taskType = new Type("muxi_game_core:join_grant");
+            private final AtomicBoolean started = new AtomicBoolean();
+            @Override public Type type() { return taskType; }
+            @Override public void start(java.util.function.Consumer<net.minecraft.network.protocol.Packet<?>> sender) {
+                if (!started.compareAndSet(false, true)) return;
+                Connection connection = listener.getConnection();
+                var profile = listener.getOwner();
+                String uid = profile == null ? null : profile.getName();
+                UUID id = profile == null ? null : profile.getId();
+                if (!current(listener)) return;
+                if (!IdentityRules.validUid(uid)) {
+                    refuse(connection, NO_GRANT, uid, "not a UID"); return;
+                }
+                if (id == null || !id.equals(IdentityRules.offlineUuid(uid))) {
+                    refuse(connection, NO_GRANT, uid, "UUID mismatch"); return;
+                }
+                verify(listener, uid, id, taskType);
+            }
+        });
+    }
+
+    private boolean current(ServerConfigurationPacketListenerImpl listener) {
+        Connection connection = listener.getConnection();
+        if (stopped) { refuse(connection, UNAVAILABLE, "unknown", "feature stopped"); return false; }
+        return connection.isConnected() && connection.getPacketListener() == listener;
+    }
+
+    private void verify(ServerConfigurationPacketListenerImpl listener, String uid, UUID id, ConfigurationTask.Type taskType) {
+        Connection connection = listener.getConnection();
         HttpRequest request;
         try {
             request = HttpRequest.newBuilder(URI.create(config.endpoint() + uid))
@@ -112,31 +129,24 @@ public final class LoginGate implements ServerFeature {
                 .header("X-Muxi-Server-Key", config.serverKey())
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
-        } catch (RuntimeException malformed) {
-            // URI 里不该出现玩家可控的内容——validUid 已经把 uid 限成纯数字——
-            // 真走到这里是配置坏了，不是玩家的问题，但一样不放行。
-            refuse(connection, UNAVAILABLE, uid, "cannot build request");
-            gate.complete(null);
-            return gate;
-        }
-        try {
             http.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
                 .orTimeout(config.timeoutSeconds() + 2L, TimeUnit.SECONDS)
-                .whenComplete((response, error) -> {
-                    try { decide(connection, uid, id, response, error); }
-                    catch (RuntimeException unexpected) { refuse(connection, UNAVAILABLE, uid, "verifier crashed"); }
-                    // 无论如何都要完成：future 不完成，玩家就永远卡在登录里。
-                    finally { gate.complete(null); }
-                });
+                .whenComplete((response, error) -> listener.getMainThreadEventLoop().execute(() -> {
+                    if (!current(listener)) return;
+                    try {
+                        if (decide(connection, uid, id, response, error)) listener.finishCurrentTask(taskType);
+                    } catch (RuntimeException unexpected) {
+                        admitted.discard(connection);
+                        refuse(connection, UNAVAILABLE, uid, "verifier crashed");
+                    }
+                }));
         } catch (RuntimeException rejected) {
             refuse(connection, UNAVAILABLE, uid, "cannot schedule lookup");
-            gate.complete(null);
         }
-        return gate;
     }
 
-    private void decide(Connection connection, String uid, UUID id, HttpResponse<String> response, Throwable error) {
-        if (error != null) { refuse(connection, UNAVAILABLE, uid, "lookup failed: " + error.getClass().getSimpleName()); return; }
+    private boolean decide(Connection connection, String uid, UUID id, HttpResponse<String> response, Throwable error) {
+        if (error != null) { refuse(connection, UNAVAILABLE, uid, "lookup failed: " + error.getClass().getSimpleName()); return false; }
         switch (response.statusCode()) {
             case 200 -> {
                 // A status code or a nickname lookup is not admission evidence.
@@ -144,23 +154,26 @@ public final class LoginGate implements ServerFeature {
                 if(!uid.equals(identity.get("loginName").getAsString())
                     || !uid.equals(identity.get("uid").getAsString())
                     || !id.toString().equals(identity.get("offlineUuid").getAsString())) {
-                    refuse(connection,UNAVAILABLE,uid,"invalid verified identity"); return;
+                    refuse(connection,UNAVAILABLE,uid,"invalid verified identity"); return false;
                 }
-                if(stopped || !connection.isConnected()) return;
-                admitted.record(connection);
+                if(stopped || !connection.isConnected()) return false;
+                admitted.record(connection,new VerifiedIdentity(uid,id));
                 LOG.info("UID {} presented a valid join grant", uid);
+                return true;
             }
             // 409：UID 存在，但没有票。这正是冒名的样子，单独记一条。
             case 409 -> refuse(connection, NO_GRANT, uid, "no join grant (impersonation attempt or stale launcher)");
             case 404 -> refuse(connection, UNKNOWN_UID, uid, "unknown UID");
             default -> refuse(connection, UNAVAILABLE, uid, "unexpected HTTP " + response.statusCode());
         }
+        return false;
     }
 
-    /** 兜底：negotiation 那一步万一没拦住，进世界的瞬间再核一次名单。 */
+    /** 兜底：configuration 那一步万一没拦住，进世界的瞬间再核一次名单。 */
     private void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || player instanceof FakePlayer) return;
-        if (!stopped && admitted.consume(player.connection.getConnection())) {
+        if (!stopped && admitted.consume(player.connection.getConnection(),
+            new VerifiedIdentity(player.getGameProfile().getName(),player.getGameProfile().getId()))) {
             net.muxigame.minigames.TrustedAccounts.admit(player);
             return;
         }
