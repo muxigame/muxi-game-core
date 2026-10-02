@@ -1,0 +1,31 @@
+家园 ↔ 生存精确坐标传送门候选修改
+
+只作用于 minecraft:overworld ↔ muxi_game_core:overworld 双向传送。
+目标门外框左下角 XYZ、X/Z 朝向与源门相同；玩家保留原 XYZ 和小数偏移，不根据地表高度、旧配对门或附近门重新选址。已成功建成目标门后才更新旧配对记录。
+
+放置范围最多36个位置：4×5门框及内部20个位置，两列门正前/后各一格的地板和三格高入口16个位置。已相同的方块不重写，可用的整块地板保留。范围外不清理。附近旧门方块保留，只删除失效的互相指向记录。
+
+越过高度/世界边界、领地保护取消、无法安全抵达、不可破坏方块，或需更改含方块实体的方块（例如装物品的箱子）时，明确失败并保留原状，不迁移门坐标。普通障碍方块按最小范围替换；箱子不自动拆除，需玩家先处理。批量放置被取消时完整回滚。
+
+下界/末地/暮色森林的原生传送路径不在修改分支内；家园↔冒险继续原有规则。
+
+基线为正式服 Core 1.12.2，SHA256：
+56cdb297d0a0de3f6bc745fcc94914bb90dd4f06e078b2c15fd40b010eb9f59d
+候选包 SHA256：
+3625c34e1bab0caebe507d0f136ebcfd858e0efb5aafed907b251189667cae14
+只替换 WorldPortals.class、PortalLinks.class；其他 ZIP 成员逐字节保留。候选包保留1.12.2元数据用于隔离验证，尚未发布版本或安装到正式服。
+
+源码来自已与线上模块化 API 对齐的 .minigames-refactor-20261001-task2-v3/muxi-game-core，并复制到本隔离仓库。不是共享根仓库旧 ChallengeFeature API 的直接全量重编译；请不要将候选补丁混入无关 SSO/社交模块的未提交更改。
+本隔离仓库基线提交 bd53546。Frame 和 PortalLinks 的未修改编译产物与正式包相同；WorldPortals 的规范化反汇编差异只有编译器生成 lambda 方法的序号（见 baseline-bytecode-diff.txt）。
+
+交付内容：
+- portal-exact.patch：只有两个生产 Java 文件的修改。
+- portal-regression-tests.patch：隔离测试和启动器的修改。
+- build/libs/muxi-game-core-1.12.2-portal-exact-candidate.jar：候选包。
+- build/patch-build.json：构建基线及精确 ZIP 成员变更。
+- portal-validation.json、portal-tests-result.json：测试与包审计结果。
+
+构建用 javac --release 21。隔离服务器使用正式包对应 NeoForge 21.1.250、已安装 minigames 0.1.1、Waystones/Balm 及真实暮色森林依赖，新的 qa-world，无真实玩家，Minecraft 网络绑定被测试 mixin 禁用。不是包含所有正式模组的完整领地兼容性测试；保护事件取消和回滚路径已由测试事件覆盖。
+Windows 本执行环境的 AF_UNIX 管道连接不受支持；隔离启动器指定不存在的 jdk.net.unixdomain.tmpdir，让 JDK 的 PipeImpl 回退到 TCP loopback。该选项只传给测试 JVM，未修改系统设置或正式服启动参数。
+
+没有写入正式服 mods、地图或共享源码，没有热替换、重启或清理正式服建筑。

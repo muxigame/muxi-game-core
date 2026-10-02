@@ -1,0 +1,1000 @@
+Compiled from "WorldPortals.java"
+public final class net.muxigame.core.feature.dimensions.WorldPortals {
+  public static final net.neoforged.neoforge.registries.DeferredRegister$Blocks BLOCKS;
+
+  public static final net.neoforged.neoforge.registries.DeferredBlock<net.muxigame.core.feature.dimensions.WorldPortalBlock> HOME;
+
+  public static final net.neoforged.neoforge.registries.DeferredBlock<net.muxigame.core.feature.dimensions.WorldPortalBlock> OVERWORLD;
+
+  private static final java.util.Set<net.minecraft.world.level.block.Block> FRAMES;
+
+  private net.muxigame.core.feature.dimensions.WorldPortals();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+
+  public static void register(net.neoforged.bus.api.IEventBus);
+    Code:
+         0: getstatic     #7                  // Field BLOCKS:Lnet/neoforged/neoforge/registries/DeferredRegister$Blocks;
+         3: aload_0
+         4: invokevirtual #13                 // Method net/neoforged/neoforge/registries/DeferredRegister$Blocks.register:(Lnet/neoforged/bus/api/IEventBus;)V
+         7: return
+
+  public static void registerEvents(net.neoforged.bus.api.IEventBus);
+    Code:
+         0: aload_0
+         1: getstatic     #19                 // Field net/neoforged/bus/api/EventPriority.LOWEST:Lnet/neoforged/bus/api/EventPriority;
+         4: invokedynamic #25,  0             // InvokeDynamic #0:accept:()Ljava/util/function/Consumer;
+         9: invokeinterface #29,  3           // InterfaceMethod net/neoforged/bus/api/IEventBus.addListener:(Lnet/neoforged/bus/api/EventPriority;Ljava/util/function/Consumer;)V
+        14: aload_0
+        15: invokedynamic #35,  0             // InvokeDynamic #1:accept:()Ljava/util/function/Consumer;
+        20: invokeinterface #36,  2           // InterfaceMethod net/neoforged/bus/api/IEventBus.addListener:(Ljava/util/function/Consumer;)V
+        25: aload_0
+        26: invokedynamic #39,  0             // InvokeDynamic #2:accept:()Ljava/util/function/Consumer;
+        31: invokeinterface #36,  2           // InterfaceMethod net/neoforged/bus/api/IEventBus.addListener:(Ljava/util/function/Consumer;)V
+        36: return
+
+  private static void endEye(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$RightClickBlock);
+    Code:
+         0: aload_0
+         1: invokevirtual #40                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getLevel:()Lnet/minecraft/world/level/Level;
+         4: invokevirtual #46                 // Method net/minecraft/world/level/Level.dimension:()Lnet/minecraft/resources/ResourceKey;
+         7: invokestatic  #52                 // Method net/muxigame/core/feature/dimensions/WorldDimensions.exploration:(Lnet/minecraft/resources/ResourceKey;)Z
+        10: ifeq          81
+        13: aload_0
+        14: invokevirtual #58                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getItemStack:()Lnet/minecraft/world/item/ItemStack;
+        17: getstatic     #62                 // Field net/minecraft/world/item/Items.ENDER_EYE:Lnet/minecraft/world/item/Item;
+        20: invokevirtual #68                 // Method net/minecraft/world/item/ItemStack.is:(Lnet/minecraft/world/item/Item;)Z
+        23: ifeq          81
+        26: aload_0
+        27: invokevirtual #40                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getLevel:()Lnet/minecraft/world/level/Level;
+        30: aload_0
+        31: invokevirtual #74                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getPos:()Lnet/minecraft/core/BlockPos;
+        34: invokevirtual #78                 // Method net/minecraft/world/level/Level.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        37: getstatic     #82                 // Field net/minecraft/world/level/block/Blocks.END_PORTAL_FRAME:Lnet/minecraft/world/level/block/Block;
+        40: invokevirtual #88                 // Method net/minecraft/world/level/block/state/BlockState.is:(Lnet/minecraft/world/level/block/Block;)Z
+        43: ifeq          81
+        46: aload_0
+        47: iconst_1
+        48: invokevirtual #93                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.setCanceled:(Z)V
+        51: aload_0
+        52: getstatic     #97                 // Field net/minecraft/world/InteractionResult.FAIL:Lnet/minecraft/world/InteractionResult;
+        55: invokevirtual #103                // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.setCancellationResult:(Lnet/minecraft/world/InteractionResult;)V
+        58: aload_0
+        59: invokevirtual #107                // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getEntity:()Lnet/minecraft/world/entity/player/Player;
+        62: astore_2
+        63: aload_2
+        64: instanceof    #111                // class net/minecraft/server/level/ServerPlayer
+        67: ifeq          81
+        70: aload_2
+        71: checkcast     #111                // class net/minecraft/server/level/ServerPlayer
+        74: astore_1
+        75: aload_1
+        76: ldc           #113                // String ��ؼ�԰����ĺɫ���½��ĩ�ش�����
+        78: invokestatic  #115                // Method message:(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V
+        81: return
+
+  private static void adventureTravel(net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent);
+    Code:
+         0: aload_0
+         1: invokevirtual #119                // Method net/neoforged/neoforge/event/entity/EntityTravelToDimensionEvent.getEntity:()Lnet/minecraft/world/entity/Entity;
+         4: invokevirtual #124                // Method net/minecraft/world/entity/Entity.level:()Lnet/minecraft/world/level/Level;
+         7: invokevirtual #46                 // Method net/minecraft/world/level/Level.dimension:()Lnet/minecraft/resources/ResourceKey;
+        10: invokestatic  #52                 // Method net/muxigame/core/feature/dimensions/WorldDimensions.exploration:(Lnet/minecraft/resources/ResourceKey;)Z
+        13: ifeq          67
+        16: aload_0
+        17: invokevirtual #129                // Method net/neoforged/neoforge/event/entity/EntityTravelToDimensionEvent.getDimension:()Lnet/minecraft/resources/ResourceKey;
+        20: getstatic     #132                // Field net/minecraft/world/level/Level.OVERWORLD:Lnet/minecraft/resources/ResourceKey;
+        23: invokevirtual #136                // Method java/lang/Object.equals:(Ljava/lang/Object;)Z
+        26: ifne          67
+        29: aload_0
+        30: iconst_1
+        31: invokevirtual #140                // Method net/neoforged/neoforge/event/entity/EntityTravelToDimensionEvent.setCanceled:(Z)V
+        34: aload_0
+        35: invokevirtual #119                // Method net/neoforged/neoforge/event/entity/EntityTravelToDimensionEvent.getEntity:()Lnet/minecraft/world/entity/Entity;
+        38: astore_2
+        39: aload_2
+        40: instanceof    #111                // class net/minecraft/server/level/ServerPlayer
+        43: ifeq          67
+        46: aload_2
+        47: checkcast     #111                // class net/minecraft/server/level/ServerPlayer
+        50: astore_1
+        51: aload_1
+        52: getfield      #141                // Field net/minecraft/server/level/ServerPlayer.tickCount:I
+        55: bipush        40
+        57: irem
+        58: ifne          67
+        61: aload_1
+        62: ldc           #145                // String ������ֻ�ܷ��ؼ�԰������ͨ����԰�ŷ���
+        64: invokestatic  #115                // Method message:(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V
+        67: return
+
+  public static net.muxigame.core.feature.dimensions.WorldPortalBlock block(int);
+    Code:
+         0: iload_0
+         1: ifne          16
+         4: getstatic     #147                // Field HOME:Lnet/neoforged/neoforge/registries/DeferredBlock;
+         7: invokevirtual #151                // Method net/neoforged/neoforge/registries/DeferredBlock.get:()Ljava/lang/Object;
+        10: checkcast     #157                // class net/muxigame/core/feature/dimensions/WorldPortalBlock
+        13: goto          25
+        16: getstatic     #159                // Field OVERWORLD:Lnet/neoforged/neoforge/registries/DeferredBlock;
+        19: invokevirtual #151                // Method net/neoforged/neoforge/registries/DeferredBlock.get:()Ljava/lang/Object;
+        22: checkcast     #157                // class net/muxigame/core/feature/dimensions/WorldPortalBlock
+        25: areturn
+
+  public static net.muxigame.core.feature.dimensions.WorldPortals$Frame find(net.minecraft.world.level.LevelAccessor, net.minecraft.core.BlockPos, int, boolean);
+    Code:
+         0: getstatic     #161                // Field net/minecraft/core/Direction$Axis.X:Lnet/minecraft/core/Direction$Axis;
+         3: getstatic     #167                // Field net/minecraft/core/Direction$Axis.Z:Lnet/minecraft/core/Direction$Axis;
+         6: invokestatic  #170                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+         9: invokeinterface #176,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        14: astore        4
+        16: aload         4
+        18: invokeinterface #180,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        23: ifeq          129
+        26: aload         4
+        28: invokeinterface #186,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        33: checkcast     #162                // class net/minecraft/core/Direction$Axis
+        36: astore        5
+        38: iconst_0
+        39: istore        6
+        41: iload         6
+        43: iconst_5
+        44: if_icmpge     126
+        47: iconst_0
+        48: istore        7
+        50: iload         7
+        52: iconst_4
+        53: if_icmpge     120
+        56: new           #189                // class net/muxigame/core/feature/dimensions/WorldPortals$Frame
+        59: dup
+        60: aload         5
+        62: getstatic     #161                // Field net/minecraft/core/Direction$Axis.X:Lnet/minecraft/core/Direction$Axis;
+        65: if_acmpne     82
+        68: aload_1
+        69: iload         7
+        71: ineg
+        72: iload         6
+        74: ineg
+        75: iconst_0
+        76: invokevirtual #191                // Method net/minecraft/core/BlockPos.offset:(III)Lnet/minecraft/core/BlockPos;
+        79: goto          93
+        82: aload_1
+        83: iconst_0
+        84: iload         6
+        86: ineg
+        87: iload         7
+        89: ineg
+        90: invokevirtual #191                // Method net/minecraft/core/BlockPos.offset:(III)Lnet/minecraft/core/BlockPos;
+        93: aload         5
+        95: iload_2
+        96: invokespecial #197                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame."<init>":(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction$Axis;I)V
+        99: astore        8
+       101: aload_0
+       102: aload         8
+       104: iload_3
+       105: invokestatic  #200                // Method valid:(Lnet/minecraft/world/level/LevelAccessor;Lnet/muxigame/core/feature/dimensions/WorldPortals$Frame;Z)Z
+       108: ifeq          114
+       111: aload         8
+       113: areturn
+       114: iinc          7, 1
+       117: goto          50
+       120: iinc          6, 1
+       123: goto          41
+       126: goto          16
+       129: aconst_null
+       130: areturn
+
+  public static boolean valid(net.minecraft.world.level.LevelAccessor, net.muxigame.core.feature.dimensions.WorldPortals$Frame, boolean);
+    Code:
+         0: iconst_0
+         1: istore_3
+         2: iload_3
+         3: iconst_4
+         4: if_icmpge     123
+         7: iconst_0
+         8: istore        4
+        10: iload         4
+        12: iconst_5
+        13: if_icmpge     117
+        16: aload_0
+        17: aload_1
+        18: iload_3
+        19: iload         4
+        21: invokevirtual #204                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.at:(II)Lnet/minecraft/core/BlockPos;
+        24: invokeinterface #208,  2          // InterfaceMethod net/minecraft/world/level/LevelAccessor.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        29: astore        5
+        31: iload_3
+        32: ifeq          51
+        35: iload_3
+        36: iconst_3
+        37: if_icmpeq     51
+        40: iload         4
+        42: ifeq          51
+        45: iload         4
+        47: iconst_4
+        48: if_icmpne     69
+        51: getstatic     #211                // Field FRAMES:Ljava/util/Set;
+        54: aload         5
+        56: invokevirtual #215                // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+        59: invokeinterface #219,  2          // InterfaceMethod java/util/Set.contains:(Ljava/lang/Object;)Z
+        64: ifne          111
+        67: iconst_0
+        68: ireturn
+        69: iload_2
+        70: ifeq          90
+        73: aload         5
+        75: aload_1
+        76: getfield      #224                // Field net/muxigame/core/feature/dimensions/WorldPortals$Frame.destination:I
+        79: invokestatic  #227                // Method block:(I)Lnet/muxigame/core/feature/dimensions/WorldPortalBlock;
+        82: invokevirtual #88                 // Method net/minecraft/world/level/block/state/BlockState.is:(Lnet/minecraft/world/level/block/Block;)Z
+        85: ifne          111
+        88: iconst_0
+        89: ireturn
+        90: aload         5
+        92: invokevirtual #231                // Method net/minecraft/world/level/block/state/BlockState.isAir:()Z
+        95: ifne          111
+        98: aload         5
+       100: getstatic     #234                // Field net/minecraft/world/level/block/Blocks.FIRE:Lnet/minecraft/world/level/block/Block;
+       103: invokevirtual #88                 // Method net/minecraft/world/level/block/state/BlockState.is:(Lnet/minecraft/world/level/block/Block;)Z
+       106: ifne          111
+       109: iconst_0
+       110: ireturn
+       111: iinc          4, 1
+       114: goto          10
+       117: iinc          3, 1
+       120: goto          2
+       123: iconst_1
+       124: ireturn
+
+  private static void ignite(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$RightClickBlock);
+    Code:
+         0: aload_0
+         1: invokevirtual #107                // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getEntity:()Lnet/minecraft/world/entity/player/Player;
+         4: astore_2
+         5: aload_2
+         6: instanceof    #111                // class net/minecraft/server/level/ServerPlayer
+         9: ifeq          30
+        12: aload_2
+        13: checkcast     #111                // class net/minecraft/server/level/ServerPlayer
+        16: astore_1
+        17: aload_0
+        18: invokevirtual #58                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getItemStack:()Lnet/minecraft/world/item/ItemStack;
+        21: getstatic     #237                // Field net/minecraft/world/item/Items.FLINT_AND_STEEL:Lnet/minecraft/world/item/Item;
+        24: invokevirtual #68                 // Method net/minecraft/world/item/ItemStack.is:(Lnet/minecraft/world/item/Item;)Z
+        27: ifne          31
+        30: return
+        31: aload_0
+        32: invokevirtual #40                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getLevel:()Lnet/minecraft/world/level/Level;
+        35: aload_0
+        36: invokevirtual #74                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getPos:()Lnet/minecraft/core/BlockPos;
+        39: invokevirtual #78                 // Method net/minecraft/world/level/Level.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        42: invokevirtual #215                // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+        45: astore_2
+        46: getstatic     #211                // Field FRAMES:Ljava/util/Set;
+        49: aload_2
+        50: invokeinterface #219,  2          // InterfaceMethod java/util/Set.contains:(Ljava/lang/Object;)Z
+        55: ifeq          71
+        58: aload_1
+        59: invokevirtual #240                // Method net/minecraft/server/level/ServerPlayer.level:()Lnet/minecraft/world/level/Level;
+        62: invokevirtual #46                 // Method net/minecraft/world/level/Level.dimension:()Lnet/minecraft/resources/ResourceKey;
+        65: invokestatic  #241                // Method net/muxigame/core/feature/dimensions/WorldDimensions.managed:(Lnet/minecraft/resources/ResourceKey;)Z
+        68: ifne          72
+        71: return
+        72: aload_1
+        73: invokevirtual #240                // Method net/minecraft/server/level/ServerPlayer.level:()Lnet/minecraft/world/level/Level;
+        76: invokevirtual #46                 // Method net/minecraft/world/level/Level.dimension:()Lnet/minecraft/resources/ResourceKey;
+        79: getstatic     #132                // Field net/minecraft/world/level/Level.OVERWORLD:Lnet/minecraft/resources/ResourceKey;
+        82: invokevirtual #136                // Method java/lang/Object.equals:(Ljava/lang/Object;)Z
+        85: ifeq          92
+        88: iconst_1
+        89: goto          93
+        92: iconst_0
+        93: istore_3
+        94: aload_1
+        95: invokevirtual #244                // Method net/minecraft/server/level/ServerPlayer.serverLevel:()Lnet/minecraft/server/level/ServerLevel;
+        98: aload_0
+        99: invokevirtual #74                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getPos:()Lnet/minecraft/core/BlockPos;
+       102: iload_3
+       103: iconst_0
+       104: invokestatic  #248                // Method find:(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;IZ)Lnet/muxigame/core/feature/dimensions/WorldPortals$Frame;
+       107: astore        4
+       109: aload         4
+       111: ifnonnull     115
+       114: return
+       115: aload_0
+       116: iconst_1
+       117: invokevirtual #93                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.setCanceled:(Z)V
+       120: aload_0
+       121: getstatic     #252                // Field net/minecraft/world/InteractionResult.SUCCESS:Lnet/minecraft/world/InteractionResult;
+       124: invokevirtual #103                // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.setCancellationResult:(Lnet/minecraft/world/InteractionResult;)V
+       127: aload_1
+       128: invokevirtual #240                // Method net/minecraft/server/level/ServerPlayer.level:()Lnet/minecraft/world/level/Level;
+       131: invokevirtual #46                 // Method net/minecraft/world/level/Level.dimension:()Lnet/minecraft/resources/ResourceKey;
+       134: invokestatic  #52                 // Method net/muxigame/core/feature/dimensions/WorldDimensions.exploration:(Lnet/minecraft/resources/ResourceKey;)Z
+       137: ifeq          151
+       140: iload_3
+       141: ifeq          151
+       144: aload_1
+       145: ldc           #255                // String ������ֻ�ܽ��췵�ؼ�԰����
+       147: invokestatic  #115                // Method message:(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V
+       150: return
+       151: aload_1
+       152: invokevirtual #240                // Method net/minecraft/server/level/ServerPlayer.level:()Lnet/minecraft/world/level/Level;
+       155: invokevirtual #46                 // Method net/minecraft/world/level/Level.dimension:()Lnet/minecraft/resources/ResourceKey;
+       158: getstatic     #257                // Field net/muxigame/core/feature/dimensions/WorldDimensions.ALL:Ljava/util/List;
+       161: iload_3
+       162: invokeinterface #261,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+       167: checkcast     #264                // class net/muxigame/core/feature/dimensions/WorldDimensions$Destination
+       170: invokevirtual #266                // Method net/muxigame/core/feature/dimensions/WorldDimensions$Destination.key:()Lnet/minecraft/resources/ResourceKey;
+       173: invokevirtual #136                // Method java/lang/Object.equals:(Ljava/lang/Object;)Z
+       176: ifeq          187
+       179: aload_1
+       180: ldc_w         #269                // String ����ſ�ָ��ǰ���磬��ѡ������Ŀ�ĵص��ſ�
+       183: invokestatic  #115                // Method message:(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V
+       186: return
+       187: aload_1
+       188: invokestatic  #271                // Method canTravel:(Lnet/minecraft/server/level/ServerPlayer;)Z
+       191: ifne          195
+       194: return
+       195: new           #275                // class java/util/LinkedHashMap
+       198: dup
+       199: invokespecial #277                // Method java/util/LinkedHashMap."<init>":()V
+       202: astore        5
+       204: iconst_1
+       205: istore        6
+       207: iload         6
+       209: iconst_2
+       210: if_icmpgt     272
+       213: iconst_1
+       214: istore        7
+       216: iload         7
+       218: iconst_3
+       219: if_icmpgt     266
+       222: aload         5
+       224: aload         4
+       226: iload         6
+       228: iload         7
+       230: invokevirtual #204                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.at:(II)Lnet/minecraft/core/BlockPos;
+       233: iload_3
+       234: invokestatic  #227                // Method block:(I)Lnet/muxigame/core/feature/dimensions/WorldPortalBlock;
+       237: invokevirtual #278                // Method net/muxigame/core/feature/dimensions/WorldPortalBlock.defaultBlockState:()Lnet/minecraft/world/level/block/state/BlockState;
+       240: getstatic     #282                // Field net/minecraft/world/level/block/NetherPortalBlock.AXIS:Lnet/minecraft/world/level/block/state/properties/EnumProperty;
+       243: aload         4
+       245: getfield      #288                // Field net/muxigame/core/feature/dimensions/WorldPortals$Frame.axis:Lnet/minecraft/core/Direction$Axis;
+       248: invokevirtual #291                // Method net/minecraft/world/level/block/state/BlockState.setValue:(Lnet/minecraft/world/level/block/state/properties/Property;Ljava/lang/Comparable;)Ljava/lang/Object;
+       251: checkcast     #89                 // class net/minecraft/world/level/block/state/BlockState
+       254: invokeinterface #295,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       259: pop
+       260: iinc          7, 1
+       263: goto          216
+       266: iinc          6, 1
+       269: goto          207
+       272: aload_1
+       273: invokevirtual #244                // Method net/minecraft/server/level/ServerPlayer.serverLevel:()Lnet/minecraft/server/level/ServerLevel;
+       276: aload_1
+       277: aload         5
+       279: invokestatic  #301                // Method place:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Ljava/util/Map;)Z
+       282: ifne          293
+       285: aload_1
+       286: ldc_w         #305                // String ��ǰλ�õı���������ֹ�˿���������
+       289: invokestatic  #115                // Method message:(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V
+       292: return
+       293: aload_0
+       294: invokevirtual #58                 // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getItemStack:()Lnet/minecraft/world/item/ItemStack;
+       297: iconst_1
+       298: aload_1
+       299: aload_0
+       300: invokevirtual #307                // Method net/neoforged/neoforge/event/entity/player/PlayerInteractEvent$RightClickBlock.getHand:()Lnet/minecraft/world/InteractionHand;
+       303: invokestatic  #311                // Method net/minecraft/world/entity/LivingEntity.getSlotForHand:(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/entity/EquipmentSlot;
+       306: invokevirtual #317                // Method net/minecraft/world/item/ItemStack.hurtAndBreak:(ILnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;)V
+       309: aload_1
+       310: getstatic     #257                // Field net/muxigame/core/feature/dimensions/WorldDimensions.ALL:Ljava/util/List;
+       313: iload_3
+       314: invokeinterface #261,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+       319: checkcast     #264                // class net/muxigame/core/feature/dimensions/WorldDimensions$Destination
+       322: invokevirtual #321                // Method net/muxigame/core/feature/dimensions/WorldDimensions$Destination.name:()Ljava/lang/String;
+       325: invokedynamic #325,  0            // InvokeDynamic #3:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+       330: invokestatic  #115                // Method message:(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V
+       333: return
+
+  private static boolean canTravel(net.minecraft.server.level.ServerPlayer);
+    Code:
+         0: aload_0
+         1: invokevirtual #329                // Method net/minecraft/server/level/ServerPlayer.isAlive:()Z
+         4: ifeq          35
+         7: aload_0
+         8: invokevirtual #332                // Method net/minecraft/server/level/ServerPlayer.isSleeping:()Z
+        11: ifne          35
+        14: aload_0
+        15: invokevirtual #335                // Method net/minecraft/server/level/ServerPlayer.isPassenger:()Z
+        18: ifne          35
+        21: aload_0
+        22: invokevirtual #338                // Method net/minecraft/server/level/ServerPlayer.isVehicle:()Z
+        25: ifne          35
+        28: aload_0
+        29: invokestatic  #341                // Method net/muxigame/minigames/GameRuntime.blocksWorldTravel:(Lnet/minecraft/server/level/ServerPlayer;)Z
+        32: ifeq          37
+        35: iconst_0
+        36: ireturn
+        37: aload_0
+        38: getfield      #346                // Field net/minecraft/server/level/ServerPlayer.containerMenu:Lnet/minecraft/world/inventory/AbstractContainerMenu;
+        41: aload_0
+        42: getfield      #350                // Field net/minecraft/server/level/ServerPlayer.inventoryMenu:Lnet/minecraft/world/inventory/InventoryMenu;
+        45: if_acmpne     65
+        48: aload_0
+        49: getfield      #346                // Field net/minecraft/server/level/ServerPlayer.containerMenu:Lnet/minecraft/world/inventory/AbstractContainerMenu;
+        52: invokevirtual #354                // Method net/minecraft/world/inventory/AbstractContainerMenu.getCarried:()Lnet/minecraft/world/item/ItemStack;
+        55: invokevirtual #359                // Method net/minecraft/world/item/ItemStack.isEmpty:()Z
+        58: ifeq          65
+        61: iconst_1
+        62: goto          66
+        65: iconst_0
+        66: ireturn
+
+  private static void message(net.minecraft.server.level.ServerPlayer, java.lang.String);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokestatic  #362                // InterfaceMethod net/minecraft/network/chat/Component.literal:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+         5: iconst_1
+         6: invokevirtual #368                // Method net/minecraft/server/level/ServerPlayer.displayClientMessage:(Lnet/minecraft/network/chat/Component;Z)V
+         9: return
+
+  public static net.minecraft.world.level.portal.DimensionTransition transition(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.Entity, net.minecraft.core.BlockPos, net.muxigame.core.feature.dimensions.WorldPortalBlock);
+    Code:
+         0: aload_1
+         1: instanceof    #111                // class net/minecraft/server/level/ServerPlayer
+         4: ifeq          31
+         7: aload_1
+         8: checkcast     #111                // class net/minecraft/server/level/ServerPlayer
+        11: astore        4
+        13: aload         4
+        15: invokestatic  #271                // Method canTravel:(Lnet/minecraft/server/level/ServerPlayer;)Z
+        18: ifeq          31
+        21: aload_0
+        22: invokevirtual #372                // Method net/minecraft/server/level/ServerLevel.dimension:()Lnet/minecraft/resources/ResourceKey;
+        25: invokestatic  #241                // Method net/muxigame/core/feature/dimensions/WorldDimensions.managed:(Lnet/minecraft/resources/ResourceKey;)Z
+        28: ifne          33
+        31: aconst_null
+        32: areturn
+        33: iconst_m1
+        34: istore        5
+        36: iconst_0
+        37: istore        6
+        39: iload         6
+        41: getstatic     #257                // Field net/muxigame/core/feature/dimensions/WorldDimensions.ALL:Ljava/util/List;
+        44: invokeinterface #375,  1          // InterfaceMethod java/util/List.size:()I
+        49: if_icmpge     88
+        52: getstatic     #257                // Field net/muxigame/core/feature/dimensions/WorldDimensions.ALL:Ljava/util/List;
+        55: iload         6
+        57: invokeinterface #261,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+        62: checkcast     #264                // class net/muxigame/core/feature/dimensions/WorldDimensions$Destination
+        65: invokevirtual #266                // Method net/muxigame/core/feature/dimensions/WorldDimensions$Destination.key:()Lnet/minecraft/resources/ResourceKey;
+        68: aload_0
+        69: invokevirtual #372                // Method net/minecraft/server/level/ServerLevel.dimension:()Lnet/minecraft/resources/ResourceKey;
+        72: invokevirtual #136                // Method java/lang/Object.equals:(Ljava/lang/Object;)Z
+        75: ifeq          82
+        78: iload         6
+        80: istore        5
+        82: iinc          6, 1
+        85: goto          39
+        88: iload         5
+        90: aload_3
+        91: invokevirtual #379                // Method net/muxigame/core/feature/dimensions/WorldPortalBlock.destination:()I
+        94: if_icmpne     99
+        97: aconst_null
+        98: areturn
+        99: iload         5
+       101: ifeq          113
+       104: aload_3
+       105: invokevirtual #379                // Method net/muxigame/core/feature/dimensions/WorldPortalBlock.destination:()I
+       108: ifeq          113
+       111: aconst_null
+       112: areturn
+       113: aload_0
+       114: aload_2
+       115: aload_3
+       116: invokevirtual #379                // Method net/muxigame/core/feature/dimensions/WorldPortalBlock.destination:()I
+       119: iconst_1
+       120: invokestatic  #248                // Method find:(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;IZ)Lnet/muxigame/core/feature/dimensions/WorldPortals$Frame;
+       123: astore        6
+       125: aload         6
+       127: ifnonnull     132
+       130: aconst_null
+       131: areturn
+       132: aload_0
+       133: invokevirtual #381                // Method net/minecraft/server/level/ServerLevel.getServer:()Lnet/minecraft/server/MinecraftServer;
+       136: getstatic     #257                // Field net/muxigame/core/feature/dimensions/WorldDimensions.ALL:Ljava/util/List;
+       139: aload_3
+       140: invokevirtual #379                // Method net/muxigame/core/feature/dimensions/WorldPortalBlock.destination:()I
+       143: invokeinterface #261,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+       148: checkcast     #264                // class net/muxigame/core/feature/dimensions/WorldDimensions$Destination
+       151: invokevirtual #266                // Method net/muxigame/core/feature/dimensions/WorldDimensions$Destination.key:()Lnet/minecraft/resources/ResourceKey;
+       154: invokevirtual #385                // Method net/minecraft/server/MinecraftServer.getLevel:(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;
+       157: astore        7
+       159: aload         7
+       161: ifnonnull     166
+       164: aconst_null
+       165: areturn
+       166: aload_0
+       167: invokevirtual #381                // Method net/minecraft/server/level/ServerLevel.getServer:()Lnet/minecraft/server/MinecraftServer;
+       170: invokestatic  #390                // Method net/muxigame/core/feature/dimensions/PortalLinks.get:(Lnet/minecraft/server/MinecraftServer;)Lnet/muxigame/core/feature/dimensions/PortalLinks;
+       173: astore        8
+       175: aload         8
+       177: aload         6
+       179: aload_0
+       180: invokevirtual #395                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.key:(Lnet/minecraft/server/level/ServerLevel;)Ljava/lang/String;
+       183: invokevirtual #398                // Method net/muxigame/core/feature/dimensions/PortalLinks.endpoint:(Ljava/lang/String;)Lnet/minecraft/nbt/CompoundTag;
+       186: astore        9
+       188: aconst_null
+       189: astore        10
+       191: aload         9
+       193: ldc_w         #402                // String pos
+       196: invokevirtual #404                // Method net/minecraft/nbt/CompoundTag.contains:(Ljava/lang/String;)Z
+       199: ifeq          271
+       202: new           #189                // class net/muxigame/core/feature/dimensions/WorldPortals$Frame
+       205: dup
+       206: aload         9
+       208: ldc_w         #402                // String pos
+       211: invokevirtual #409                // Method net/minecraft/nbt/CompoundTag.getLong:(Ljava/lang/String;)J
+       214: invokestatic  #413                // Method net/minecraft/core/BlockPos.of:(J)Lnet/minecraft/core/BlockPos;
+       217: aload         9
+       219: ldc_w         #416                // String axis
+       222: invokevirtual #417                // Method net/minecraft/nbt/CompoundTag.getString:(Ljava/lang/String;)Ljava/lang/String;
+       225: ldc_w         #420                // String x
+       228: invokevirtual #422                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       231: ifeq          240
+       234: getstatic     #161                // Field net/minecraft/core/Direction$Axis.X:Lnet/minecraft/core/Direction$Axis;
+       237: goto          243
+       240: getstatic     #167                // Field net/minecraft/core/Direction$Axis.Z:Lnet/minecraft/core/Direction$Axis;
+       243: iload         5
+       245: invokespecial #197                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame."<init>":(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction$Axis;I)V
+       248: astore        10
+       250: aload         7
+       252: aload         10
+       254: iconst_1
+       255: invokestatic  #200                // Method valid:(Lnet/minecraft/world/level/LevelAccessor;Lnet/muxigame/core/feature/dimensions/WorldPortals$Frame;Z)Z
+       258: ifne          271
+       261: aload         4
+       263: ldc_w         #425                // String ��ԵĻس������𻵣������޸�ԭ�ſ����µ��
+       266: invokestatic  #115                // Method message:(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V
+       269: aconst_null
+       270: areturn
+       271: aload         10
+       273: ifnonnull     335
+       276: aload         7
+       278: aload         4
+       280: aload         6
+       282: getfield      #427                // Field net/muxigame/core/feature/dimensions/WorldPortals$Frame.origin:Lnet/minecraft/core/BlockPos;
+       285: iload         5
+       287: invokestatic  #431                // Method buildExit:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/core/BlockPos;I)Lnet/muxigame/core/feature/dimensions/WorldPortals$Frame;
+       290: astore        10
+       292: aload         10
+       294: ifnonnull     307
+       297: aload         4
+       299: ldc_w         #435                // String Ŀ������û�пɽ��ŵĿյأ�����ر������뻻��λ�ý���
+       302: invokestatic  #115                // Method message:(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V
+       305: aconst_null
+       306: areturn
+       307: aload         8
+       309: aload         6
+       311: aload_0
+       312: invokevirtual #395                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.key:(Lnet/minecraft/server/level/ServerLevel;)Ljava/lang/String;
+       315: aload         6
+       317: invokevirtual #437                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.tag:()Lnet/minecraft/nbt/CompoundTag;
+       320: aload         10
+       322: aload         7
+       324: invokevirtual #395                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.key:(Lnet/minecraft/server/level/ServerLevel;)Ljava/lang/String;
+       327: aload         10
+       329: invokevirtual #437                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.tag:()Lnet/minecraft/nbt/CompoundTag;
+       332: invokevirtual #441                // Method net/muxigame/core/feature/dimensions/PortalLinks.pair:(Ljava/lang/String;Lnet/minecraft/nbt/CompoundTag;Ljava/lang/String;Lnet/minecraft/nbt/CompoundTag;)V
+       335: aload         10
+       337: iconst_1
+       338: iconst_1
+       339: invokevirtual #204                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.at:(II)Lnet/minecraft/core/BlockPos;
+       342: astore        11
+       344: new           #445                // class net/minecraft/world/level/portal/DimensionTransition
+       347: dup
+       348: aload         7
+       350: aload         11
+       352: invokestatic  #447                // Method net/minecraft/world/phys/Vec3.atBottomCenterOf:(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/world/phys/Vec3;
+       355: getstatic     #453                // Field net/minecraft/world/phys/Vec3.ZERO:Lnet/minecraft/world/phys/Vec3;
+       358: aload         4
+       360: invokevirtual #457                // Method net/minecraft/server/level/ServerPlayer.getYRot:()F
+       363: aload         4
+       365: invokevirtual #461                // Method net/minecraft/server/level/ServerPlayer.getXRot:()F
+       368: getstatic     #464                // Field net/minecraft/world/level/portal/DimensionTransition.PLAY_PORTAL_SOUND:Lnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;
+       371: getstatic     #468                // Field net/minecraft/world/level/portal/DimensionTransition.PLACE_PORTAL_TICKET:Lnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;
+       374: invokeinterface #471,  2          // InterfaceMethod net/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition.then:(Lnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;)Lnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;
+       379: aload         7
+       381: invokedynamic #477,  0            // InvokeDynamic #4:onTransition:(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;
+       386: invokeinterface #471,  2          // InterfaceMethod net/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition.then:(Lnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;)Lnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;
+       391: invokespecial #481                // Method net/minecraft/world/level/portal/DimensionTransition."<init>":(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;FFLnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;)V
+       394: areturn
+
+  private static net.muxigame.core.feature.dimensions.WorldPortals$Frame buildExit(net.minecraft.server.level.ServerLevel, net.minecraft.server.level.ServerPlayer, net.minecraft.core.BlockPos, int);
+    Code:
+         0: iconst_0
+         1: istore        4
+         3: iload         4
+         5: bipush        32
+         7: if_icmpgt     456
+        10: iload         4
+        12: ineg
+        13: istore        5
+        15: iload         5
+        17: iload         4
+        19: if_icmpgt     450
+        22: iload         4
+        24: ineg
+        25: istore        6
+        27: iload         6
+        29: iload         4
+        31: if_icmpgt     444
+        34: iload         5
+        36: invokestatic  #484                // Method java/lang/Math.abs:(I)I
+        39: iload         6
+        41: invokestatic  #484                // Method java/lang/Math.abs:(I)I
+        44: invokestatic  #490                // Method java/lang/Math.max:(II)I
+        47: iload         4
+        49: if_icmpeq     55
+        52: goto          438
+        55: aload_2
+        56: invokevirtual #494                // Method net/minecraft/core/BlockPos.getX:()I
+        59: iload         5
+        61: iadd
+        62: istore        7
+        64: aload_2
+        65: invokevirtual #497                // Method net/minecraft/core/BlockPos.getZ:()I
+        68: iload         6
+        70: iadd
+        71: istore        8
+        73: aload_0
+        74: invokevirtual #500                // Method net/minecraft/server/level/ServerLevel.getMinBuildHeight:()I
+        77: iconst_1
+        78: iadd
+        79: istore        9
+        81: aload_0
+        82: invokevirtual #503                // Method net/minecraft/server/level/ServerLevel.getWorldBorder:()Lnet/minecraft/world/level/border/WorldBorder;
+        85: new           #192                // class net/minecraft/core/BlockPos
+        88: dup
+        89: iload         7
+        91: iconst_0
+        92: iload         8
+        94: invokespecial #507                // Method net/minecraft/core/BlockPos."<init>":(III)V
+        97: invokevirtual #510                // Method net/minecraft/world/level/border/WorldBorder.isWithinBounds:(Lnet/minecraft/core/BlockPos;)Z
+       100: ifne          106
+       103: goto          438
+       106: iconst_m1
+       107: istore        10
+       109: iload         10
+       111: iconst_4
+       112: if_icmpgt     160
+       115: iconst_m1
+       116: istore        11
+       118: iload         11
+       120: iconst_1
+       121: if_icmpgt     154
+       124: iload         9
+       126: aload_0
+       127: getstatic     #516                // Field net/minecraft/world/level/levelgen/Heightmap$Types.MOTION_BLOCKING:Lnet/minecraft/world/level/levelgen/Heightmap$Types;
+       130: iload         7
+       132: iload         10
+       134: iadd
+       135: iload         8
+       137: iload         11
+       139: iadd
+       140: invokevirtual #522                // Method net/minecraft/server/level/ServerLevel.getHeight:(Lnet/minecraft/world/level/levelgen/Heightmap$Types;II)I
+       143: invokestatic  #490                // Method java/lang/Math.max:(II)I
+       146: istore        9
+       148: iinc          11, 1
+       151: goto          118
+       154: iinc          10, 1
+       157: goto          109
+       160: new           #189                // class net/muxigame/core/feature/dimensions/WorldPortals$Frame
+       163: dup
+       164: new           #192                // class net/minecraft/core/BlockPos
+       167: dup
+       168: iload         7
+       170: iload         9
+       172: iload         8
+       174: invokespecial #507                // Method net/minecraft/core/BlockPos."<init>":(III)V
+       177: getstatic     #161                // Field net/minecraft/core/Direction$Axis.X:Lnet/minecraft/core/Direction$Axis;
+       180: iload_3
+       181: invokespecial #197                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame."<init>":(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction$Axis;I)V
+       184: astore        10
+       186: iload         9
+       188: iconst_5
+       189: iadd
+       190: aload_0
+       191: invokevirtual #526                // Method net/minecraft/server/level/ServerLevel.getMaxBuildHeight:()I
+       194: if_icmplt     200
+       197: goto          438
+       200: new           #275                // class java/util/LinkedHashMap
+       203: dup
+       204: invokespecial #277                // Method java/util/LinkedHashMap."<init>":()V
+       207: astore        11
+       209: iconst_1
+       210: istore        12
+       212: iconst_m1
+       213: istore        13
+       215: iload         13
+       217: iconst_4
+       218: if_icmpgt     318
+       221: iconst_m1
+       222: istore        14
+       224: iload         14
+       226: iconst_1
+       227: if_icmpgt     312
+       230: iconst_0
+       231: istore        15
+       233: iload         15
+       235: iconst_4
+       236: if_icmpgt     306
+       239: aload         10
+       241: iload         13
+       243: iload         15
+       245: iload         14
+       247: invokevirtual #529                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.normal:(III)Lnet/minecraft/core/BlockPos;
+       250: astore        16
+       252: aload_0
+       253: invokevirtual #503                // Method net/minecraft/server/level/ServerLevel.getWorldBorder:()Lnet/minecraft/world/level/border/WorldBorder;
+       256: aload         16
+       258: invokevirtual #510                // Method net/minecraft/world/level/border/WorldBorder.isWithinBounds:(Lnet/minecraft/core/BlockPos;)Z
+       261: ifeq          273
+       264: aload_0
+       265: aload         16
+       267: invokevirtual #532                // Method net/minecraft/server/level/ServerLevel.isEmptyBlock:(Lnet/minecraft/core/BlockPos;)Z
+       270: ifne          279
+       273: iconst_0
+       274: istore        12
+       276: goto          306
+       279: iload         15
+       281: ifne          300
+       284: aload         11
+       286: aload         16
+       288: getstatic     #535                // Field net/minecraft/world/level/block/Blocks.STONE_BRICKS:Lnet/minecraft/world/level/block/Block;
+       291: invokevirtual #538                // Method net/minecraft/world/level/block/Block.defaultBlockState:()Lnet/minecraft/world/level/block/state/BlockState;
+       294: invokeinterface #295,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       299: pop
+       300: iinc          15, 1
+       303: goto          233
+       306: iinc          14, 1
+       309: goto          224
+       312: iinc          13, 1
+       315: goto          215
+       318: iload         12
+       320: ifne          326
+       323: goto          438
+       326: iconst_0
+       327: istore        13
+       329: iload         13
+       331: iconst_4
+       332: if_icmpge     425
+       335: iconst_0
+       336: istore        14
+       338: iload         14
+       340: iconst_5
+       341: if_icmpge     419
+       344: aload         11
+       346: aload         10
+       348: iload         13
+       350: iload         14
+       352: invokevirtual #204                // Method net/muxigame/core/feature/dimensions/WorldPortals$Frame.at:(II)Lnet/minecraft/core/BlockPos;
+       355: iload         13
+       357: ifeq          377
+       360: iload         13
+       362: iconst_3
+       363: if_icmpeq     377
+       366: iload         14
+       368: ifeq          377
+       371: iload         14
+       373: iconst_4
+       374: if_icmpne     386
+       377: getstatic     #541                // Field net/minecraft/world/level/block/Blocks.COBBLESTONE:Lnet/minecraft/world/level/block/Block;
+       380: invokevirtual #538                // Method net/minecraft/world/level/block/Block.defaultBlockState:()Lnet/minecraft/world/level/block/state/BlockState;
+       383: goto          407
+       386: iload_3
+       387: invokestatic  #227                // Method block:(I)Lnet/muxigame/core/feature/dimensions/WorldPortalBlock;
+       390: invokevirtual #278                // Method net/muxigame/core/feature/dimensions/WorldPortalBlock.defaultBlockState:()Lnet/minecraft/world/level/block/state/BlockState;
+       393: getstatic     #282                // Field net/minecraft/world/level/block/NetherPortalBlock.AXIS:Lnet/minecraft/world/level/block/state/properties/EnumProperty;
+       396: aload         10
+       398: getfield      #288                // Field net/muxigame/core/feature/dimensions/WorldPortals$Frame.axis:Lnet/minecraft/core/Direction$Axis;
+       401: invokevirtual #291                // Method net/minecraft/world/level/block/state/BlockState.setValue:(Lnet/minecraft/world/level/block/state/properties/Property;Ljava/lang/Comparable;)Ljava/lang/Object;
+       404: checkcast     #89                 // class net/minecraft/world/level/block/state/BlockState
+       407: invokeinterface #295,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       412: pop
+       413: iinc          14, 1
+       416: goto          338
+       419: iinc          13, 1
+       422: goto          329
+       425: aload_0
+       426: aload_1
+       427: aload         11
+       429: invokestatic  #301                // Method place:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Ljava/util/Map;)Z
+       432: ifeq          438
+       435: aload         10
+       437: areturn
+       438: iinc          6, 8
+       441: goto          27
+       444: iinc          5, 8
+       447: goto          15
+       450: iinc          4, 8
+       453: goto          3
+       456: aconst_null
+       457: areturn
+
+  private static boolean place(net.minecraft.server.level.ServerLevel, net.minecraft.server.level.ServerPlayer, java.util.Map<net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState>);
+    Code:
+         0: new           #544                // class java/util/ArrayList
+         3: dup
+         4: invokespecial #546                // Method java/util/ArrayList."<init>":()V
+         7: astore_3
+         8: aload_2
+         9: invokeinterface #547,  1          // InterfaceMethod java/util/Map.entrySet:()Ljava/util/Set;
+        14: invokeinterface #551,  1          // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+        19: astore        4
+        21: aload         4
+        23: invokeinterface #180,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        28: ifeq          111
+        31: aload         4
+        33: invokeinterface #186,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        38: checkcast     #552                // class java/util/Map$Entry
+        41: astore        5
+        43: aload_0
+        44: invokevirtual #503                // Method net/minecraft/server/level/ServerLevel.getWorldBorder:()Lnet/minecraft/world/level/border/WorldBorder;
+        47: aload         5
+        49: invokeinterface #554,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+        54: checkcast     #192                // class net/minecraft/core/BlockPos
+        57: invokevirtual #510                // Method net/minecraft/world/level/border/WorldBorder.isWithinBounds:(Lnet/minecraft/core/BlockPos;)Z
+        60: ifeq          81
+        63: aload_0
+        64: aload_1
+        65: aload         5
+        67: invokeinterface #554,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+        72: checkcast     #192                // class net/minecraft/core/BlockPos
+        75: invokevirtual #557                // Method net/minecraft/server/level/ServerLevel.mayInteract:(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;)Z
+        78: ifne          83
+        81: iconst_0
+        82: ireturn
+        83: aload_3
+        84: aload_0
+        85: invokevirtual #372                // Method net/minecraft/server/level/ServerLevel.dimension:()Lnet/minecraft/resources/ResourceKey;
+        88: aload_0
+        89: aload         5
+        91: invokeinterface #554,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+        96: checkcast     #192                // class net/minecraft/core/BlockPos
+        99: invokestatic  #561                // Method net/neoforged/neoforge/common/util/BlockSnapshot.create:(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;)Lnet/neoforged/neoforge/common/util/BlockSnapshot;
+       102: invokeinterface #567,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       107: pop
+       108: goto          21
+       111: aload_2
+       112: invokeinterface #547,  1          // InterfaceMethod java/util/Map.entrySet:()Ljava/util/Set;
+       117: invokeinterface #551,  1          // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+       122: astore        4
+       124: aload         4
+       126: invokeinterface #180,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       131: ifeq          176
+       134: aload         4
+       136: invokeinterface #186,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       141: checkcast     #552                // class java/util/Map$Entry
+       144: astore        5
+       146: aload_0
+       147: aload         5
+       149: invokeinterface #554,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+       154: checkcast     #192                // class net/minecraft/core/BlockPos
+       157: aload         5
+       159: invokeinterface #570,  1          // InterfaceMethod java/util/Map$Entry.getValue:()Ljava/lang/Object;
+       164: checkcast     #89                 // class net/minecraft/world/level/block/state/BlockState
+       167: bipush        18
+       169: invokevirtual #573                // Method net/minecraft/server/level/ServerLevel.setBlock:(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z
+       172: pop
+       173: goto          124
+       176: aload_1
+       177: aload_3
+       178: getstatic     #577                // Field net/minecraft/core/Direction.UP:Lnet/minecraft/core/Direction;
+       181: invokestatic  #583                // Method net/neoforged/neoforge/event/EventHooks.onMultiBlockPlace:(Lnet/minecraft/world/entity/Entity;Ljava/util/List;Lnet/minecraft/core/Direction;)Z
+       184: ifeq          227
+       187: aload_3
+       188: invokeinterface #375,  1          // InterfaceMethod java/util/List.size:()I
+       193: iconst_1
+       194: isub
+       195: istore        4
+       197: iload         4
+       199: iflt          225
+       202: aload_3
+       203: iload         4
+       205: invokeinterface #261,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+       210: checkcast     #562                // class net/neoforged/neoforge/common/util/BlockSnapshot
+       213: bipush        18
+       215: invokevirtual #589                // Method net/neoforged/neoforge/common/util/BlockSnapshot.restore:(I)Z
+       218: pop
+       219: iinc          4, -1
+       222: goto          197
+       225: iconst_0
+       226: ireturn
+       227: aload_2
+       228: invokeinterface #547,  1          // InterfaceMethod java/util/Map.entrySet:()Ljava/util/Set;
+       233: invokeinterface #551,  1          // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+       238: astore        4
+       240: aload         4
+       242: invokeinterface #180,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       247: ifeq          292
+       250: aload         4
+       252: invokeinterface #186,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       257: checkcast     #552                // class java/util/Map$Entry
+       260: astore        5
+       262: aload_0
+       263: aload         5
+       265: invokeinterface #554,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+       270: checkcast     #192                // class net/minecraft/core/BlockPos
+       273: aload         5
+       275: invokeinterface #570,  1          // InterfaceMethod java/util/Map$Entry.getValue:()Ljava/lang/Object;
+       280: checkcast     #89                 // class net/minecraft/world/level/block/state/BlockState
+       283: invokevirtual #215                // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+       286: invokevirtual #593                // Method net/minecraft/server/level/ServerLevel.updateNeighborsAt:(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V
+       289: goto          240
+       292: iconst_1
+       293: ireturn
+
+  private static void lambda$transition$2(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.Entity);
+    Code:
+         0: aload_1
+         1: bipush        40
+         3: invokevirtual #597                // Method net/minecraft/world/entity/Entity.setPortalCooldown:(I)V
+         6: aload_1
+         7: instanceof    #111                // class net/minecraft/server/level/ServerPlayer
+        10: ifeq          34
+        13: aload_1
+        14: checkcast     #111                // class net/minecraft/server/level/ServerPlayer
+        17: astore_2
+        18: aload_2
+        19: aload_0
+        20: invokevirtual #372                // Method net/minecraft/server/level/ServerLevel.dimension:()Lnet/minecraft/resources/ResourceKey;
+        23: invokestatic  #601                // Method net/muxigame/core/feature/dimensions/WorldDimensions.name:(Lnet/minecraft/resources/ResourceKey;)Ljava/lang/String;
+        26: invokedynamic #604,  0            // InvokeDynamic #5:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        31: invokestatic  #115                // Method message:(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;)V
+        34: return
+
+  private static net.muxigame.core.feature.dimensions.WorldPortalBlock lambda$static$1();
+    Code:
+         0: new           #157                // class net/muxigame/core/feature/dimensions/WorldPortalBlock
+         3: dup
+         4: iconst_1
+         5: invokespecial #605                // Method net/muxigame/core/feature/dimensions/WorldPortalBlock."<init>":(I)V
+         8: areturn
+
+  private static net.muxigame.core.feature.dimensions.WorldPortalBlock lambda$static$0();
+    Code:
+         0: new           #157                // class net/muxigame/core/feature/dimensions/WorldPortalBlock
+         3: dup
+         4: iconst_0
+         5: invokespecial #605                // Method net/muxigame/core/feature/dimensions/WorldPortalBlock."<init>":(I)V
+         8: areturn
+
+  static {};
+    Code:
+         0: ldc_w         #607                // String muxi_game_core
+         3: invokestatic  #609                // Method net/neoforged/neoforge/registries/DeferredRegister.createBlocks:(Ljava/lang/String;)Lnet/neoforged/neoforge/registries/DeferredRegister$Blocks;
+         6: putstatic     #7                  // Field BLOCKS:Lnet/neoforged/neoforge/registries/DeferredRegister$Blocks;
+         9: getstatic     #7                  // Field BLOCKS:Lnet/neoforged/neoforge/registries/DeferredRegister$Blocks;
+        12: ldc_w         #615                // String home_portal
+        15: invokedynamic #617,  0            // InvokeDynamic #6:get:()Ljava/util/function/Supplier;
+        20: invokevirtual #620                // Method net/neoforged/neoforge/registries/DeferredRegister$Blocks.register:(Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/neoforged/neoforge/registries/DeferredBlock;
+        23: putstatic     #147                // Field HOME:Lnet/neoforged/neoforge/registries/DeferredBlock;
+        26: getstatic     #7                  // Field BLOCKS:Lnet/neoforged/neoforge/registries/DeferredRegister$Blocks;
+        29: ldc_w         #623                // String overworld_portal
+        32: invokedynamic #625,  0            // InvokeDynamic #7:get:()Ljava/util/function/Supplier;
+        37: invokevirtual #620                // Method net/neoforged/neoforge/registries/DeferredRegister$Blocks.register:(Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/neoforged/neoforge/registries/DeferredBlock;
+        40: putstatic     #159                // Field OVERWORLD:Lnet/neoforged/neoforge/registries/DeferredBlock;
+        43: getstatic     #541                // Field net/minecraft/world/level/block/Blocks.COBBLESTONE:Lnet/minecraft/world/level/block/Block;
+        46: getstatic     #626                // Field net/minecraft/world/level/block/Blocks.STONE:Lnet/minecraft/world/level/block/Block;
+        49: getstatic     #629                // Field net/minecraft/world/level/block/Blocks.QUARTZ_BLOCK:Lnet/minecraft/world/level/block/Block;
+        52: getstatic     #632                // Field net/minecraft/world/level/block/Blocks.DIRT:Lnet/minecraft/world/level/block/Block;
+        55: getstatic     #635                // Field net/minecraft/world/level/block/Blocks.GRASS_BLOCK:Lnet/minecraft/world/level/block/Block;
+        58: invokestatic  #638                // InterfaceMethod java/util/Set.of:(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/Set;
+        61: putstatic     #211                // Field FRAMES:Ljava/util/Set;
+        64: return
+}

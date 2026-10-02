@@ -1,0 +1,14 @@
+--- 
+
++++ 
+
+@@ -921,7 +921,7 @@
+
+ goto          240
+ iconst_1
+ ireturn
+-private static void lambda$transition$2(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.Entity);
++private static void lambda$transition$0(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.Entity);
+ Code:
+ aload_1
+ bipush        40
