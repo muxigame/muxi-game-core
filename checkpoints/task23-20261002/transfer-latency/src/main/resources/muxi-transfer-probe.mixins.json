@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.muxigame.transferprobe.mixin",
+  "plugin": "net.muxigame.transferprobe.ProbePlugin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["ServerTransferMixin", "ServerSendMixin", "ServerAckMixin", "ServerChunkQueueMixin"],
+  "client": ["ClientPacketMixin", "ClientLevelMixin", "ClientReadyMixin", "ClientScreenMixin", "IrisReloadMixin", "IrisPipelineMixin", "EuphoriaReloadMixin", "SodiumWorkersMixin", "SodiumResetMixin"],
+  "injectors": {"defaultRequire": 1}
+}

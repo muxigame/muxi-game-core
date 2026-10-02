@@ -1,0 +1,22 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+[[mods]]
+modId="muxi_transfer_probe"
+version="0.1.0-task23-diag"
+displayName="Muxi Transfer Probe (Isolated Diagnostic)"
+description="Bounded transfer phase tracing and opt-in experimental A/B toggle. Not a production release."
+[[mixins]]
+config="muxi-transfer-probe.mixins.json"
+[[dependencies.muxi_transfer_probe]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.250,21.1.251)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.muxi_transfer_probe]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH"
