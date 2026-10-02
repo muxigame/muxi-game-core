@@ -10,13 +10,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Guards only network-owned contexts; ordinary Waystones item/physical travel is unchanged. */
 public final class NetworkTeleportGuard {
     private NetworkTeleportGuard() {}
     private record Guard(ServerPlayer player,WeakReference<Object> connection,ResourceLocation sourceDimension,
                          NetworkPortalFacilities.Source source,BlockPos sourcePos,UUID target,
-                         ResourceLocation targetDimension,BlockPos targetPos,int deadline) {}
+                         ResourceLocation targetDimension,BlockPos targetPos,int deadline,AtomicBoolean destinationPrepared) {}
     private static final Map<WaystoneTeleportContext,Guard> guards=Collections.synchronizedMap(new WeakHashMap<>());
     private static boolean registered;
     public static synchronized void register() {
@@ -28,7 +29,7 @@ public final class NetworkTeleportGuard {
         });
     }
     public static void track(WaystoneTeleportContext context,ServerPlayer player,NetworkPortalFacilities.Source source,Waystone target) {
-        guards.put(context,new Guard(player,new WeakReference<>(player.connection),player.serverLevel().dimension().location(),source,source.stone().getPos().immutable(),target.getWaystoneUid(),target.getDimension().location(),target.getPos().immutable(),player.tickCount+400));
+        guards.put(context,new Guard(player,new WeakReference<>(player.connection),player.serverLevel().dimension().location(),source,source.stone().getPos().immutable(),target.getWaystoneUid(),target.getDimension().location(),target.getPos().immutable(),player.tickCount+400,new AtomicBoolean()));
     }
     public static void untrack(WaystoneTeleportContext context){guards.remove(context);}
     public static String initialDenial(ServerPlayer player,NetworkPortalFacilities.Source source,Waystone target,NetworkFacilityConfig cfg) {
@@ -45,6 +46,11 @@ public final class NetworkTeleportGuard {
     }
     public static String denial(WaystoneTeleportContext context,boolean prepared) {
         Guard guard=guards.get(context);if(guard==null)return null;
+        // hasChunkAt only reports chunk presence, not completion of Waystones'
+        // block-entity onLoad. Native pending validation runs after preparation.
+        // Remember that phase so validateRequirements also rechecks the physical
+        // target immediately before the original requirements are consumed.
+        if(prepared)guard.destinationPrepared.set(true);
         ServerPlayer player=guard.player;
         if(player.connection!=guard.connection.get() || player.hasDisconnected() || player.server.getPlayerList().getPlayer(player.getUUID())!=player)return "连接已变化，已取消旧传送";
         if(player.tickCount>guard.deadline || !player.serverLevel().dimension().location().equals(guard.sourceDimension))return "入口环境已变化，请重新选择";
@@ -57,7 +63,7 @@ public final class NetworkTeleportGuard {
         if(target==null || !target.getWaystoneUid().equals(context.getTargetWaystone().getWaystoneUid())
             || !target.getDimension().location().equals(guard.targetDimension) || !target.getPos().equals(guard.targetPos))return "目标石碑已变化";
         var targetLevel=player.server.getLevel(target.getDimension());
-        if(targetLevel==null || ((prepared || targetLevel.hasChunkAt(target.getPos())) && !NetworkPortalFacilities.actualStone(targetLevel,target)))return "目标石碑已失效";
+        if(targetLevel==null || (guard.destinationPrepared.get() && !NetworkPortalFacilities.actualStone(targetLevel,target)))return "目标石碑已失效";
         return initialDenial(player,current,target,cfg);
     }
 }
