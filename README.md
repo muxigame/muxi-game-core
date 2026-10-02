@@ -2,6 +2,27 @@
 
 # muxi Game Core
 
+## Dedicated terminal SSO authority
+
+`features.terminalSso` is independent of `features.login` and `features.opSync`.
+Its endpoint is `https://account.muxigame.com/api/internal/minecraft/`; its key
+must be the dedicated Auth `MUXI_TERMINAL_SSO_SERVER_KEY`, distinct from identity,
+login, OP and social keys. It defaults off. No existing production key or gate is
+changed by this source patch.
+
+Only a matching issuer-verified UID/requestId/gameSession, valid 30-second ticket
+and the exact current online listener can call `TrustedAccounts.admitTerminal`.
+The callback runs on the server thread and rejects elapsed requests at/after 30
+seconds. `socialUid` is social-only; `uid` retains join-admission-only semantics.
+Logout/stop revoke that connection's trust and pending issuer tickets. A late
+reply or old logout cannot bind/revoke a replacement connection.
+
+Build/deploy the matching task2 framework exposing `admitTerminal`, `socialUid`
+and connection-conditional `revoke` before enabling this Core. A missing new API
+fails the account handoff closed; do not mix candidate versions. Tests are in
+`tests/run_terminal_sso_trust.py` (actual Core/trust source with explicit listener
+fixtures). Production Minecraft/MCEF player acceptance is a separate gate.
+
 muxigame 整合包的**功能集成模组**：服务端功能（登录核验、昵称同步、玩法规则），以及客户端的显示兼容（到处显示昵称而不是 UID）。
 
 - 模组 ID：`muxi_game_core`

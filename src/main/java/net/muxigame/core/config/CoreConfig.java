@@ -67,7 +67,18 @@ public record CoreConfig(Identity identity, Login login, OpSync opSync, Terminal
             OpSync opSync = opSync(features);
             // A UID-shaped client profile alone is not authentication. Require the join gate.
             if (opSync.enabled() && (!identity.enabled() || !login.enabled())) throw new IllegalArgumentException();
-            return new CoreConfig(identity, login, opSync, terminalSso(features));
+            TerminalSso terminal = terminalSso(features);
+            if (terminal.enabled()) {
+                // Check even disabled sections: enabling SSO never repurposes an existing authority.
+                for (String name : new String[]{"identity", "login", "opSync"}) {
+                    if (features.has(name) && features.get(name).isJsonObject()) {
+                        JsonObject other = features.getAsJsonObject(name);
+                        if (other.has("serverKey") && terminal.serverKey().equals(other.get("serverKey").getAsString()))
+                            throw new IllegalArgumentException();
+                    }
+                }
+            }
+            return new CoreConfig(identity, login, opSync, terminal);
         } catch (Exception ignored) {
             throw new IllegalArgumentException("Invalid Game Core configuration (values redacted)");
         }
@@ -107,6 +118,7 @@ public record CoreConfig(Identity identity, Login login, OpSync opSync, Terminal
         JsonObject source=section(features,"terminalSso");
         if(source==null)return disabled().terminalSso();
         String endpoint=source.has("endpoint")?source.get("endpoint").getAsString():TERMINAL_SSO_ENDPOINT;
+        if(!source.get("serverKey").isJsonPrimitive() || !source.get("serverKey").getAsJsonPrimitive().isString())throw new IllegalArgumentException();
         String key=source.get("serverKey").getAsString();
         checkEndpointAndKey(endpoint,key);
         if(!TERMINAL_SSO_ENDPOINT.equals(endpoint))throw new IllegalArgumentException();
