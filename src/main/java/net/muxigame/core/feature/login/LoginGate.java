@@ -19,10 +19,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -63,11 +61,12 @@ public final class LoginGate implements ServerFeature {
     private final HttpClient http;
     private final CoreConfig.Login config;
     /** 已经核验通过、但还没走完登录流程的人。值是 monotonic 毫秒，用来清扫掉队的条目。 */
-    private final Map<UUID, Long> admitted = new ConcurrentHashMap<>();
+    private final ConnectionAdmissions<Connection> admitted = new ConnectionAdmissions<>(ADMISSION_TTL_MS*1_000_000L,System::nanoTime);
     private volatile boolean stopped;
 
     public LoginGate(CoreConfig.Login config) {
         this.config = config;
+        TerminalPassportServer.configure(config);
         http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(4))
             .followRedirects(HttpClient.Redirect.NEVER).build();
     }
@@ -77,6 +76,7 @@ public final class LoginGate implements ServerFeature {
     @Override public void register(IEventBus gameBus) {
         gameBus.addListener(this::onNegotiate);
         gameBus.addListener(this::onLoggedIn);
+        gameBus.addListener(this::onLoggedOut);
         LOG.info("Join-grant verification enabled; unverified logins are refused (timeout {}s)", config.timeoutSeconds());
     }
 
@@ -140,8 +140,15 @@ public final class LoginGate implements ServerFeature {
         if (error != null) { refuse(connection, UNAVAILABLE, uid, "lookup failed: " + error.getClass().getSimpleName()); return; }
         switch (response.statusCode()) {
             case 200 -> {
-                sweep();
-                admitted.put(id, System.currentTimeMillis());
+                // A status code or a nickname lookup is not admission evidence.
+                var identity=com.google.gson.JsonParser.parseString(response.body()).getAsJsonObject();
+                if(!uid.equals(identity.get("loginName").getAsString())
+                    || !uid.equals(identity.get("uid").getAsString())
+                    || !id.toString().equals(identity.get("offlineUuid").getAsString())) {
+                    refuse(connection,UNAVAILABLE,uid,"invalid verified identity"); return;
+                }
+                if(stopped || !connection.isConnected()) return;
+                admitted.record(connection);
                 LOG.info("UID {} presented a valid join grant", uid);
             }
             // 409：UID 存在，但没有票。这正是冒名的样子，单独记一条。
@@ -154,10 +161,20 @@ public final class LoginGate implements ServerFeature {
     /** 兜底：negotiation 那一步万一没拦住，进世界的瞬间再核一次名单。 */
     private void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || player instanceof FakePlayer) return;
-        if (admitted.remove(player.getUUID()) != null) return;
+        if (!stopped && admitted.consume(player.connection.getConnection())) {
+            TerminalPassportServer.admit(player);
+            return;
+        }
         LOG.warn("UID {} reached login without a verified join grant; disconnecting late",
             player.getGameProfile().getName());
         player.connection.disconnect(NO_GRANT);
+    }
+
+    private void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        if(event.getEntity() instanceof ServerPlayer player && !(player instanceof FakePlayer) && player.connection!=null){
+            admitted.discard(player.connection.getConnection());
+            TerminalPassportServer.disconnect(player);
+        }
     }
 
     private void refuse(Connection connection, Component reason, String uid, String detail) {
@@ -166,14 +183,10 @@ public final class LoginGate implements ServerFeature {
         catch (RuntimeException ignored) { LOG.warn("Could not disconnect refused UID {}", uid); }
     }
 
-    private void sweep() {
-        long deadline = System.currentTimeMillis() - ADMISSION_TTL_MS;
-        admitted.entrySet().removeIf(entry -> entry.getValue() < deadline);
-    }
-
     @Override public void close() {
         stopped = true;
         http.shutdownNow();
         admitted.clear();
+        TerminalPassportServer.close();
     }
 }
