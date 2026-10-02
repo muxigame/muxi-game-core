@@ -42,10 +42,25 @@ public final class WorldPortals {
     }
     private static void adventureTravel(net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent event) {
         if(WorldDimensions.exploration(event.getEntity().level().dimension()) && !event.getDimension().equals(Level.OVERWORLD)) {
+            if(minigameTravel(event))return;
             event.setCanceled(true);
             if(event.getEntity() instanceof ServerPlayer player && player.tickCount%40==0)
                 message(player,"此世界只能返回家园，请先通过家园门返回");
         }
+    }
+    private static boolean minigameTravel(net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer player) || !player.server.isSameThread()
+            || player.server.getPlayerList().getPlayer(player.getUUID())!=player)return false;
+        var target=player.server.getLevel(event.getDimension());
+        if(target==null || !net.muxigame.minigames.GameAreas.contains(target))return false;
+        var owner=net.muxigame.minigames.GameRuntime.get(player.server).memberships.owner(player.getUUID());
+        if(owner==null || !owner.team().members.contains(player.getUUID()))return false;
+        String key=MinigameTravelRules.returnKey(owner.game(),event.getDimension().location().toString());
+        if(key.isEmpty() || !player.getPersistentData().contains(key,net.minecraft.nbt.Tag.TAG_COMPOUND))return false;
+        // A waiting-room membership alone never permits travel. The game must
+        // have persisted the actual source before installing its temporary kit.
+        var captured=player.getPersistentData().getCompound(key);
+        return captured.getString("dimension").equals(player.level().dimension().location().toString());
     }
     public static WorldPortalBlock block(int destination) { return destination==0?HOME.get():OVERWORLD.get(); }
     public record Frame(BlockPos origin,Direction.Axis axis,int destination) {
