@@ -75,6 +75,11 @@ def build(server: Path, java_home: Path | None = None, run_tests: bool = False,
     client_game = client_game or ROOT.parent / '_client_test' / 'game'
     pack_mods = pack_mods or ROOT.parent / 'better-mc-remake' / 'pack' / 'source' / 'Better MC Remake [FORGE]' / 'mods'
     client_jars = [client_game / client['neoforgePatched'], client_game / client['minecraft']]
+    # Graphics compatibility imports the installed client's LWJGL Java APIs.
+    # Compile only: neither these libraries nor their native binaries enter the mod.
+    client_lwjgl = sorted(p for p in (client_game / 'libraries/org/lwjgl').rglob('*.jar') if 'natives-' not in p.name)
+    if not client_lwjgl:
+        raise ValueError('Installed client LWJGL API jars are required for graphics compatibility.')
     compile_only = [pack_mods / name for name in deps['compileOnly']]
     missing = [str(p) for p in client_jars + compile_only if not p.is_file()]
     if missing:
@@ -85,7 +90,7 @@ def build(server: Path, java_home: Path | None = None, run_tests: bool = False,
         temp = Path(temp); classes = temp / 'classes'
         nested = temp / 'nested'; nested.mkdir()
         # NeoForge 打过补丁的类放在原版前面，否则 Entity.hasData 这类补丁方法编译时看不见。
-        libraries = (client_jars + [neo_server] + mapped
+        libraries = (client_jars + client_lwjgl + [neo_server] + mapped
                      + [p for p in all_jars if '/net/minecraft/' not in p.as_posix() and p != neo_server]
                      + nested_jars(neo, nested) + [nickname] + compile_only
                      + [j for jar in compile_only for j in nested_jars(jar, nested)])
