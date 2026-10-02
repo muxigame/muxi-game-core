@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "type": "local_candidate_delta_only",
+  "base_pack": "1.4.26",
+  "side": "client",
+  "files": [
+    {
+      "path": "config/litematica.json",
+      "size": 320,
+      "sha1": "d9a346c141c23f490fd4456955196f440c7da6c9",
+      "sha256": "6c50c87e00a7b388a52e0098d4632e4228506610f24c1dbaa8c4a16fda99de24",
+      "policy": "seed"
+    },
+    {
+      "path": "mods/forgematica-0.4.2+mc1.21.1.jar",
+      "size": 1646155,
+      "sha1": "586c374d30d7a110c2f940b17cb0faac377e51c8",
+      "sha256": "e19f1653c2f72c771bca2c21519620b71cb32511e25698ba70d5654d50e96c2d",
+      "policy": "managed"
+    },
+    {
+      "path": "mods/mafglib-0.4.3+mc1.21.1.jar",
+      "size": 1314767,
+      "sha1": "9f62df832b1d5c9fe1aead873bd65cb8defacac7",
+      "sha256": "d40789ad40e5643ae232a07b4535135fe56585c12538bc30158076f956aab081",
+      "policy": "managed"
+    },
+    {
+      "path": "schematics/task23-test-floor.litematic",
+      "size": 365,
+      "sha1": "7f5e48250e552bc3adaf4f315e3ed800e1e7a02f",
+      "sha256": "3328d0c19e5e67f5128c763e4be92639ec652b8de82563987af755f4c182651b",
+      "policy": "seed"
+    }
+  ],
+  "runtime_verified": false,
+  "promotable": false
+}

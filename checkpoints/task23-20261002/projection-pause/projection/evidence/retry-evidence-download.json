@@ -1,0 +1,52 @@
+[
+  {
+    "pattern": "*.png",
+    "returncode": 1,
+    "stderr": "scp: C:/Users/ranzh/Documents/Codex/schematic-task23-20261002/runs/projection-20261002-053523-f39cfd49/*.png: No such file or directory\r\n"
+  },
+  {
+    "pattern": "runtime-*.json",
+    "returncode": 1,
+    "stderr": "scp: C:/Users/ranzh/Documents/Codex/schematic-task23-20261002/runs/projection-20261002-053523-f39cfd49/runtime-*.json: No such file or directory\r\n"
+  },
+  {
+    "pattern": "run-inputs.json",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "pattern": "exit.json",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "pattern": "logs/latest.log",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "pattern": "boot.log",
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "file": "boot.log",
+    "size": 842765,
+    "sha256": "d664bcfe703daad42d191860020f3bfef445c4cedfde3ba178385edd1af57aca"
+  },
+  {
+    "file": "exit.json",
+    "size": 680,
+    "sha256": "31ad08436da98066556ea1679b8e4617ad12bd8522fb594e0cafeb9eea56e1f4"
+  },
+  {
+    "file": "latest.log",
+    "size": 910635,
+    "sha256": "3437c7d6a15066a0eca1a394b2d51ae91186d241093bc61991f75ad949980aa9"
+  },
+  {
+    "file": "run-inputs.json",
+    "size": 527,
+    "sha256": "af9df319f6e68af0e8d056021f4848143fa34af6056165e0cfc9e005bc78495a"
+  }
+]

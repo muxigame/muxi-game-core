@@ -1,0 +1,20 @@
+{
+  "Generic": {
+    "easyPlaceMode": false,
+    "easyPlaceHoldEnabled": false
+  },
+  "Hotkeys": {
+    "easyPlaceUseKey": {
+      "keys": ""
+    },
+    "easyPlaceFirst": {
+      "keys": ""
+    },
+    "easyPlaceToggle": {
+      "keys": ""
+    },
+    "executeOperation": {
+      "keys": ""
+    }
+  }
+}

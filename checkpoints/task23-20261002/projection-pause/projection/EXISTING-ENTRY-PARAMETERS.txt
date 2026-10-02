@@ -1,0 +1,27 @@
+Task23 投影实测 / 已有入口协调参数（2026-10-02，取代新建持久任务提案）
+
+父级已明确由 task14 / 发布 owner 唯一管理 MuxiDesktopQA 并行入口。task23 不修改共享任务定义、动作、入口脚本或持久权限，不要求新建计划任务。
+
+需要 task14 在 131 Session 2 执行的固定独立脚本：
+C:\Users\ranzh\Documents\Codex\schematic-task23-20261002\start-visible-task23.ps1
+脚本参数：无。
+如果现有入口需要完整调用字符串：
+powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Users\ranzh\Documents\Codex\schematic-task23-20261002\start-visible-task23.ps1"
+若 task14 选择已有 Python 入口，则等价调用：
+C:\Python38\pythonw.exe -B "C:\Users\ranzh\Documents\Codex\schematic-task23-20261002\start_visible_131.py"
+两个调用任选其一，不要同时启动。脚本只允许 JBC_FCRL / Session 2，拒绝 SSH Session 0。
+
+启动焦点：约 20 秒。task23 预先在 SSH Session 0 复制全套运行副本，不占用焦点；入口只启动 Java，不临时复制大包。MC 新窗口可能取得焦点，启动窗口结束后全部测试在本客户端内通过实际游戏与模组 API 自动完成，不发送全局键鼠或主动抢其他窗口。
+
+独立目录：C:\Users\ranzh\Documents\Codex\schematic-task23-20261002
+当前准备好的运行目录见 receipts\prepared-run.json；每次新实例使用 runs\projection-时间-随机值。
+启动确认位置：receipts\active-run.json，包含 Java PID / Session 2 / lab。
+进度：运行目录内 runtime-progress.json、boot.log、logs\latest.log。
+结果：runtime-result.json、exit.json、PNG 截图，及 receipts\latest-result.json。
+不连接多人服，不开启 LAN/HTTP 测试监听；独立集成世界 schematic-task23-local-only。
+库、assets、natives、mods、配置和运行日志均已与 task14/生产隔离。Java 内存上限 6 GiB，渲染距离 3，窗口 1280×720，30 FPS，静音。
+
+测试由 task23 自己负责：加载 9 方块 litematic，记录真实编译/渲染块返回值和 framebuffer PNG；检查材料总数、材料 UI、放置移动/旋转、卸载/重载，Iris 开/关，YSM 第一/第三人称组合；正常退出并核对进程退出码。单个石头修改只是本地测试 fixture 的动态计数验证，不冒充真实键鼠手工放置。
+QA helper 仅在测试副本，绝不加入可发布投影 overlay。
+
+旧 register-independent-entry.review.ps1 仅为未执行的历史提案，当前方案不需要运行它。

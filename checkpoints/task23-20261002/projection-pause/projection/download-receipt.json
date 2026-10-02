@@ -1,0 +1,62 @@
+[
+  {
+    "project": "forgematica",
+    "version": "0.4.2+mc1.21.1",
+    "version_id": "71jxaAwz",
+    "path": "client/mods/forgematica-0.4.2+mc1.21.1.jar",
+    "url": "https://cdn.modrinth.com/data/dCKRaeBC/versions/71jxaAwz/forgematica-0.4.2%2Bmc1.21.1.jar",
+    "size": 1646155,
+    "sha256": "e19f1653c2f72c771bca2c21519620b71cb32511e25698ba70d5654d50e96c2d",
+    "published_hashes": {
+      "sha1": "586c374d30d7a110c2f940b17cb0faac377e51c8",
+      "sha512": "4436d2dbeb5e7f63615ce40f99b980e07acf03ac0709ccf0f951c2841fb2983da7e2d55802659b4026b4b3bcc76ce1e29c605cb589059318c4b704615f0a3378"
+    },
+    "published_hashes_verified": true,
+    "runtime_mod": true
+  },
+  {
+    "project": "forgematica",
+    "version": "0.4.2+mc1.21.1",
+    "version_id": "71jxaAwz",
+    "path": "redistribution/sources/forgematica-0.4.2+mc1.21.1-sources.jar",
+    "url": "https://cdn.modrinth.com/data/dCKRaeBC/versions/71jxaAwz/forgematica-0.4.2%2Bmc1.21.1-sources.jar",
+    "size": 1016636,
+    "sha256": "8de36e3fd4d709a195b25a7ed3efdd8bb1b41b2728081c74fc0c76065b261cc5",
+    "published_hashes": {
+      "sha512": "f5d8485f48a3e4ba22d6d5988487b8f0c4e1363553ff959113a3bfe4840594d364b9aee16d15926391240c5aa1e8a8c776f6cb7f6d99c9c55afa4bb9093909b3",
+      "sha1": "ccf8458ee57090e2c09839e72cd04d913a07a314"
+    },
+    "published_hashes_verified": true,
+    "runtime_mod": false
+  },
+  {
+    "project": "mafglib",
+    "version": "0.4.3+mc1.21.1",
+    "version_id": "CgDQ0u0Q",
+    "path": "client/mods/mafglib-0.4.3+mc1.21.1.jar",
+    "url": "https://cdn.modrinth.com/data/SKI34J7B/versions/CgDQ0u0Q/mafglib-0.4.3%2Bmc1.21.1.jar",
+    "size": 1314767,
+    "sha256": "d40789ad40e5643ae232a07b4535135fe56585c12538bc30158076f956aab081",
+    "published_hashes": {
+      "sha512": "b28b0552022ba22a729c917b848d119b84236689b550b99ba1fe11f2353551abcd2d9e23b190689be82376a9b2a47ffc22cdb116f413d6f76a5d19f075a9e78d",
+      "sha1": "9f62df832b1d5c9fe1aead873bd65cb8defacac7"
+    },
+    "published_hashes_verified": true,
+    "runtime_mod": true
+  },
+  {
+    "project": "mafglib",
+    "version": "0.4.3+mc1.21.1",
+    "version_id": "CgDQ0u0Q",
+    "path": "redistribution/sources/mafglib-0.4.3+mc1.21.1-sources.jar",
+    "url": "https://cdn.modrinth.com/data/SKI34J7B/versions/CgDQ0u0Q/mafglib-0.4.3%2Bmc1.21.1-sources.jar",
+    "size": 626159,
+    "sha256": "7c3db5dd124e3713ffad32ca4d84874bc8a6902f2e4412d3a3b29df0442f2821",
+    "published_hashes": {
+      "sha512": "040eb51ba5532d4bff619028e5e910466777fc59e74d2bfafa2d42f54477b03e198ebac5f1cad277dedf1afc6368ec0655eaa9d1982e4d4e3f8a5e0913365c1f",
+      "sha1": "d96875d67662ef49c7504387d55333401d8e40ea"
+    },
+    "published_hashes_verified": true,
+    "runtime_mod": false
+  }
+]

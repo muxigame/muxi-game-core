@@ -1,0 +1,137 @@
+维度角色交换：只读盘点与离线迁移设计
+日期：2026-10-02 UTC。阶段：方案评审；没有生产迁移授权，没有执行迁移。
+
+1. 建议路线与明确边界
+
+把现有生存地图整体迁入真正的 minecraft:overworld；把原主世界/现家园整体迁入新维度 muxi_game_core:home。冒险继续 muxi_game_core:adventure。保留方块、实体、POI、生物群系、结构、坐标与玩家身份，不创建新生存地图，不通过 clone 方块来迁世界。
+
+角色 / 原 ID / 新 ID / 新物理位置
+家园 / minecraft:overworld / muxi_game_core:home / world/dimensions/muxi_game_core/home/
+生存 / muxi_game_core:overworld / minecraft:overworld / world/ 的原版地形目录
+冒险 / muxi_game_core:adventure / 不变 / 原目录
+下界 / minecraft:the_nether / 不变 / world/DIM-1/
+末地 / minecraft:the_end / 不变 / world/DIM1/
+
+不建立“旧生存 ID 和新主世界同时指向同一批区块”的活动别名；两个 ServerLevel 不能共享可写存储。旧 ID 只由离线迁移适配器识别。旧生存目录从活动布局移除并在完整原始备份中保留；新 Core 和 level.dat 的维度注册均不再创建旧生存维度。
+
+此路线能减少依赖 Level.OVERWORLD 的模组对生存的兼容负担，但不会自动修复已生成地形、既有损坏结构、光照或刷怪密度问题。即使 seed 和生成 preset 相同，模组按维度键作出的判定可能改变未来新区块，不能承诺边界绝无接缝。
+
+最小风险顺序：以正式1.4.26冻结基线创建独立迁移候选与完整停服副本，先证明角色交换，再决定是否与届时已稳定的其他更新合并。不要把迁移混进当前统一候选，或用全量重编译覆盖其 SSO/社交/终端工作。若统一候选先上线，迁移分支必须重新以实际线上哈希为基线验证，禁止继续沿用旧锁。
+
+2. 正式包与未上线候选的区别
+
+正式整合包：1.4.26，Core 1.12.2。
+正式 Core SHA256：56cdb297d0a0de3f6bc745fcc94914bb90dd4f06e078b2c15fd40b010eb9f59d。
+本机6个已安装 Muxi JAR 与1.4.26发布记录一致；本机旧工作树 packspec 的1.4.24文字不作为线上版本依据。
+
+当前统一社交候选 Core：1.12.3-task14-qa.1，SHA256 f4c9c11097c348cabef5b96c192ca0482887c40a4fd5b4defa2c81823a00c204。已读取交付目录内实际 JAR 并核对哈希，不只看源码或文件名。
+WorldDimensions、DimensionsFeature、HomeSpawningFeature、Mowzie SurvivalSpawnRulesMixin 与正式包逐字节相同；WorldPortals 不同。该候选已包含同坐标门修改及相关组合测试，但没有做本次维度角色交换。
+正式1.4.26仍是旧的地表寻找出口行为；本任务既有严格同坐标补丁候选 SHA256 为3625c34e1bab0caebe507d0f136ebcfd858e0efb5aafed907b251189667cae14，未安装。其121项测试不能作为“角色交换已经通过”的证据。
+
+3. 这次已读取的存档事实（在线磁盘快照，不是可恢复备份）
+
+主要盘点时间：2026-10-02T00:27:58Z。正在运行的服务器会继续保存，数量和位置可能变化。
+- 存在21个维度存储目录；level.dat 尚未注册 muxi_game_core:home。
+- seed=8324402536652151177；家园、生存、冒险均为 minecraft:overworld 类型、noise settings 和 overworld multi_noise preset。
+- 当前根世界全局 Spawn=(-496,74,304)。不能直接认定这个位置在迁入的生存地形中安全。
+- 现家园 region 有400755个已占用Anvil槽、约3.562 GB地形；生存5579槽、约51.5 MB地形；冒险10187槽、约99.4 MB地形。槽数是磁盘头统计，不代表全是完成生成或实体正在 tick。
+- 现家园有5234个region文件，其中4520个为0字节；生存73个，其中59个为0字节。预生成遗留空文件已与读取错误区分，不据此宣称坏档。
+- 当前有7份 playerdata/*.dat：保存维度为家园5、生存1、冒险1。5份有显式 SpawnDimension，2份没有。床位和死亡点确实存在交叉维度，不能统一将玩家重置到一个出生点。
+- Core门配对数据有6条组合键（双方各3），键结构为“维度ID/packed BlockPos/axis”。索引 destination=0/1 是逻辑家园/生存；保持 ALL 的角色顺序后不需要交换数字。
+- waystones.dat 有407个石碑：现家园279、生存1、冒险1、下界89、末地30、其他7。保持407个 WaystoneUid 和方块位置，仅按角色改 World 字段；不重新创建石碑。
+- OPAC有9份玩家领地NBT，其中2份非空，dimensions 字典键为 minecraft:overworld。重映射到 home，保留所有者UUID、区块、权限、强制加载标记及队伍关系。
+- 安装FTB Teams/Quests，未见FTB Chunks JAR/存储目录；FTB Teams 8个文件、Quests 7个文件本轮未匹配到这些维度ID。保持原身份与任务数据；不虚构一套FTB领地迁移。
+- 发现原版地图 dimension、YIGD墓碑世界、Create DimensionPalette、Iron's Spellbooks双向portal GlobalPos、女仆位置/墓碑、傀儡lastDim、背包和RS物品组件中的维度引用。傀儡配置卡有2549个相关引用，其中2546个指向现家园；单看玩家当前位置会漏掉绝大多数引用。
+- 玩家Balm ReturnPortalList[].FromDim、LastDeathLocation.dimension 及装备中女仆的MaidSchedulePos.Dimension需要适配。物品组件、附件、压缩存储里的位置引用不能只扫描最外层NBT。
+- 存在Chunky预生成任务 config/chunky/tasks/minecraft/overworld.properties、原世界的mfix_stronghold_cache_v2.nbt和world/xaeromap.txt，分别涉及任务归属、可重建的结构查询缓存和地图服务器身份。
+
+4. Core 必须按角色改，不能全局替换 Level.OVERWORLD
+
+建议引入明确的 HOME、SURVIVAL、ADVENTURE 和 isHome/isSurvival/isAdventure；HOME=自定义home，SURVIVAL=Level.OVERWORLD。
+WorldDimensions.ALL保持顺序：[home, overworld(生存), adventure]，命令名和已有portal block ID home_portal/overworld_portal保留。
+
+必须修改与重测：
+- HomeSpawningFeature.home 由 Level.OVERWORLD 改为 HOME，否则新主世界生存会继续被禁刷、独立家园反而放开。所有调用该方法的自然生成/孵化/模组人口过滤跟随新角色。
+- PlayerList首登及DimensionsFeature的初始落点/重生目标改为SURVIVAL。老玩家的first-join、pending/done和每日任务进度保留，不能重新发首登物品或重新随机传送已有玩家。
+- WorldPortals.ignite 不能再用“是否Level.OVERWORLD”推断目的地，否则新生存中造门会仍指向生存自身。必须用isHome决定1，其余允许来源决定0。
+- endEye、DimensionFirePortalMixin、TwilightPortalCreationMixin和adventureTravel不能继续共用旧EXPLORATION来拦截真正主世界。推荐生存开放原生门链，冒险只允许返回HOME；家园原生门链的策略见第7节。
+- 世界生成兼容与旅行限制拆成两个集合。逻辑探索角色可含生存/冒险；需要模拟Overworld的自定义生成兼容应按实际自定义home/adventure分别评审。不要因为把SURVIVAL改为Root就把home加入所有旧EXPLORATION限制。
+- Blueprint biome slices/seed/surface/noise、Serene Seasons、PasterDream结构/竞技场存储、Goblin Trader等兼容mixin重新核对。生存变Root后许多专用绕过已不必要；冒险仍需要原兼容；家园新区块生成是否继承旧Root效果须单独测试。
+- server.overworld()作为全局 SavedData、时钟、统计入口仍应指真正Root；作为“返回家园”的调用则改显式HOME。现小游戏PlayerReturns缺失目标回退、挑战恢复回退、OutbreakMap默认维度都需要按语义检查，不能机械替换所有server.overworld()。
+- 旧生存标记resettable=true不能直接套在新的Root上。新Root禁止按旧“删除维度目录”流程重置；具体可重置机制另行设计，首次迁移不引入重置功能。
+- Xaero维度标签、石碑标记和终端显示随角色更新；不变更玩家UUID、账户或SSO信任策略。
+
+严格同坐标补丁的关系：
+逻辑0↔1继续保留同门锚XYZ、轴向、玩家小数偏移、最多36位置的放置范围、保护取消回滚和箱子/不可破坏障碍拒绝。迁移门配对键时只换维度前缀，packed位置与axis不改。旧非同坐标链接可先保留，补丁在以后实际过门成功时才替换；不在离线迁移时拆门或强行凿建筑。
+物理门块ID和目的地索引不交换。HOME↔冒险保持现有规则。角色换过之后必须重新跑上述回归；旧测试不自动证明新映射正确。
+
+5. 地图与SavedData的移动归属
+
+地形目录明确交换：region、entities、poi、sublevels作为一组从原维度迁入相应新目录。包括全部.mca、外部.mcc、.slvlr、.slvls及其他伴随文件，不只复制有方块的region。冒险/下界/末地的这些目录不换位置。
+坐标不平移，不改变区块xPos/zPos、实体Pos/UUID、POI坐标、结构Starts/References里的区块坐标。
+
+root的data/不是可以整体跟旧家园搬走的目录：
+- 全服共享数据如map_<id>.dat/idcounts、waystones、Core门配对、OPAC、铁路网络、RS、墓碑等仍留在Root保存位置，内部合法的世界引用按语义重映射，不分裂出另一套ID计数。
+- 真正逐维度数据则随地形移动，必须先逐文件建所有权表。已由已安装Sable字节码确认：occupancy、force_load_tickets、tracking_points三种SavedData通过传入ServerLevel的DataStorage加载，属于该维度；根世界这三份应归新HOME，生存对应文件应归新Root。root tracking_points没有维度字符串，普通文本搜索会漏掉它。
+- raids、neoforge level attachments、seasons、未加载气球等不能与全局表一起盲搬。生存目录现在已有6份SavedData，与Root存在同名条目；必须按模组实际getDataStorage的归属分发，而不是目录合并时任意覆盖。
+- 根customnpcs、easy_npc、FTB队伍/任务、KubeJS持久化、chunk_activity_info等先确认全局/逐维度归属。NPC实体随entities走，不代表NPC目录中所有用户/脚本数据也应整体移到HOME。
+
+Sable盘点：家园476个、生存14个、冒险20个sublevels伴随文件；这次可读内容均为零，occupancy/tickets为空，root tracking_points有一个玩家位置。在线曾遇到短暂占用中的临时文件，故不能以此断言完整船只/子世界迁移已验证。停服备份时要保存所有子世界UUID/坐标/占用和依赖，离线副本用同版Sable验证；禁止转换成方块clone或删除认为“空”的伴随文件。
+
+6. 玩家、领地、传送石碑、地图与任务
+
+只对真正的世界键执行一次同时映射：旧Root→HOME，旧Survival→Root；冒险、下界、末地及其他ID不变。不能顺序字符串替换两遍，否则旧Survival先变Root又被错误变HOME。
+更不能替换dimension_type、noise settings或biome_source preset中的minecraft:overworld，它们是生成注册项，不是玩家所属世界。
+
+玩家：Dimension、SpawnDimension、LastDeathLocation.dimension、Core muxi_dimension_positions字典键、模组GlobalPos/返回点按原角色映射；XYZ/yaw/pitch、背包、末影箱、经验、属性和进度保持。若有床坐标但省略SpawnDimension，要显式补HOME以保存旧默认床位语义；本次2份无SpawnDimension的文件也没有床坐标，建议无床回退使用新生存安全出生点，作为后续范围决策，不现在迁人。
+根level.dat的Spawn需要在离线生存地图中验证/选择；原家园入口/恢复点独立保存，不能把全局Spawn改名就当作已迁移世界。
+
+领地：OPAC dimensions键一次映射；若一个所有者在两个来源都有区块，保留两套role映射后的区块，不因X/Z相同互相覆盖。保留强制加载标记，首次副本启动核对强制加载目标。FTB Teams/Quests、好友数据保留原UUID与任务完成状态；未来若发现FTB Chunks或远端插件，新增适配器，不能按当前“未发现”直接跳过。
+
+传送与地图：WaystoneUid不变，更新World，保留每人已解锁UUID、Balm返回点以及传送卷轴/附魔/背包里携带的世界引用。原版地图ID/pixel数据不变，只换正确的data.dimension。保留world/xaeromap.txt服务器身份；客户端Xaero旧Overworld地形缓存现在会指错图，另做按原世界迁入home的缓存/Waypoint转换或导出备份，不清空重建所有客户端地图。不擅读写未给出的其他电脑客户端存档。
+
+任务：Core每日/主线、FTB Quest、小游戏状态、统计和advancements保持；只迁其中世界引用。小世界quarantine/campaign等地图不改。迁移窗口结束游戏房间并保存/恢复玩家返回状态是未来维护步骤，现不停止任何房间。当前候选的社交、SSO、信用结算等不属于这次存档迁移。
+
+7. seed、结构与原生门链：需要事先写清的玩法边界
+
+保留全服seed、Time/DayTime、难度、gamerules和已有DIM-1/DIM1及龙战状态；不重建下界/末地。level.dat的维度条目和Core home.json共同注册HOME，Root使用现生存生成设置；旧生存条目退出活动注册。保留所有生成preset注册名。
+结构的Starts/References随region原样保留；数据中的真GlobalPos按世界映射。Root强要塞查询缓存mfix_stronghold_cache_v2.nbt与Biolith等worldgen状态须分清归属，不能带着旧家园的坐标缓存假装属于新生存。确认是可重建缓存后，只在副本中重建/失效，不删生产文件，也不重生成玩家已有区块。
+
+原生NetherPortalBlock从下界返回Level.OVERWORLD；End出口同样以Root/玩家重生目标为依据。交换后原生链自然归新生存，8:1比例保持，但现有下界门原本对应的是旧家园地形，新生存对应坐标可能没有门或不安全。这是实质性玩法影响，不是换标签。
+推荐：生存拥有下界/末地/暮色等原生探险入口；家园和冒险经自定义门连接生存，家园不直接创建原生探险门，以免进去后回生存造成“家园门回错世界”。已存在的家园原生门不能擅拆；需在副本检查并在范围确定后选择保留为告知入口、禁用触发或另设明确返程协议。若用户要求这些原生门仍双向返回独立家园，必须增加单独的原生portal返程设计和测试，不能承诺原版自动支持。
+暮色/Aether等保存的回程维度字段可以迁移，但也需检查模组硬编码Root的fallback。冒险虽不移动，其缓存里指向旧家园的回程ID仍需改HOME。
+
+8. 备份、离线工具与回滚设计
+
+当前 migration_preflight.py 只有读取/生成工作区报告模式，没有apply、复制、重命名或RCON命令。已读取NBT、维度目录统计与Anvil location头，最后一次盘点没有读取解析错误；没有完整解码所有region实体/方块实体。结果不是一致性备份，不可拿它直接部署。
+
+离线迁移器待单独实现，建议命令合同：inventory(只读) → plan(精确路径/字段/所有权清单) → stage(只写新副本) → verify(静态比对)；没有直接apply生产目录的模式。
+stage输入必须为停服后完整一致备份，要求源world不含活动Java句柄、哈希锁完整、home不存在、源角色/seed/模组哈希与计划一致，输出必须独立目录。逐文件适配器明确字段路径/类型；未知世界引用、同名冲突、未分类SavedData、缺失.mcc或未支持压缩格式即停止。不能用本盘点的轻量NBT解析器重写数据：它不保留所有NBT标签类型，也不是支持全部Anvil编码的迁移写入器。写入器用当前版本NBT库保存类型和原始未修改payload，支持实际1.21.1压缩/外部chunk文件，保持所有未触及数据。
+计划必须列出每个源/目标路径、SHA256、tag路径、原值/新值和同名处理依据；worldgen注册项单列，禁止与世界引用共用通用替换器。未知引用可人工登记适配，不能静默跳过。执行时始终从原始快照计算映射，支持重复stage产物相同；已经带迁移epoch的源拒绝二次迁移。
+
+未来获批窗口的顺序：
+1) 冻结具体mod/source/配置锁，停游戏活动，正常完整保存并停服，确认Java退出和world句柄释放。
+2) 完整备份整个world，以及实际mods/config/defaultconfigs/datapacks/KubeJS/启动配置及服务器身份文件；校验hash。以前为局部clone做的region备份绝不足以回滚这次角色交换。
+3) 从备份产生全新stage世界，进行typed引用迁移及逐维度SavedData分发，生成前后清单。
+4) 在副本验证和完整模组环境演练后，再将新world与迁移Core作为同一个维护批次切换。第一次启动先禁止普通玩家进入，核对实际注册键、角色、日志和关键点后再开放。
+5) 出现门/领地/床/船/任务不一致则停服，恢复完整迁移前world和对应原mod/config/启动锁；不逆向拼接几个region。开放后新增进度不能保证无损回滚，须在窗口范围中约定验收点。
+新启动流程检查migration_epoch/manifest和Core/客户端兼容版本，防止把旧Core 1.12.2直接启动在新布局上。客户端维度UI/地图适配作为此迁移发行的必要内容，不在当前统一候选里偷偷追加。
+
+9. 验收门槛（尚未执行角色交换实验）
+
+静态：实际注册只有HOME/Root/冒险的正确角色；旧生存无活动实例；seed/Time/难度不变；所有来源的区块坐标、实体UUID总量、POI、结构Starts/Refs、方块实体和Sable子世界标识保持；除允许的字段重写，未修改文件字节一致。未知世界键残留为0或有明确不应改的生成/文本登记。
+数据：7名已有玩家逐个保持位置/背包/XP/床/死亡点，缺省床语义覆盖；OPAC两份非空领地和权限无碰撞；407个石碑UID完全一致且目标块匹配；地图像素/ID、墓碑、傀儡/女仆、RS/背包、铁路和任务完成状态保持。
+运行：完整正式模组副本启动、保存、退出、再启动通过；分别验证新生存自然刷怪、家园禁刷、冒险原规则，新玩家直接进生存；比较旧/新区块边界和结构查询。
+传送：HOME↔SURVIVAL障碍、附近旧门、双向XYZ及小数偏移、X/Z轴、世界上下界、OPAC真正保护事件回滚、箱子拒绝；家园↔冒险不变；实际下界8:1去返、末地出生与龙战/出口、暮色等返回点；死亡、重连和缺失目标fallback。
+Sable/Create：子世界/船/气球、乘客、控制器、停放位置、铁路信号/列车跨维度、强制加载票据，保存重启无复制/丢失。
+小游戏与任务：房间开始/退出/服务器重启恢复、来源维度回程、缺失维度fallback、daily/FTB进度无清零。新旧客户端兼容或明确拒绝旧版，不依赖错误地图标签进行玩家迁移。
+破坏性负例只作用副本：旧Core+新布局、stage重复运行、源仍在线、少文件/未知tag/键碰撞/坏边界都必须拒绝；演练完整原样回滚。
+
+10. 当前仍待确定的内容，不在本轮索要批准
+
+家园已有原生门的保留/禁用策略、无床玩家默认回退点、完整worldgen/SavedData所有权表、客户端Xaero缓存范围、可重建缓存处理、完整模组副本的测试通过，以及实际迁移窗口/回滚验收时间均待后续确定。当前没有apply迁移器，没有停服副本实验，不能宣称可以直接上线。
+
+附：对上轮刷怪报告的修正
+本轮核对正式Core实际JAR发现SurvivalSpawnRulesMixin已在compat.runtime注册；它在MowzieEntity.spawnPredicate中将生存/冒险的dimension检查映射为Level.OVERWORLD，CompatMixinPlugin在Mowzie安装时启用。因此“配置7项只有minecraft:overworld，所以正式服生存/冒险被排除”这个推断不成立。此前报告遗漏了Core兼容重定向；本轮应以实际组合行为为准，不能将静态白名单当成已证实的密度根因。
+
+支持文件：world-role-code-baselines.json、world-role-inventory.json、world-role-config-references.json、migration_preflight.py及Sable SavedData字节码文本。文件保存在本任务工作区；未修改正式存档、共享源码、统一候选或任何其他项目运行状态。
