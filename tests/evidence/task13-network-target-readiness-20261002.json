@@ -1,0 +1,175 @@
+{
+  "scope": "Full installed 520-mod cold cross-dimension Waystones native preparation and original guards",
+  "coreHeadBeforeOwnCommit": "62b5da9754b27b7f8a23373d4bbaca95c85d8122",
+  "testedCoreJar": {
+    "path": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-13\\candidate-20261002-190259\\muxi-game-core-131-public-integration-qa.jar",
+    "sha256": "98417e360394d1473f5dac001a30fd692e5ff45ccede3693d80d4c470c551c1e",
+    "entries": 238,
+    "version": "1.12.3-task14-qa.1"
+  },
+  "testedTerminalJar": {
+    "path": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-13\\candidate-20261002-190259\\muxi-terminal-131-public-integration-qa.jar",
+    "sha256": "0b7f3ae39ea20c2e2661b077d77928b7c3111f67a0793054754101343b76bd34",
+    "entries": 147,
+    "version": "0.2.4-task14-social-qa.1"
+  },
+  "sourceSha256": {
+    "src/main/java/net/muxigame/core/feature/waystones/network/NetworkTeleportGuard.java": "34f7c033cac63cf11447f0d3eb626795d6f4bace859dabd90fc888e5ba76992c",
+    "src/main/java/net/muxigame/core/feature/waystones/network/NetworkTargetPreparation.java": "b1ec563ecadb72b9c5e9ec5ed09cc62897c55544727d9b1178672082070d9c88",
+    "tests/run_network_target_preparation_tests.py": "328cb07b7d5a4dff54dcd47a3cc3284829f2c42e82bbc242ed2904e7553c9ce1"
+  },
+  "cause": "ServerLevel skips tickBlockEntities in an empty dimension after 300 ticks; native FULL futures leave fresh Waystone block entities invalid until the native world tick is resumed.",
+  "fix": "Network-owned native Prepare task wakes an allowed uninitialized target dimension with resetEmptyTime, then waits at most 40 server ticks for the exact physical UID before original pending/requirement/entity guards continue.",
+  "guardsRetained": true,
+  "directOnLoad": false,
+  "customChunkLoadsOrTickets": false,
+  "coordinateFallback": false,
+  "codeFixtureChecks": 58,
+  "nativeModCount": 520,
+  "nativeChecks": {
+    "fixtureActualStones": true,
+    "playerGateBadgeOnly": true,
+    "outsideEntrance": true,
+    "ordinaryMOutsideEntrance": true,
+    "realUnactivatedRejected": true,
+    "unactivatedNoMoveNoFee": true,
+    "unregisteredGateCannotCross": true,
+    "unregisteredCrossNoMoveNoFee": true,
+    "realCurrentDimRegisteredGate": true,
+    "realNativeSameDimCompleted": true,
+    "realNativeSameDimArrived": true,
+    "sameDimOriginalNativeEvent": true,
+    "realNativeCrossDimCompleted": true,
+    "realNativeCrossDimArrived": true,
+    "actualWaystonesPrepareObserved": true,
+    "actualGateBrokenDuringPrepare": true,
+    "actualAsyncBrokenGateRejected": true,
+    "actualAsyncNoMoveNoFee": true,
+    "legacyRealPacketDelivered": true,
+    "legacyGuardActualNoMoveNoFee": true,
+    "legacyGuardActualPacketHandled": true
+  },
+  "nativeCrossReceipt": {
+    "request": "13ef86cc-d5e4-4349-8ccf-62318f10f971",
+    "target": "146dc150-7d33-45a8-91ab-0ef42fc3305e",
+    "status": "completed",
+    "message": "已到达石碑"
+  },
+  "nativeArrival": {
+    "dimension": "muxi_game_core:overworld",
+    "x": 0.5,
+    "y": 64.0,
+    "z": -0.5,
+    "xp": 4978,
+    "level": 48,
+    "executed": 4,
+    "completeEvents": 2
+  },
+  "observations": [
+    {
+      "phase": "native-full-before-wake",
+      "thread": "Server thread",
+      "dimension": "minecraft:overworld",
+      "expectedUid": "ca99def9-6c2d-4ee8-a105-6db0dff2d3db",
+      "emptyTime": 0,
+      "freshBlockEntities": 0,
+      "chunkLoaded": true,
+      "physicalExactUid": true,
+      "localValid": true,
+      "localUid": "ca99def9-6c2d-4ee8-a105-6db0dff2d3db"
+    },
+    {
+      "phase": "native-preparation-finish",
+      "thread": "Server thread",
+      "dimension": "minecraft:overworld",
+      "expectedUid": "ca99def9-6c2d-4ee8-a105-6db0dff2d3db",
+      "emptyTime": 0,
+      "freshBlockEntities": 0,
+      "chunkLoaded": true,
+      "physicalExactUid": true,
+      "localValid": true,
+      "localUid": "ca99def9-6c2d-4ee8-a105-6db0dff2d3db"
+    },
+    {
+      "phase": "native-full-before-wake",
+      "thread": "Server thread",
+      "dimension": "muxi_game_core:overworld",
+      "expectedUid": "146dc150-7d33-45a8-91ab-0ef42fc3305e",
+      "emptyTime": 480,
+      "freshBlockEntities": 2,
+      "chunkLoaded": true,
+      "physicalExactUid": false,
+      "localValid": false,
+      "localUid": "9035c76b-673e-4c5c-a342-2e7d4d9bf2d1"
+    },
+    {
+      "phase": "native-preparation-finish",
+      "thread": "Server thread",
+      "dimension": "muxi_game_core:overworld",
+      "expectedUid": "146dc150-7d33-45a8-91ab-0ef42fc3305e",
+      "emptyTime": 1,
+      "freshBlockEntities": 0,
+      "chunkLoaded": true,
+      "physicalExactUid": true,
+      "localValid": true,
+      "localUid": "146dc150-7d33-45a8-91ab-0ef42fc3305e"
+    },
+    {
+      "phase": "native-full-before-wake",
+      "thread": "Server thread",
+      "dimension": "muxi_game_core:overworld",
+      "expectedUid": "146dc150-7d33-45a8-91ab-0ef42fc3305e",
+      "emptyTime": 184,
+      "freshBlockEntities": 0,
+      "chunkLoaded": true,
+      "physicalExactUid": true,
+      "localValid": true,
+      "localUid": "146dc150-7d33-45a8-91ab-0ef42fc3305e"
+    },
+    {
+      "phase": "native-preparation-finish",
+      "thread": "Server thread",
+      "reason": "当前维度的石碑网络尚未连接服务器设施门，不能跨维度传送",
+      "dimension": "muxi_game_core:overworld",
+      "expectedUid": "146dc150-7d33-45a8-91ab-0ef42fc3305e",
+      "emptyTime": 184,
+      "freshBlockEntities": 0,
+      "chunkLoaded": true,
+      "physicalExactUid": true,
+      "localValid": true,
+      "localUid": "146dc150-7d33-45a8-91ab-0ef42fc3305e"
+    }
+  ],
+  "nativeAsyncBrokenGateReceipt": {
+    "request": "2c172f79-1b37-42ff-8d92-e65b118f1f14",
+    "target": "146dc150-7d33-45a8-91ab-0ef42fc3305e",
+    "status": "failed",
+    "message": "当前维度的石碑网络尚未连接服务器设施门，不能跨维度传送"
+  },
+  "exit": {
+    "pid": 5640,
+    "lab": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-13\\qa-runtime\\all-20261002-190356",
+    "startedUtc": "2026-10-02T19:04:37.457468+00:00",
+    "session": 2,
+    "hiddenBoot": true,
+    "otherPidsUntouched": [],
+    "exitCode": 0,
+    "normalStopLogged": true
+  },
+  "analyticsExitConfig": {
+    "config": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-13\\qa-runtime\\all-20261002-190356\\config\\packanalytics-common.toml",
+    "originalSha256": "8265b5c3f66f01a59112c6314058bfd424d289814465567c2dfd0e84b2eee315",
+    "patchedSha256": "c29c7504437a35bb8ab16ceca5f5d974b524b60c939b028bd852c9f4218702e6",
+    "onlyChange": "Metrics Endpoint URL empty",
+    "appliedBeforeBoot": true,
+    "source": "task-12/projection-qa/HANDOFF-exit-diagnosis.txt"
+  },
+  "candidateManifest": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-13\\candidate-20261002-190259\\candidate-manifest.json",
+  "nativeLab": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-13\\qa-runtime\\all-20261002-190356",
+  "unverified": [
+    "Actual settings wallpaper file chooser",
+    "Friends real accounts A/B login, expiry and exchange"
+  ],
+  "pushed": false,
+  "published": false
+}

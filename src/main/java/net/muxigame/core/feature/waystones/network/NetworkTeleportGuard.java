@@ -3,6 +3,9 @@ package net.muxigame.core.feature.waystones.network;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.waystones.api.*;
 import net.blay09.mods.waystones.api.event.WaystoneTeleportEntityEvent;
+import net.blay09.mods.waystones.api.event.WaystoneTeleportEvent;
+import com.mojang.datafixers.util.Either;
+import java.util.concurrent.CompletableFuture;
 import net.blay09.mods.waystones.api.error.WaystoneTeleportError;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,6 +25,28 @@ public final class NetworkTeleportGuard {
     private static boolean registered;
     public static synchronized void register() {
         if(registered)return;registered=true;
+        NetworkTargetPreparation.register();
+        Balm.getEvents().onEvent(WaystoneTeleportEvent.Prepare.class,event->{
+            Guard guard=guards.get(event.getContext());if(guard==null)return;
+            // Waystones chains these tasks after its FULL chunk futures and before
+            // pending validation. FULL alone does not finish Balm's onLoad queue.
+            event.addPreparationTask(previous->{
+                if(previous.right().isPresent())return CompletableFuture.completedFuture(previous);
+                return NetworkTargetPreparation.await(event.getContext(),guard.player.server,
+                    ()->guards.get(event.getContext())==guard?denial(event.getContext(),false):"传送已取消",
+                    ()->{
+                        Waystone target=WaystonesAPI.getWaystone(guard.player.server,guard.target).orElse(null);
+                        var level=target==null?null:guard.player.server.getLevel(target.getDimension());
+                        return level!=null && NetworkPortalFacilities.actualStone(level,target);
+                    },()->{
+                        // Empty dimensions stop tickBlockEntities after 300 ticks,
+                        // leaving FULL chunks' fresh block entities uninitialized.
+                        // Wake the native world tick; never call onLoad ourselves.
+                        var level=guard.player.server.getLevel(event.getContext().getTargetWaystone().getDimension());
+                        if(level!=null)level.resetEmptyTime();
+                    }).thenApply(reason->reason==null?previous:Either.right(new WaystoneTeleportError(Component.literal(reason))));
+            });
+        });
         Balm.getEvents().onEvent(WaystoneTeleportEntityEvent.Pre.class,event->{
             if(event.getEntity()!=event.getContext().getEntity())return;
             String reason=denial(event.getContext(),true);
@@ -31,7 +56,7 @@ public final class NetworkTeleportGuard {
     public static void track(WaystoneTeleportContext context,ServerPlayer player,NetworkPortalFacilities.Source source,Waystone target) {
         guards.put(context,new Guard(player,new WeakReference<>(player.connection),player.serverLevel().dimension().location(),source,source.stone().getPos().immutable(),target.getWaystoneUid(),target.getDimension().location(),target.getPos().immutable(),player.tickCount+400,new AtomicBoolean()));
     }
-    public static void untrack(WaystoneTeleportContext context){guards.remove(context);}
+    public static void untrack(WaystoneTeleportContext context){guards.remove(context);NetworkTargetPreparation.cancel(context);}
     public static String initialDenial(ServerPlayer player,NetworkPortalFacilities.Source source,Waystone target,NetworkFacilityConfig cfg) {
         if(!player.isAlive() || player.hasDisconnected() || net.muxigame.minigames.GameRuntime.blocksWorldTravel(player))return "当前状态不能传送";
         if(source==null)return "请靠近真实石碑或已连接石碑的服务器设施门";
