@@ -24,6 +24,8 @@ public final class MuxiGameCoreClient {
     public MuxiGameCoreClient(IEventBus modBus) {
         net.muxigame.core.feature.dimensions.WorldPortals.register(modBus);
         TaskNetwork.register(modBus);
+        net.muxigame.core.feature.login.TerminalPassportNetwork.register(modBus);
+        TerminalPassportApi.register(NeoForge.EVENT_BUS);
         WaystoneMapNetwork.register(modBus);
         new DailyTasksFeature().register(NeoForge.EVENT_BUS);
         new net.muxigame.core.feature.dimensions.DimensionsFeature().register(NeoForge.EVENT_BUS);

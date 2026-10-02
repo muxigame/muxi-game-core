@@ -8,10 +8,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /** Private runtime configuration lives in the server, never in this repository. */
-public record CoreConfig(Identity identity, Login login, OpSync opSync) {
+public record CoreConfig(Identity identity, Login login, OpSync opSync, TerminalSso terminalSso) {
     public static final String FILE = "config/muxi-game-core.json";
     public static final String DEFAULT_ENDPOINT = "https://account.muxigame.com/api/internal/minecraft/identity/";
     public static final String DEFAULT_JOIN_ENDPOINT = "https://account.muxigame.com/api/internal/minecraft/join/";
+    public static final String TERMINAL_SSO_ENDPOINT = "https://account.muxigame.com/api/internal/minecraft/";
+    public CoreConfig(Identity identity, Login login, OpSync opSync) { this(identity,login,opSync,new TerminalSso(false,TERMINAL_SSO_ENDPOINT,"")); }
+    /** Optional account handoff; independent of game admission, identity display and OP. */
+    public record TerminalSso(boolean enabled,String endpoint,String serverKey) {
+        @Override public String toString(){return "TerminalSso[enabled="+enabled+", serverKey=<redacted>]";}
+    }
 
     public record Identity(boolean enabled, String endpoint, String serverKey, int refreshSeconds) {
         @Override public String toString() {
@@ -61,7 +67,7 @@ public record CoreConfig(Identity identity, Login login, OpSync opSync) {
             OpSync opSync = opSync(features);
             // A UID-shaped client profile alone is not authentication. Require the join gate.
             if (opSync.enabled() && (!identity.enabled() || !login.enabled())) throw new IllegalArgumentException();
-            return new CoreConfig(identity, login, opSync);
+            return new CoreConfig(identity, login, opSync, terminalSso(features));
         } catch (Exception ignored) {
             throw new IllegalArgumentException("Invalid Game Core configuration (values redacted)");
         }
@@ -96,6 +102,15 @@ public record CoreConfig(Identity identity, Login login, OpSync opSync) {
         int seconds = boundedInt(source, "timeoutSeconds", 6, 2, 20);
         checkEndpointAndKey(endpoint, key);
         return new Login(true, endpoint, key, seconds);
+    }
+    private static TerminalSso terminalSso(JsonObject features) {
+        JsonObject source=section(features,"terminalSso");
+        if(source==null)return disabled().terminalSso();
+        String endpoint=source.has("endpoint")?source.get("endpoint").getAsString():TERMINAL_SSO_ENDPOINT;
+        String key=source.get("serverKey").getAsString();
+        checkEndpointAndKey(endpoint,key);
+        if(!TERMINAL_SSO_ENDPOINT.equals(endpoint))throw new IllegalArgumentException();
+        return new TerminalSso(true,endpoint,key);
     }
 
     /** The section's object when it exists and is switched on, otherwise null. */

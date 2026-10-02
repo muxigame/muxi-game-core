@@ -33,10 +33,12 @@ public final class MuxiGameCore {
         net.muxigame.core.threading.ChunkTravel.register(NeoForge.EVENT_BUS);
         net.muxigame.core.feature.dimensions.WorldPortals.register(modBus);
         TaskNetwork.register(modBus);
+        net.muxigame.core.feature.login.TerminalPassportNetwork.register(modBus);
         WaystoneMapNetwork.register(modBus);
         CoreConfig config = CoreConfig.load(Path.of(CoreConfig.FILE));
         // 先注册进服核验：它是这台服务器唯一的身份关口，出问题要第一时间在日志里看见。
         if (config.login().enabled()) register(new LoginGate(config.login()));
+        if (config.terminalSso().enabled()) register(new net.muxigame.core.feature.login.TerminalPassportFeature(config.terminalSso()));
         if (config.identity().enabled()) {
             if (!ModList.get().isLoaded("simplenicknames"))
                 throw new IllegalStateException("Game Core identity is enabled but Simple Nicknames 0.8.x is not installed.");
