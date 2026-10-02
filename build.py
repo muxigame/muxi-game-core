@@ -89,7 +89,9 @@ def build(server: Path, java_home: Path | None = None, run_tests: bool = False,
                      + [p for p in all_jars if '/net/minecraft/' not in p.as_posix() and p != neo_server]
                      + nested_jars(neo, nested) + [nickname] + compile_only
                      + [j for jar in compile_only for j in nested_jars(jar, nested)])
-        framework = ROOT.parent / "muxi-minigames/build/libs/muxi-minigames-0.1.2.jar"
+        framework_root = ROOT.parent / "muxi-minigames"
+        framework_version = json.loads((framework_root / "mod.json").read_text(encoding="utf-8"))["version"]
+        framework = framework_root / "build" / "libs" / f"muxi-minigames-{framework_version}.jar"
         if not framework.is_file(): raise ValueError("Build muxi-minigames first")
         libraries.append(framework)
         classpath = os.pathsep.join(str(p.resolve()) for p in libraries)
