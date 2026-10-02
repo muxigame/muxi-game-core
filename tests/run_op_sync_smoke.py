@@ -25,6 +25,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 import build as core_build
+from integrated_fixture import install as install_integrated_fixture
 
 
 def run():
@@ -85,6 +86,7 @@ def run():
         try:
             release=json.loads((ROOT/'build/release.json').read_text());core=ROOT/'build/libs'/release['artifact']
             shutil.copy2(core,lab/'mods'/core.name)
+            install_integrated_fixture(lab, ROOT)
             for pattern in ('waystones-*.jar','balm-*.jar'):
                 found=list((server/'mods').glob(pattern))
                 if len(found)!=1:raise ValueError('Expected one existing public runtime dependency: '+pattern)

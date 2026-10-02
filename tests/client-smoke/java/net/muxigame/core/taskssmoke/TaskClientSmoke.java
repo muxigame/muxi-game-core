@@ -56,30 +56,30 @@ public final class TaskClientSmoke {
     }
     private static final class Preview extends Screen {
         private final DailyTaskScreen detail=new DailyTaskScreen();
-        private final net.muxigame.core.client.challenge.ChallengeScreen challenge=new net.muxigame.core.client.challenge.ChallengeScreen();
+        private final net.muxigame.zombie.client.ChallengeScreen challenge=new net.muxigame.zombie.client.ChallengeScreen();
         private final Class<?> client;
         private Method compact;
         private Object box;
         private int boxY;
         private int frames;
         private boolean mainlineShown;
-        private final net.muxigame.core.client.challenge.ChallengeWheelScreen wheel=new net.muxigame.core.client.challenge.ChallengeWheelScreen();
+        private final net.muxigame.zombie.client.ChallengeWheelScreen wheel=new net.muxigame.zombie.client.ChallengeWheelScreen();
         Preview(Class<?> client) { super(Component.literal("muxi daily tasks native-render QA")); this.client=client; }
         @Override protected void init() {
             try {
                 detail.init(minecraft,width,height);
-                net.muxigame.core.client.challenge.ChallengeClient.state=com.google.gson.JsonParser.parseString("""
+                net.muxigame.zombie.client.ChallengeClient.state=com.google.gson.JsonParser.parseString("""
                     {"available":true,"self":"qa","wins":2,"kills":140,"best":6200,"rewards":0,"credits":62,"coins":62,"earned":300,"exchangeRate":500,"exchangePreview":0,"primary":5,"secondary":-1,"last":"通关 · 困难 · 6200 分 → 12 兑换币",
                      "shop":[{"id":"diamond","title":"钻石 ×1","cost":40},{"id":"glock","title":"格洛克 17","cost":40},{"id":"mp5","title":"MP5A5","cost":105}],
                      "weapons":[{"slot":5,"name":"弩（渲染示例）"},{"slot":8,"name":"弓（渲染示例）"}],
                      "rooms":[{"id":"qa-room","host":"other","name":"研究所突击队","difficulty":"HARD","phase":"LOBBY","wave":0,"total":10,"count":2,"mine":false,"invited":true}],
                      "players":[],"tasks":[{"title":"首次防线：完成一次挑战","ready":true,"claimed":false},{"title":"清剿行动：累计击败 100 只入侵僵尸","ready":true,"claimed":true},{"title":"精英防线：完成困难及以上挑战","ready":true,"claimed":false}]}
                     """).getAsJsonObject();
-                var challengeState=net.muxigame.core.client.challenge.ChallengeClient.state;
+                var challengeState=net.muxigame.zombie.client.ChallengeClient.state;
                 challengeState.addProperty("ammoCooldown",0);
-                if(!net.muxigame.core.client.challenge.ChallengeClient.supplyLabel(challengeState).equals("弹药补给点"))throw new AssertionError("idle ammo label has extra text");
+                if(!net.muxigame.zombie.client.ChallengeClient.supplyLabel(challengeState).equals("弹药补给点"))throw new AssertionError("idle ammo label has extra text");
                 challengeState.addProperty("ammoCooldown",4);
-                if(!net.muxigame.core.client.challenge.ChallengeClient.supplyLabel(challengeState).equals("弹药补给点 冷却 4 秒"))throw new AssertionError("cooldown label missing player-specific time");
+                if(!net.muxigame.zombie.client.ChallengeClient.supplyLabel(challengeState).equals("弹药补给点 冷却 4 秒"))throw new AssertionError("cooldown label missing player-specific time");
                 challengeState.addProperty("ammoCooldown",0);
                 challenge.init(minecraft,width,height);
                 Class<?> boxType=Class.forName("net.muxigame.core.client.tasks.DailyTasksClient$Box");
@@ -114,7 +114,7 @@ public final class TaskClientSmoke {
                 else if(frames<270)renderArena(g,frames>=260?2:frames>=250?1:0);
                 else if(frames<300){
                     if(frames==270){
-                        var state=net.muxigame.core.client.challenge.ChallengeClient.state;
+                        var state=net.muxigame.zombie.client.ChallengeClient.state;
                         state.add("rooms",com.google.gson.JsonParser.parseString("""
                             [{"id":"batch-qa","host":"other","name":"示例小队","difficulty":"HARD","phase":"RUNNING","wave":2,"total":10,"remaining":16,"seconds":245,"count":1,"mine":true,"sites":["L1 北端走廊","L1 洗消更衣室"],"batch":2,"batchCount":3,"batchAlive":8,"batchUnspawned":0,"batchSeconds":18,"aliveCount":12}]
                             """).getAsJsonArray());
@@ -124,11 +124,11 @@ public final class TaskClientSmoke {
                     if(frames<280)challenge.render(g,16,228,delta);else compact.invoke(null,g,box,-1,-1,false);
                 }
                 else{
-                    if(frames==300){var state=net.muxigame.core.client.challenge.ChallengeClient.state;state.addProperty("locked",true);state.addProperty("earned",720);state.addProperty("tactical",1800);state.addProperty("coins",24);state.addProperty("battleRevision",2);state.addProperty("ammoHoldTicks",10);state.add("battleShop",com.google.gson.JsonParser.parseString("""
+                    if(frames==300){var state=net.muxigame.zombie.client.ChallengeClient.state;state.addProperty("locked",true);state.addProperty("earned",720);state.addProperty("tactical",1800);state.addProperty("coins",24);state.addProperty("battleRevision",2);state.addProperty("ammoHoldTicks",10);state.add("battleShop",com.google.gson.JsonParser.parseString("""
                         [{"id":"glock_17","title":"格洛克17","category":"手枪","gun":"tacz:glock_17","cost":350,"coins":0,"burstDps":40,"sustainedDps":24,"magazine":17},{"id":"deagle","title":"沙漠之鹰","category":"手枪","gun":"tacz:deagle","cost":850,"coins":0,"burstDps":60,"sustainedDps":30,"magazine":7},{"id":"heal","title":"治疗药剂II","category":"补给","gun":"","cost":250,"coins":2}]
                         """).getAsJsonArray());wheel.init(minecraft,width,height);}
                     if(frames==320){var category=wheel.getClass().getDeclaredField("category");category.setAccessible(true);category.set(wheel,"手枪");var slot=wheel.getClass().getDeclaredField("slot");slot.setAccessible(true);slot.set(wheel,2);var rebuild=wheel.getClass().getDeclaredMethod("rebuild");rebuild.setAccessible(true);rebuild.invoke(wheel);}
-                    if(frames<340)wheel.render(g,width/2,height/2,delta);else{var state=net.muxigame.core.client.challenge.ChallengeClient.state;state.addProperty("ammoHolding",true);state.addProperty("ammoProgress",5);net.muxigame.core.client.challenge.ChallengeClient.renderCombat(g);}
+                    if(frames<340)wheel.render(g,width/2,height/2,delta);else{var state=net.muxigame.zombie.client.ChallengeClient.state;state.addProperty("ammoHolding",true);state.addProperty("ammoProgress",5);net.muxigame.zombie.client.ChallengeClient.renderCombat(g);}
                 }
                 Component note=Component.literal("本地界面测试 · 示例任务");
                 g.drawString(font,note,width-font.width(note)-12,height-18,0xFF81909C,true);
@@ -151,7 +151,7 @@ public final class TaskClientSmoke {
             g.flush();com.mojang.blaze3d.platform.Lighting.setupFor3DItems();
             g.pose().pushPose();g.pose().translate(width/2.0,height/2.0,250);g.pose().scale(3,-3,3);
             g.pose().mulPose(com.mojang.math.Axis.XP.rotationDegrees(35));g.pose().mulPose(com.mojang.math.Axis.YP.rotationDegrees(-45));g.pose().translate(-40,0,-40);
-            var arena=new net.muxigame.core.feature.challenge.ChallengeArena(0);
+            var arena=new net.muxigame.zombie.challenge.ChallengeArena(0);
             for(int y=0;y<9;y++)for(int z=0;z<80;z++)for(int x=0;x<80;x++){
                 var state=arena.block(x,y+floor*10,z);if(state.isAir())continue;
                 g.pose().pushPose();g.pose().translate(x,y,z);

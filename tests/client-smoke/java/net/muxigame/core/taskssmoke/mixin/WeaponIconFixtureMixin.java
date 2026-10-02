@@ -1,6 +1,6 @@
 package net.muxigame.core.taskssmoke.mixin;
 
-import net.muxigame.core.client.challenge.ChallengeClient;
+import net.muxigame.zombie.client.ChallengeClient;
 import net.minecraft.world.item.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;

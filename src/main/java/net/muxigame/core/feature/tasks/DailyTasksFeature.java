@@ -135,7 +135,7 @@ public final class DailyTasksFeature implements ServerFeature {
     }
     /** Shooting tasks never encourage farming players, pets or passive creatures. */
     public boolean acceptsCombat(ServerPlayer player,LivingEntity target) {
-        return !net.muxigame.core.feature.challenge.ChallengeFeature.dimension(target.level())
+        return !net.muxigame.minigames.GameAreas.contains(target.level())
             && enabled() && player.server==server && !(player instanceof FakePlayer) && !player.isSpectator()
             && !target.level().isClientSide() && !(target instanceof Player)
             && !(target instanceof net.minecraft.world.entity.TamableAnimal pet && pet.isTame())

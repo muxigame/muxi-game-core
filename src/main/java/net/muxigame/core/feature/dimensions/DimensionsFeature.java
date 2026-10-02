@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.muxigame.core.feature.ServerFeature;
-import net.muxigame.core.feature.challenge.ChallengeFeature;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -122,10 +121,8 @@ public final class DimensionsFeature implements ServerFeature {
         if (!WorldDimensions.ALL.contains(destination)) return reject(player, "未知的目标维度");
         if (!player.isAlive() || player.isSleeping() || player.isPassenger() || player.isVehicle())
             return reject(player, "请先起床或离开坐骑，再切换维度");
-        var challenge = ChallengeFeature.active(player.server);
-        if (ChallengeFeature.locked(player) || ChallengeFeature.dimension(player.level())
-            || (challenge != null && challenge.room(player.getUUID()) != null))
-            return reject(player, "请先离开挑战房间，再切换维度");
+        if (net.muxigame.minigames.GameRuntime.blocksWorldTravel(player))
+            return reject(player, "请先离开小游戏房间，再切换维度");
         if (player.containerMenu != player.inventoryMenu || !player.containerMenu.getCarried().isEmpty())
             return reject(player, "请先关闭容器并放下鼠标上的物品");
         if (player.level().dimension().equals(destination.key())) return reject(player, "你已在" + destination.name());

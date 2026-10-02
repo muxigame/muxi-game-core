@@ -20,6 +20,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import build as core_build
+from integrated_fixture import install as install_integrated_fixture
 
 
 def run() -> None:
@@ -59,6 +60,12 @@ def run() -> None:
     lab.mkdir(parents=True, exist_ok=False)
     (lab / 'mods').mkdir(); (lab / 'config').mkdir()
     shutil.copy2(core, lab / 'mods' / core.name)
+    minigame_jars=[]
+    for module in (('muxi-minigames','muxi-zombie-challenge') if args.challenge else ('muxi-minigames',)):
+        meta=json.loads((ROOT.parent/module/'build/release.json').read_text(encoding='utf-8'))
+        jar=ROOT.parent/module/'build/libs'/meta['artifact']
+        minigame_jars.append(jar);shutil.copy2(jar,lab/'mods'/jar.name)
+
     omitted=[]
     if args.full_pack:
         for mod in (server/'mods').glob('*.jar'):
@@ -68,6 +75,12 @@ def run() -> None:
             shutil.copy2(mod,lab/'mods'/mod.name)
         if args.without_c2me and not omitted: raise SystemExit('No source C2ME jar found; cannot establish the requested removal baseline')
     dependencies=[]
+    # Waystones is a required Core 1.12+ dependency in every minimal server fixture.
+    if not args.full_pack:
+        for pattern in ('waystones-neoforge*.jar', 'balm-neoforge*.jar'):
+            matches=list((server/'mods').glob(pattern))
+            if len(matches)!=1: raise SystemExit('Ambiguous required test dependency '+pattern)
+            dependencies.append(matches[0]);shutil.copy2(matches[0],lab/'mods'/matches[0].name)
     if args.portals:
         twilight=next((server/'mods').glob('twilightforest-*.jar'))
         dependencies.append(twilight);shutil.copy2(twilight,lab/'mods'/twilight.name)
@@ -80,6 +93,7 @@ def run() -> None:
             if len(found)!=1: raise SystemExit(f'Expected one existing integration dependency: {pattern}')
             dependencies.append(found[0]); shutil.copy2(found[0],lab/'mods'/found[0].name)
     (lab / 'config/muxi-game-core.json').write_text('{"schema":1,"features":{}}', encoding='utf-8')
+    dependencies.extend(install_integrated_fixture(lab, ROOT))
     (lab / 'config/neoforge-server.toml').write_text('advertiseDedicatedServerToLan = false\n', encoding='utf-8')
     (lab / 'config/fml.toml').write_text('versionCheck = false\n', encoding='utf-8')
     if args.travel:
@@ -127,9 +141,9 @@ def run() -> None:
     mapped = next(p for p in jars if p.name == 'server-1.21.1-20240808.144430-srg.jar')
     nested=lab/'compile-nested'; nested.mkdir()
     extra=[p for jar in dependencies for p in core_build.nested_jars(jar,nested)]
-    cp = os.pathsep.join(str(p) for p in [core, neo, mapped, *jars, *dependencies, *extra])
+    cp = os.pathsep.join(str(p) for p in [core, *minigame_jars, neo, mapped, *jars, *dependencies, *extra])
     classes = lab / 'test-classes'
-    sources='tests/portals-smoke/java' if args.portals else 'tests/dimensions-smoke/java' if args.dimensions else 'tests/challenge-smoke/java' if args.challenge else 'tests/extended-smoke/java' if args.extended else 'tests/integration-smoke/java' if args.integrations else 'tests/smoke/java'
+    sources='tests/portals-smoke/java' if args.portals else 'tests/dimensions-smoke/java' if args.dimensions else '../muxi-zombie-challenge/tests/challenge-smoke/java' if args.challenge else 'tests/extended-smoke/java' if args.extended else 'tests/integration-smoke/java' if args.integrations else 'tests/smoke/java'
     if args.worldgen_audit: sources='tests/worldgen-audit/java'
     if args.travel: sources='tests/travel-smoke/java'
     core_build.compile_java(compiler, sorted((ROOT / sources).rglob('*.java')) + sorted((ROOT / 'tests/smoke-common/java').rglob('*.java')), classes, cp, lab / 'compile.args')

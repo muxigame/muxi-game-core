@@ -35,10 +35,10 @@ public final class MuxiGameCore {
         TaskNetwork.register(modBus);
         net.muxigame.core.feature.login.TerminalPassportNetwork.register(modBus);
         WaystoneMapNetwork.register(modBus);
-        net.muxigame.core.feature.challenge.ChallengeNetwork.register(modBus);
         CoreConfig config = CoreConfig.load(Path.of(CoreConfig.FILE));
         // 先注册进服核验：它是这台服务器唯一的身份关口，出问题要第一时间在日志里看见。
         if (config.login().enabled()) register(new LoginGate(config.login()));
+        if (config.terminalSso().enabled()) register(new net.muxigame.core.feature.login.TerminalPassportFeature(config.terminalSso()));
         if (config.identity().enabled()) {
             if (!ModList.get().isLoaded("simplenicknames"))
                 throw new IllegalStateException("Game Core identity is enabled but Simple Nicknames 0.8.x is not installed.");
@@ -49,10 +49,10 @@ public final class MuxiGameCore {
         // 普通聊天按 Tab 也能补在线玩家的昵称（原版只补 UID）；只发原版的补全包，不需要配置。
         if (ModList.get().isLoaded("simplenicknames")) register(new ChatCompletionFeature());
         register(new net.muxigame.core.feature.rules.CreeperTerrainProtection());
+        register(new net.muxigame.core.feature.spawning.HomeSpawningFeature());
         register(new net.muxigame.core.feature.teleport.TpaFeature());
         register(new DailyTasksFeature());
         register(new net.muxigame.core.feature.dimensions.DimensionsFeature());
-        register(new net.muxigame.core.feature.challenge.ChallengeFeature());
         NeoForge.EVENT_BUS.addListener(this::onStopped);
         LOG.info("muxi Game Core loaded; enabled features: {}", features.stream().map(ServerFeature::id).toList());
     }

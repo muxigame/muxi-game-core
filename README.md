@@ -1,19 +1,27 @@
+> 小游戏拆分迁移：僵尸枪战已迁出本模组，由独立 `muxi_zombie_challenge` 注册；Core 仅提供既有可信账号证明和通用参与状态查询。旧挑战章节属于历史资料，现行安装与回归说明见 `../muxi-minigames/docs/migration.md`。运行必须配套新版 `muxi_minigames`；禁止与旧 Core 混用。
+
 # muxi Game Core
 
-## Terminal platform SSO (isolated implementation)
+## Dedicated terminal SSO authority
 
-The optional passport channel requires LoginGate admission on the exact transport
-connection, plus an independently authenticated launcher/native PKCE proof. The
-client never supplies the authoritative UID, platform role or return target.
-Admission evidence is monotonic, connection-bound and consumed once; logout and
-server stop clear it. Passport requests are rate-limited per admitted connection,
-and asynchronous replies are discarded after disconnect/reconnect.
+`features.terminalSso` is independent of `features.login` and `features.opSync`.
+Its endpoint is `https://account.muxigame.com/api/internal/minecraft/`; its key
+must be the dedicated Auth `MUXI_TERMINAL_SSO_SERVER_KEY`, distinct from identity,
+login, OP and social keys. It defaults off. No existing production key or gate is
+changed by this source patch.
 
-The native PKCE verifier and restricted launcher credential do not traverse the
-game connection. Only short single-use proof/ticket values do. Missing auth/Core
-support falls back to normal platform login. The feature does not change OP,
-platform admin, game bans, task state or gameplay permissions. Rollout requires
-updated launcher/client/server code and separately enabled auth/platform gates.
+Only a matching issuer-verified UID/requestId/gameSession, valid 30-second ticket
+and the exact current online listener can call `TrustedAccounts.admitTerminal`.
+The callback runs on the server thread and rejects elapsed requests at/after 30
+seconds. `socialUid` is social-only; `uid` retains join-admission-only semantics.
+Logout/stop revoke that connection's trust and pending issuer tickets. A late
+reply or old logout cannot bind/revoke a replacement connection.
+
+Build/deploy the matching task2 framework exposing `admitTerminal`, `socialUid`
+and connection-conditional `revoke` before enabling this Core. A missing new API
+fails the account handoff closed; do not mix candidate versions. Tests are in
+`tests/run_terminal_sso_trust.py` (actual Core/trust source with explicit listener
+fixtures). Production Minecraft/MCEF player acceptance is a separate gate.
 
 muxigame 整合包的**功能集成模组**：服务端功能（登录核验、昵称同步、玩法规则），以及客户端的显示兼容（到处显示昵称而不是 UID）。
 

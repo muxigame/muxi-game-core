@@ -66,7 +66,6 @@ public final class LoginGate implements ServerFeature {
 
     public LoginGate(CoreConfig.Login config) {
         this.config = config;
-        TerminalPassportServer.configure(config);
         http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(4))
             .followRedirects(HttpClient.Redirect.NEVER).build();
     }
@@ -162,7 +161,7 @@ public final class LoginGate implements ServerFeature {
     private void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || player instanceof FakePlayer) return;
         if (!stopped && admitted.consume(player.connection.getConnection())) {
-            TerminalPassportServer.admit(player);
+            net.muxigame.minigames.TrustedAccounts.admit(player);
             return;
         }
         LOG.warn("UID {} reached login without a verified join grant; disconnecting late",
@@ -173,7 +172,7 @@ public final class LoginGate implements ServerFeature {
     private void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         if(event.getEntity() instanceof ServerPlayer player && !(player instanceof FakePlayer) && player.connection!=null){
             admitted.discard(player.connection.getConnection());
-            TerminalPassportServer.disconnect(player);
+            net.muxigame.minigames.TrustedAccounts.revoke(player);
         }
     }
 
@@ -187,6 +186,5 @@ public final class LoginGate implements ServerFeature {
         stopped = true;
         http.shutdownNow();
         admitted.clear();
-        TerminalPassportServer.close();
     }
 }
