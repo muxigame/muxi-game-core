@@ -1,0 +1,120 @@
+diff --git a/src/main/java/net/muxigame/core/feature/dimensions/PortalLinks.java b/src/main/java/net/muxigame/core/feature/dimensions/PortalLinks.java
+index f41f0be..b5cff56 100644
+--- a/src/main/java/net/muxigame/core/feature/dimensions/PortalLinks.java
++++ b/src/main/java/net/muxigame/core/feature/dimensions/PortalLinks.java
+@@ -18,5 +18,12 @@ public final class PortalLinks extends SavedData {
+     public void pair(String first,CompoundTag firstEndpoint,String second,CompoundTag secondEndpoint) {
+         links.put(first,secondEndpoint);links.put(second,firstEndpoint);setDirty();
+     }
++    /** Detach only reciprocal obsolete links; unrelated gates and their terrain stay untouched. */
++    public void pairReplacing(String first,CompoundTag firstEndpoint,String second,CompoundTag secondEndpoint,
++                              String previousFirstTarget,String previousSecondTarget) {
++        if(previousFirstTarget!=null&&endpoint(previousFirstTarget).equals(firstEndpoint))links.remove(previousFirstTarget);
++        if(previousSecondTarget!=null&&endpoint(previousSecondTarget).equals(secondEndpoint))links.remove(previousSecondTarget);
++        pair(first,firstEndpoint,second,secondEndpoint);
++    }
+     @Override public CompoundTag save(CompoundTag tag,HolderLookup.Provider registries) { tag.put("links",links);return tag; }
+ }
+diff --git a/src/main/java/net/muxigame/core/feature/dimensions/WorldPortals.java b/src/main/java/net/muxigame/core/feature/dimensions/WorldPortals.java
+index e150fa9..6b0d51a 100644
+--- a/src/main/java/net/muxigame/core/feature/dimensions/WorldPortals.java
++++ b/src/main/java/net/muxigame/core/feature/dimensions/WorldPortals.java
+@@ -109,6 +109,19 @@ public final class WorldPortals {
+         ServerLevel target=source.getServer().getLevel(WorldDimensions.ALL.get(portal.destination()).key());
+         if(target==null)return null;
+         PortalLinks links=PortalLinks.get(source.getServer());
++        boolean exactPair=(sourceIndex==0&&portal.destination()==1)||(sourceIndex==1&&portal.destination()==0);
++        if(exactPair) {
++            Frame to=buildExactExit(target,player,from,sourceIndex);
++            if(to==null) {
++                message(player,"同坐标门无法建立：门体或出入口越界、受保护，或含方块实体/不可破坏障碍；未迁移门的位置");
++                return null;
++            }
++            // Old surface/nearby links are replaced only after the exact placement succeeds.
++            CompoundTag oldTo=links.endpoint(from.key(source)),oldFrom=links.endpoint(to.key(target));
++            links.pairReplacing(from.key(source),from.tag(),to.key(target),to.tag(),
++                endpointKey(target,oldTo),endpointKey(source,oldFrom));
++            return arrival(target,player,player.position());
++        }
+         CompoundTag tag=links.endpoint(from.key(source));
+         Frame to=null;
+         if(tag.contains("pos")) {
+@@ -122,12 +135,77 @@ public final class WorldPortals {
+         }
+         // Arrival inside the paired gate is safe. Vanilla's portal cooldown prevents immediate bounce-back.
+         BlockPos landing=to.at(1,1);
+-        return new DimensionTransition(target,Vec3.atBottomCenterOf(landing),Vec3.ZERO,player.getYRot(),player.getXRot(),
++        return arrival(target,player,Vec3.atBottomCenterOf(landing));
++    }
++    private static DimensionTransition arrival(ServerLevel target,ServerPlayer player,Vec3 position) {
++        return new DimensionTransition(target,position,Vec3.ZERO,player.getYRot(),player.getXRot(),
+             DimensionTransition.PLAY_PORTAL_SOUND.then(DimensionTransition.PLACE_PORTAL_TICKET).then(arrived->{
+                 arrived.setPortalCooldown(40);
+                 if(arrived instanceof ServerPlayer p)message(p,"已抵达"+WorldDimensions.name(target.dimension()));
+             }));
+     }
++    private static String endpointKey(ServerLevel level,CompoundTag endpoint) {
++        if(!endpoint.contains("pos"))return null;
++        return new Frame(BlockPos.of(endpoint.getLong("pos")),
++            endpoint.getString("axis").equals("x")?Direction.Axis.X:Direction.Axis.Z,0).key(level);
++    }
++    /** Home/survival gates keep the exact XYZ anchor, axis and player fractional position. */
++    private static Frame buildExactExit(ServerLevel level,ServerPlayer player,Frame from,int destination) {
++        Frame frame=new Frame(from.origin,from.axis,destination);
++        for(int w=0;w<4;w++)for(int h=0;h<5;h++)
++            if(level.isOutsideBuildHeight(frame.at(w,h))||!level.getWorldBorder().isWithinBounds(frame.at(w,h)))return null;
++        for(int w=1;w<=2;w++)for(int d:List.of(-1,1))for(int h=0;h<=3;h++)
++            if(level.isOutsideBuildHeight(frame.normal(w,h,d))||!level.getWorldBorder().isWithinBounds(frame.normal(w,h,d)))return null;
++        Map<BlockPos,BlockState> changes=new LinkedHashMap<>();
++        boolean existing=valid(level,frame,true);
++        for(int w=0;w<4;w++)for(int h=0;h<5;h++) {
++            boolean border=w==0||w==3||h==0||h==4;
++            changes.put(frame.at(w,h),existing&&border?level.getBlockState(frame.at(w,h)):
++                border?Blocks.COBBLESTONE.defaultBlockState():block(destination).defaultBlockState().setValue(NetherPortalBlock.AXIS,frame.axis));
++        }
++        // Only the two portal columns and one block immediately in front/behind.
++        for(int w=1;w<=2;w++)for(int d:List.of(-1,1)) {
++            BlockPos floor=frame.normal(w,0,d);
++            BlockState state=level.getBlockState(floor);
++            if(!state.isCollisionShapeFullBlock(level,floor)||state.is(Blocks.MAGMA_BLOCK))
++                changes.put(floor,Blocks.STONE_BRICKS.defaultBlockState());
++            for(int h=1;h<=3;h++)changes.put(frame.normal(w,h,d),Blocks.AIR.defaultBlockState());
++        }
++        changes.entrySet().removeIf(entry->level.getBlockState(entry.getKey()).equals(entry.getValue()));
++        for(var entry:changes.entrySet()) {
++            BlockPos pos=entry.getKey();BlockState state=level.getBlockState(pos);
++            if(level.isOutsideBuildHeight(pos)||!level.getWorldBorder().isWithinBounds(pos)
++                ||(state.getDestroySpeed(level,pos)<0&&!state.is(HOME.get())&&!state.is(OVERWORLD.get()))
++                ||level.getBlockEntity(pos)!=null)return null;
++        }
++        if(!placeExact(level,player,changes))return null;
++        return frame;
++    }
++    private static boolean placeExact(ServerLevel level,ServerPlayer player,Map<BlockPos,BlockState> changes) {
++        List<BlockSnapshot> snapshots=new ArrayList<>();
++        for(var entry:changes.entrySet()) {
++            if(!level.mayInteract(player,entry.getKey()))return false;
++            snapshots.add(BlockSnapshot.create(level.dimension(),level,entry.getKey()));
++        }
++        boolean failed=false;
++        try {
++            for(var entry:changes.entrySet()) {
++                level.setBlock(entry.getKey(),entry.getValue(),18);
++                if(!level.getBlockState(entry.getKey()).equals(entry.getValue())) {failed=true;break;}
++            }
++            if(!failed&&( !level.noCollision(player,player.getBoundingBox())
++                ||(!snapshots.isEmpty()&&EventHooks.onMultiBlockPlace(player,snapshots,Direction.UP))))failed=true;
++        } catch(RuntimeException error) {
++            for(int i=snapshots.size()-1;i>=0;i--)snapshots.get(i).restore(18);
++            throw error;
++        }
++        if(failed) {
++            for(int i=snapshots.size()-1;i>=0;i--)snapshots.get(i).restore(18);
++            return false;
++        }
++        for(var entry:changes.entrySet())level.updateNeighborsAt(entry.getKey(),entry.getValue().getBlock());
++        return true;
++    }
+     private static Frame buildExit(ServerLevel level,ServerPlayer player,BlockPos center,int destination) {
+         for(int radius=0;radius<=32;radius+=8)for(int dx=-radius;dx<=radius;dx+=8)for(int dz=-radius;dz<=radius;dz+=8) {
+             if(Math.max(Math.abs(dx),Math.abs(dz))!=radius)continue;

@@ -38,6 +38,7 @@ def run() -> None:
     parser.add_argument('--vanilla-bg-threads',type=int,help='Diagnostic vanilla background pool limit (1..255), only with --without-c2me')
     parser.add_argument('--threaded',action='store_true',help='Enable the experimental native dimension runtime only in this lab')
     parser.add_argument('--java-home', type=Path, help='Use an existing local JDK 21+')
+    parser.add_argument('--runtime-java-home', type=Path, help='Optional separate runtime JDK 21+')
     parser.add_argument('--full-pack', action='store_true', help='Use locally installed server mods, with fresh offline configs, for dimension compatibility tests')
     parser.add_argument('--portals', action='store_true', help='Exercise built gates and adventure restrictions with the real Twilight Forest mod')
     args = parser.parse_args()
@@ -70,7 +71,7 @@ def run() -> None:
     dependencies=[]
     # Waystones is a required Core 1.12+ dependency in every minimal server fixture.
     if not args.full_pack:
-        for pattern in ('waystones-neoforge*.jar', 'balm-neoforge*.jar'):
+        for pattern in ('waystones-neoforge*.jar', 'balm-neoforge*.jar', 'muxi-minigames-*.jar'):
             matches=list((server/'mods').glob(pattern))
             if len(matches)!=1: raise SystemExit('Ambiguous required test dependency '+pattern)
             dependencies.append(matches[0]);shutil.copy2(matches[0],lab/'mods'/matches[0].name)
@@ -127,7 +128,9 @@ def run() -> None:
         (lab/'server.properties').write_text(f'server-ip=127.0.0.1\nonline-mode=false\nlevel-name=qa-world\nlevel-seed={args.seed}\nlevel-type=minecraft:normal\nview-distance=2\nsimulation-distance=2\nenable-rcon=false\nenable-query=false\nmax-tick-time=-1\n',encoding='utf-8')
     compiler, runtime = core_build.java_tools(args.java_home)
     java21 = ROOT.parent / 'perf-lab/java21/jdk-21.0.2/bin/java.exe'
-    if java21.is_file(): runtime = java21
+    if java21.is_file() and args.java_home is None: runtime = java21
+    if args.runtime_java_home is not None:
+        _, runtime = core_build.java_tools(args.runtime_java_home)
     jars = sorted((server / 'libraries').rglob('*.jar'))
     neo = server / 'libraries/net/neoforged/neoforge/21.1.250/neoforge-21.1.250-server.jar'
     mapped = next(p for p in jars if p.name == 'server-1.21.1-20240808.144430-srg.jar')
@@ -154,11 +157,19 @@ def run() -> None:
     launch = shlex.split((server / 'libraries/net/neoforged/neoforge/21.1.250/win_args.txt').read_text(encoding='utf-8'))
     libraries = (server / 'libraries').as_posix()
     launch = [s.replace('libraries/', libraries + '/').replace('-DlibraryDirectory=libraries', '-DlibraryDirectory=' + libraries) for s in launch]
-    command = [str(runtime), '-Xms512M', '-Xmx6G' if args.full_pack else '-Xmx2G', '-XX:ActiveProcessorCount=4', '-Dfile.encoding=UTF-8', *launch, '--nogui']
+    command = [str(runtime), '-Xms512M', '-Xmx6G' if args.full_pack else '-Xmx2G', '-XX:ActiveProcessorCount=2', '-Dfile.encoding=UTF-8', *launch, '--nogui']
+    # Windows AF_UNIX cannot connect in this execution environment. An absent
+    # socket directory makes JDK PipeImpl fall back to its TCP loopback pipe.
+    # This changes only the disposable JVM and requires no network service.
+    if os.name == 'nt':
+        socket_dir = lab / 'absent-unix-socket-dir'
+        assert not socket_dir.exists()
+        command.insert(1, '-Djdk.net.unixdomain.tmpdir=' + str(socket_dir))
     if args.vanilla_bg_threads is not None: command.insert(1,f'-Dmax.bg.threads={args.vanilla_bg_threads}')
     if args.threaded: command.insert(1,'-Dmuxi.dimensionThreads=true')
     with (lab / 'boot.log').open('w', encoding='utf-8') as log:
-        process = subprocess.Popen(command, cwd=lab, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT)
+        process = subprocess.Popen(command, cwd=lab, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT,
+                                   creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
         stopped_background=False
         try:
             timeout=900 if args.worldgen_audit else 360 if args.full_pack else 180
@@ -183,6 +194,7 @@ def run() -> None:
     result['exitCode'] = code; result['lab'] = str(lab)
     result['terminatedBackgroundThreadsAfterServerStopped']=stopped_background
     result['environment']={'coreArtifact':core.name,'coreSha256':hashlib.sha256((lab/'mods'/core.name).read_bytes()).hexdigest(),
+        'runtimeJava':str(runtime), 'compilerJava':str(compiler),
         'omittedMods':omitted,'serialC2meProfile':args.serial_worldgen,'vanillaBackgroundThreads':args.vanilla_bg_threads,'dimensionThreads':args.threaded}
     result_file.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps(result, ensure_ascii=False, indent=2))

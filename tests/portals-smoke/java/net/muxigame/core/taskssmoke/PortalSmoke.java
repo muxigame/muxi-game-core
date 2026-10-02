@@ -58,6 +58,8 @@ public final class PortalSmoke {
         ServerLevel home=player.serverLevel();var gate=new WorldPortals.Frame(new BlockPos(destination*24,179,0),Direction.Axis.X,destination);
         frame(home,gate,material);ignite(player,gate);
         check("physical gate ignites "+destination,WorldPortals.valid(home,gate,true));
+        Vec3 originalPosition=new Vec3(gate.origin().getX()+1.75,gate.origin().getY()+1.25,gate.origin().getZ()+0.5);
+        player.setPos(originalPosition);
         if(material==Blocks.GRASS_BLOCK) {
             home.setBlockAndUpdate(gate.at(0,2),Blocks.DIRT.defaultBlockState());
             check("grass becoming dirt preserves active gate",WorldPortals.valid(home,gate,true));
@@ -70,7 +72,7 @@ public final class PortalSmoke {
         var returnBlock=target.getBlockState(player.blockPosition()).getBlock();
         check("automatic return gate exists "+destination,returnBlock==WorldPortals.HOME.get());
         var reverse=WorldPortals.HOME.get().getPortalDestination(target,player,player.blockPosition());
-        check("paired gate points to original home "+destination,reverse!=null&&reverse.newLevel()==home&&reverse.pos().distanceTo(Vec3.atBottomCenterOf(gate.at(1,1)))<0.01);
+        check("paired gate points to original home "+destination,reverse!=null&&reverse.newLevel()==home&&reverse.pos().distanceTo(originalPosition)<0.01);
         player.changeDimension(reverse);
         check("physical roundtrip completed "+destination,player.level()==home);
         var link=PortalLinks.get(player.server).endpoint(gate.key(home));
@@ -80,6 +82,7 @@ public final class PortalSmoke {
     }
     private void exercise(MinecraftServer server) throws Exception {
         var p=player(server);
+        exactCoordinates(server,p);
         try {server.getCommands().getDispatcher().execute("muxiworld overworld",p.createCommandSourceStack().withPermission(0));throw new AssertionError("Players must use gates");}
         catch(com.mojang.brigadier.exceptions.CommandSyntaxException expected){passed.add("ordinary players cannot bypass gates with debug command");}
         for(Block material:List.of(Blocks.GRASS_BLOCK,Blocks.DIRT,Blocks.STONE,Blocks.COBBLESTONE,Blocks.QUARTZ_BLOCK)) {
@@ -123,6 +126,7 @@ public final class PortalSmoke {
             frame(level,newReturn,Blocks.QUARTZ_BLOCK);
             p.getInventory().setItem(0,new ItemStack(Items.FLINT_AND_STEEL));ignite(p,newReturn);
             check("new quartz return frame ignites on Z axis",WorldPortals.valid(level,newReturn,true));
+            p.setPos(96.5,180,1.5);
             var newReturnTrip=WorldPortals.HOME.get().getPortalDestination(level,p,newReturn.at(1,1));
             check("new survival-built gate resolves home",newReturnTrip!=null&&newReturnTrip.newLevel()==server.overworld());
             p.changeDimension(newReturnTrip);
@@ -137,8 +141,99 @@ public final class PortalSmoke {
         server.saveEverything(false,true,true);
         check("portal pairs saved on disk",Files.isRegularFile(server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("data/muxi_world_portals.dat")));
     }
+    private void active(ServerLevel level,WorldPortals.Frame gate,Block material) {
+        frame(level,gate,material);
+        for(int w=1;w<=2;w++)for(int h=1;h<=3;h++)level.setBlock(gate.at(w,h),
+            WorldPortals.block(gate.destination()).defaultBlockState().setValue(NetherPortalBlock.AXIS,gate.axis()),18);
+    }
+    private Map<BlockPos,net.minecraft.world.level.block.state.BlockState> footprint(ServerLevel level,WorldPortals.Frame gate) {
+        Map<BlockPos,net.minecraft.world.level.block.state.BlockState> result=new LinkedHashMap<>();
+        for(int w=0;w<4;w++)for(int h=0;h<5;h++)result.put(gate.at(w,h),level.getBlockState(gate.at(w,h)));
+        for(int w=1;w<=2;w++)for(int d:List.of(-1,1))for(int h=0;h<=3;h++)result.put(gate.normal(w,h,d),level.getBlockState(gate.normal(w,h,d)));
+        return result;
+    }
+    private void prepare(ServerPlayer p,ServerLevel home,WorldPortals.Frame gate) {
+        p.teleportTo(home,gate.origin().getX()+1.5,gate.origin().getY()+1,gate.origin().getZ()+0.5,0,0);
+        p.getInventory().setItem(0,new ItemStack(Items.FLINT_AND_STEEL));active(home,gate,Blocks.STONE);
+        if(gate.axis()==Direction.Axis.Z)p.setPos(gate.origin().getX()+0.45,gate.origin().getY()+1.25,gate.origin().getZ()+1.75);
+        else p.setPos(gate.origin().getX()+1.75,gate.origin().getY()+1.25,gate.origin().getZ()+0.45);
+    }
+    private void exactCoordinates(MinecraftServer server,ServerPlayer p) throws Exception {
+        ServerLevel home=server.overworld(),target=server.getLevel(WorldDimensions.OVERWORLD);
+        var from=new WorldPortals.Frame(new BlockPos(220,179,64),Direction.Axis.X,1);
+        prepare(p,home,from);Vec3 start=p.position();
+        for(var pos:footprint(target,from).keySet())target.setBlock(pos,Blocks.STONE.defaultBlockState(),18);
+        var sentinel=from.normal(-1,2,1);target.setBlock(sentinel,Blocks.DIAMOND_BLOCK.defaultBlockState(),18);
+        var nearby=new WorldPortals.Frame(from.origin().offset(8,7,0),Direction.Axis.X,0);active(target,nearby,Blocks.QUARTZ_BLOCK);
+        var beforeNearby=footprint(target,nearby);
+        var links=PortalLinks.get(server);links.pair(from.key(home),from.tag(),nearby.key(target),nearby.tag());
+        var trip=WorldPortals.OVERWORLD.get().getPortalDestination(home,p,from.at(1,1));
+        check("obstructed target stays exact XYZ",trip!=null&&trip.pos().equals(start));
+        var endpoint=links.endpoint(from.key(home));
+        check("old shifted pair replaced by exact XYZ",BlockPos.of(endpoint.getLong("pos")).equals(from.origin()));
+        check("nearby existing portal terrain preserved",beforeNearby.equals(footprint(target,nearby)));
+        check("obsolete reciprocal link detached",links.endpoint(nearby.key(target)).isEmpty());
+        check("outside minimal footprint unchanged",target.getBlockState(sentinel).is(Blocks.DIAMOND_BLOCK));
+        check("exact passage only needs 36 blocks",footprint(target,from).size()==36);
+        check("minimal entry obstacle cleared",target.isEmptyBlock(from.normal(1,1,-1)));
+        p.changeDimension(trip);
+        check("fractional player position survives forward trip",p.position().distanceTo(start)<1e-9);
+        var back=WorldPortals.HOME.get().getPortalDestination(target,p,from.at(1,1));
+        check("exact paired reverse position",back!=null&&back.newLevel()==home&&back.pos().equals(start));
+        p.changeDimension(back);
+        check("fractional XYZ roundtrip",p.position().distanceTo(start)<1e-9&&p.level()==home);
+
+        var zgate=new WorldPortals.Frame(new BlockPos(240,100,80),Direction.Axis.Z,1);prepare(p,home,zgate);start=p.position();
+        trip=WorldPortals.OVERWORLD.get().getPortalDestination(home,p,zgate.at(1,1));
+        check("Z axis exact player coordinates",trip!=null&&trip.pos().equals(start));
+        check("Z axis target frame orientation preserved",target.getBlockState(zgate.at(1,1)).getValue(NetherPortalBlock.AXIS)==Direction.Axis.Z);
+
+        var blocked=new WorldPortals.Frame(new BlockPos(280,179,80),Direction.Axis.X,1);prepare(p,home,blocked);
+        for(var pos:footprint(target,blocked).keySet())target.setBlock(pos,Blocks.STONE.defaultBlockState(),18);
+        var original=footprint(target,blocked);veto=true;
+        try {check("protection cancels exact portal",WorldPortals.OVERWORLD.get().getPortalDestination(home,p,blocked.at(1,1))==null);}
+        finally {veto=false;}
+        check("protected terrain rolled back completely",original.equals(footprint(target,blocked)));
+        check("protected failure does not create link",links.endpoint(blocked.key(home)).isEmpty());
+
+        var container=new WorldPortals.Frame(new BlockPos(300,179,80),Direction.Axis.X,1);prepare(p,home,container);
+        var chest=container.normal(1,1,-1);target.setBlock(chest,Blocks.CHEST.defaultBlockState(),18);
+        var chestEntity=(net.minecraft.world.level.block.entity.ChestBlockEntity)target.getBlockEntity(chest);
+        chestEntity.setItem(0,new ItemStack(Items.DIAMOND,7));original=footprint(target,container);
+        check("container obstruction fails without relocation",WorldPortals.OVERWORLD.get().getPortalDestination(home,p,container.at(1,1))==null);
+        check("obstructing container and inventory preserved",original.equals(footprint(target,container))&&chestEntity.getItem(0).getCount()==7);
+
+        var bedrock=new WorldPortals.Frame(new BlockPos(320,179,80),Direction.Axis.X,1);prepare(p,home,bedrock);
+        target.setBlock(bedrock.at(1,1),Blocks.BEDROCK.defaultBlockState(),18);original=footprint(target,bedrock);
+        check("unbreakable obstacle explicitly fails",WorldPortals.OVERWORLD.get().getPortalDestination(home,p,bedrock.at(1,1))==null);
+        check("unbreakable failure has no partial writes",original.equals(footprint(target,bedrock)));
+
+        var exact=WorldPortals.class.getDeclaredMethod("buildExactExit",ServerLevel.class,ServerPlayer.class,WorldPortals.Frame.class,int.class);exact.setAccessible(true);
+        for(int y:List.of(target.getMinBuildHeight(),target.getMaxBuildHeight()-5)) {
+            var edge=new WorldPortals.Frame(new BlockPos(360,y,96),Direction.Axis.X,1);prepare(p,home,edge);
+            for(var pos:footprint(target,edge).keySet())target.setBlock(pos,Blocks.AIR.defaultBlockState(),18);
+            var result=(WorldPortals.Frame)exact.invoke(null,target,p,edge,0);
+            check("legal height boundary preserves Y "+y,result!=null&&result.origin().equals(edge.origin()));
+        }
+        for(int y:List.of(target.getMinBuildHeight()-1,target.getMaxBuildHeight()-4)) {
+            var edge=new WorldPortals.Frame(new BlockPos(380,y,96),Direction.Axis.X,1);original=footprint(target,edge);
+            check("illegal height fails instead of surface search "+y,exact.invoke(null,target,p,edge,0)==null);
+            check("height failure has no writes "+y,original.equals(footprint(target,edge)));
+        }
+        var borderGate=new WorldPortals.Frame(new BlockPos(400,179,80),Direction.Axis.X,1);prepare(p,home,borderGate);
+        var border=target.getWorldBorder();double oldSize=border.getSize();original=footprint(target,borderGate);
+        try {border.setSize(32);check("border fails without choosing a nearby gate",exact.invoke(null,target,p,borderGate,0)==null);}
+        finally {border.setSize(oldSize);}
+        check("border failure has no writes",original.equals(footprint(target,borderGate)));
+        p.teleportTo(home,0.5,180,2.5,0,0);
+    }
     private void homeAdventurePortals(MinecraftServer server,ServerPlayer p,java.lang.reflect.Method tfCheck) throws Exception {
         var home=server.overworld();
+        var netherLevel=server.getLevel(Level.NETHER);
+        check("vanilla home to Nether coordinate scale remains 1:8",
+            net.minecraft.world.level.dimension.DimensionType.getTeleportationScale(home.dimensionType(),netherLevel.dimensionType())==0.125);
+        check("vanilla Nether to home coordinate scale remains 8:1",
+            net.minecraft.world.level.dimension.DimensionType.getTeleportationScale(netherLevel.dimensionType(),home.dimensionType())==8.0);
         var netherFrame=new WorldPortals.Frame(new BlockPos(120,179,0),Direction.Axis.X,1);
         frame(home,netherFrame,Blocks.OBSIDIAN);
         home.setBlockAndUpdate(netherFrame.at(1,1),Blocks.FIRE.defaultBlockState());

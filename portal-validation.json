@@ -1,0 +1,35 @@
+{
+  "utc": "2026-10-01T16:26:54.629730+00:00",
+  "production_unchanged": true,
+  "production_sha256": "56cdb297d0a0de3f6bc745fcc94914bb90dd4f06e078b2c15fd40b010eb9f59d",
+  "candidate_sha256": "3625c34e1bab0caebe507d0f136ebcfd858e0efb5aafed907b251189667cae14",
+  "changed_jar_members": [
+    "net/muxigame/core/feature/dimensions/PortalLinks.class",
+    "net/muxigame/core/feature/dimensions/WorldPortals.class"
+  ],
+  "other_members_byte_identical": true,
+  "class_major_version": 65,
+  "isolated_test_runs": [
+    {
+      "lab": "C:\\Users\\Administrator\\Documents\\Codex\\2026-10-01\\task-23\\portal-exact-core\\build\\tasks-smoke-20261001-092259-839450",
+      "success": true,
+      "checks": 121,
+      "exit_code": 0,
+      "java_runtime": "JDK 24",
+      "candidate_sha256": "3625c34e1bab0caebe507d0f136ebcfd858e0efb5aafed907b251189667cae14"
+    },
+    {
+      "lab": "C:\\Users\\Administrator\\Documents\\Codex\\2026-10-01\\task-23\\portal-exact-core\\build\\tasks-smoke-20261001-092513-200912",
+      "success": true,
+      "checks": 121,
+      "exit_code": 0,
+      "java_runtime": "C:\\Users\\Administrator\\WorkSpace\\muxigame\\perf-lab\\java21\\jdk-21.0.2\\bin\\java.exe",
+      "candidate_sha256": "3625c34e1bab0caebe507d0f136ebcfd858e0efb5aafed907b251189667cae14"
+    }
+  ],
+  "deployed": false,
+  "remaining_limits": [
+    "No full-pack end-to-end claim mod test or production deployment performed.",
+    "Containers/block entities are intentionally rejected rather than automatically removed."
+  ]
+}
