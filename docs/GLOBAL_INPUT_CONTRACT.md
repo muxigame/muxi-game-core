@@ -30,7 +30,7 @@ Alt+B 屏蔽其他 B 绑定和遗留点击队列；先松 Alt、后松 B 也不�
 
 ## 旧客户端和 seed
 
-Core 在原生 Options.load(boolean) 后逐键迁移旧默认值（包含 NeoForge 注册模组键位后的 load(true) 轮次）。`config/muxi_game_core/input-migrations.json` 为每个已注册键记录一次目标版本；不同于旧默认值的自定义保持原样，玩家之后重新改键也不反复纠正。构造器同步默认值与修饰键，Controls 的 Reset 使用新默认。迁移只替换目标行，保留无关键、注释、换行、未知项；同名重复行一并更新。
+Core 在原生 Options.load(boolean) 后逐键迁移旧默认值（包含 NeoForge 注册模组键位后的 load(true) 轮次）。`config/muxi_game_core/input-migrations.json` 为每个已注册键记录一次目标版本；不同于旧默认值的自定义保持原样，玩家之后重新改键也不反复纠正。构造器同步默认值与修饰键，原版与 NeoForge 带修饰键的两个叶构造器均以完整签名覆盖；TACZ/Zombie 走独立的 NeoForge 构造路径，Controls 的 Reset 使用新默认。迁移只替换目标行，保留无关键、注释、换行、未知项；同名重复行一并更新。
 
 五个 seed 字段已集成到 `better-mc-remake/pack/packspec.json` 的 options.txt overlay。保留原有 Seed 文件策略和 `createIfMissing: false`；没有整文件强制覆盖。启动器按 OverlaySeeds 的值版本下发一次，之后继续允许玩家改键。Core 与小游戏框架须随统一客户端/服务端同步，由 008 集成；本任务不发布或部署。
 

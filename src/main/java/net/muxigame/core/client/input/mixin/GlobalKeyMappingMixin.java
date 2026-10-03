@@ -14,7 +14,10 @@ public abstract class GlobalKeyMappingMixin {
     @Shadow private InputConstants.Key key;
     @Shadow private KeyModifier keyModifierDefault;
     @Shadow private int clickCount;
-    @Inject(method="<init>",at=@At("RETURN"))
+    @Inject(method={
+        "<init>(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;ILjava/lang/String;)V",
+        "<init>(Ljava/lang/String;Lnet/neoforged/neoforge/client/settings/IKeyConflictContext;Lnet/neoforged/neoforge/client/settings/KeyModifier;Lcom/mojang/blaze3d/platform/InputConstants$Key;Ljava/lang/String;)V"
+    },at=@At("RETURN"))
     private void muxi$defaults(CallbackInfo ci){
         var value=GlobalKeyBindingPlan.defaultBinding(((KeyMapping)(Object)this).getName());if(value==null)return;
         var parts=value.split(":",2);defaultKey=InputConstants.getKey(parts[0]);

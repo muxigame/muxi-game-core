@@ -1,0 +1,193 @@
+{
+  "createdUtc": "2026-10-03T06:27:32.752145+00:00",
+  "scope": "Actual full-pack Options.load migration and KeyMapping constructor defaults; no physical input",
+  "physicalInputAccepted": false,
+  "remainingAcceptance": "Physical Tab/Ctrl+Tab, contextual F vs TACZ, Alt+B/B and Alt-first release in real gameplay; desktop control unavailable in this session",
+  "loadedMods": 523,
+  "logicFixtures": {
+    "success": true,
+    "checks": 70,
+    "scope": "actual migration and arbitration classes with file/native-state fixtures; not physical input",
+    "sources": {
+      "GlobalKeyBindingPlan.java": "2a124aa8db82cc2329cdf369e4a09a6c573e148f99e7663563c22febe49c884b",
+      "GlobalKeyBindingMigration.java": "201d29ac65acd325290c5342180c8b5ffb15968dfe7ceee7f9acc3fd07b68e9f",
+      "GameplayInputPriority.java": "e7f6e8e8819309a297d537fa3db4328556ba123fbd55eb353309a573e5e5f851",
+      "GameInputContextState.java": "4ffa36362251b0eae7ebad43968d129b6d7b04c3a38359cca5684fd6ea16d52f"
+    },
+    "realInput": false,
+    "newMcStarted": false
+  },
+  "launcherSeedFixtures": {
+    "success": true,
+    "checks": 14,
+    "scope": "actual launcher ConfigOverlay and LocalState; isolated old-client file fixtures",
+    "realInput": false
+  },
+  "nativeChecks": {
+    "nativeOutbreakInputEntryInitialized": true,
+    "nativeKeyboardWrapperTransformed": true,
+    "nativeInputContextCodec": true,
+    "nativeLoaded.key.swapOffhand": true,
+    "nativeResetDefault.key.swapOffhand": true,
+    "nativeLoaded.key.playerlist": true,
+    "nativeResetDefault.key.playerlist": true,
+    "nativeLoaded.key.tacz.interact.desc": true,
+    "nativeResetDefault.key.tacz.interact.desc": true,
+    "nativeLoaded.key.toms_storage.open_terminal": true,
+    "nativeResetDefault.key.toms_storage.open_terminal": true,
+    "nativeLoaded.key.muxi_game_core.challenge_wheel": true,
+    "nativeResetDefault.key.muxi_game_core.challenge_wheel": true,
+    "nativeUnrelatedForwardBinding": true,
+    "nativeMigrationUnrelatedKeys": true,
+    "nativeMigrationUnknownAndCommentLines": true,
+    "nativeMigrationBytePreservation": true,
+    "nativeMarker.key.swapOffhand": true,
+    "nativeMarker.key.playerlist": true,
+    "nativeMarker.key.tacz.interact.desc": true,
+    "nativeMarker.key.toms_storage.open_terminal": true,
+    "nativeMarker.key.muxi_game_core.challenge_wheel": true,
+    "nativeSecondApplyPreservesFile": true,
+    "nativeSecondApplyPreservesMarker": true
+  },
+  "nativeMappings": {
+    "key.swapOffhand": "key.keyboard.tab",
+    "key.swapOffhand.default": "key.keyboard.tab",
+    "key.playerlist": "key.keyboard.tab:CONTROL",
+    "key.playerlist.default": "key.keyboard.tab:CONTROL",
+    "key.tacz.interact.desc": "key.keyboard.f",
+    "key.tacz.interact.desc.default": "key.keyboard.f",
+    "key.toms_storage.open_terminal": "key.keyboard.t:ALT",
+    "key.toms_storage.open_terminal.default": "key.keyboard.t:ALT",
+    "key.muxi_game_core.challenge_wheel": "key.keyboard.b:ALT",
+    "key.muxi_game_core.challenge_wheel.default": "key.keyboard.b:ALT"
+  },
+  "registeredFOTabB": [
+    {
+      "name": "key.playerlist",
+      "key": "key.keyboard.tab",
+      "modifier": "CONTROL"
+    },
+    {
+      "name": "key.swapOffhand",
+      "key": "key.keyboard.tab",
+      "modifier": "NONE"
+    },
+    {
+      "name": "iris.keybind.shaderPackSelection",
+      "key": "key.keyboard.o",
+      "modifier": "NONE"
+    },
+    {
+      "name": "key.refinedstorage.focus_search_bar",
+      "key": "key.keyboard.tab",
+      "modifier": "NONE"
+    },
+    {
+      "name": "key.sophisticatedbackpacks.open_backpack",
+      "key": "key.keyboard.b",
+      "modifier": "NONE"
+    },
+    {
+      "name": "key.jei.toggleOverlay",
+      "key": "key.keyboard.o",
+      "modifier": "CONTROL"
+    },
+    {
+      "name": "key.jei.focusSearch",
+      "key": "key.keyboard.f",
+      "modifier": "CONTROL"
+    },
+    {
+      "name": "key.yes_steve_model.debug_animation.desc",
+      "key": "key.keyboard.b",
+      "modifier": "ALT"
+    },
+    {
+      "name": "gui.xaero_new_waypoint",
+      "key": "key.keyboard.b",
+      "modifier": "NONE"
+    },
+    {
+      "name": "key.immersive_aircraft.boost",
+      "key": "key.keyboard.b",
+      "modifier": "NONE"
+    },
+    {
+      "name": "simulated.keyinfo.rotate_mode",
+      "key": "key.keyboard.tab",
+      "modifier": "NONE"
+    },
+    {
+      "name": "key.starcatcher.expand_tournament",
+      "key": "key.keyboard.tab",
+      "modifier": "NONE"
+    },
+    {
+      "name": "key.deeperdarker.boost",
+      "key": "key.keyboard.b",
+      "modifier": "NONE"
+    },
+    {
+      "name": "key.ftbquests.gui.next_chapter",
+      "key": "key.keyboard.tab",
+      "modifier": "NONE"
+    },
+    {
+      "name": "key.ftbquests.gui.prev_chapter",
+      "key": "key.keyboard.tab",
+      "modifier": "SHIFT"
+    },
+    {
+      "name": "key.ftbquests.gui.search",
+      "key": "key.keyboard.f",
+      "modifier": "CONTROL"
+    },
+    {
+      "name": "key.tacz.interact.desc",
+      "key": "key.keyboard.f",
+      "modifier": "NONE"
+    },
+    {
+      "name": "key.muxi_game_core.challenge_wheel",
+      "key": "key.keyboard.b",
+      "modifier": "ALT"
+    }
+  ],
+  "nativeKeyboardInputHooks": [
+    "wrapMethod$naj000$muxi_game_core$muxi$dispatch"
+  ],
+  "exit": {
+    "exitCode": 0,
+    "normalStopLogged": true,
+    "forceTermination": false,
+    "worldCreated": false,
+    "noPhysicalInput": true
+  },
+  "nativeSourceHashes": {
+    "src/main/java/net/muxigame/core/client/input/GameplayInputPriority.java": "e7f6e8e8819309a297d537fa3db4328556ba123fbd55eb353309a573e5e5f851",
+    "src/main/java/net/muxigame/core/client/input/GlobalKeyBindingMigration.java": "201d29ac65acd325290c5342180c8b5ffb15968dfe7ceee7f9acc3fd07b68e9f",
+    "src/main/java/net/muxigame/core/client/input/GlobalKeyBindingPlan.java": "2a124aa8db82cc2329cdf369e4a09a6c573e148f99e7663563c22febe49c884b",
+    "src/main/java/net/muxigame/core/client/input/mixin/GlobalKeyboardInputMixin.java": "8492f41b7decab48f471a1effd4c4ecbe94e480b736df5972b661ae817667b66",
+    "src/main/java/net/muxigame/core/client/input/mixin/GlobalKeyMappingMixin.java": "9363c6e6e94b791082758552c969d7863129a535df8c1d5eec6c36121807b924",
+    "src/main/java/net/muxigame/core/client/input/mixin/GlobalOptionsInputMixin.java": "4b0215d492e43794dd5260b8716369d8fab855dc1d0b7deae17a02439157f023",
+    "src/main/resources/muxi_game_core.input.mixins.json": "a1c15c84daf3afd9442e8a318d93de3afa01a4a86d5e0e401332bcb995fa7f15",
+    "src/main/resources/META-INF/neoforge.mods.toml": "4356fa63178a417f71568e04b950e08525f2fa48df5ed62d3bd657302b883da5",
+    "docs/GLOBAL_INPUT_CONTRACT.md": "4596341dcbb0d6b5019d1a8eb409afd494cdd064efc20573e4df9202eac5f837",
+    "tests/run_global_keybindings_tests.py": "327e600761533ca30551ac16d63bb0cce382bfbcf75ae5169da3bca33ffef8eb",
+    "src/main/java/net/muxigame/core/feature/input/GameInputContextState.java": "4ffa36362251b0eae7ebad43968d129b6d7b04c3a38359cca5684fd6ea16d52f",
+    "src/main/java/net/muxigame/core/feature/input/GameInputContextNetwork.java": "9064f4369c6158b157d395254f871497f0d1d42fad4efc6b0309b0d24142ce7e",
+    "src/main/java/net/muxigame/core/feature/input/GameInputContextServer.java": "d231e1eeb8cb3c3b53bbff7d7f61b60c48e87d66d9144753d2db712227bbff88",
+    "src/main/java/net/muxigame/core/client/input/GameInputContextClient.java": "ddbc11b5f9c1d562acacd0faca72d5ea8ebaf9789d911dcb32b083de0ee4d96d"
+  },
+  "runtimeArtifacts": {
+    "muxi-minigames-0.2.1-equipment.1.jar": "75aead1ee9f55fafeac46cb394c2e3b759737befc8cee1a6efb7852e114342b7",
+    "muxi-game-core-131-public-integration-qa.jar": "32620fc82104157e0aad69b4791921d8237640c67752396cadef53c2585d5f01",
+    "muxi-terminal-131-public-integration-qa.jar": "e4b5c413752c76f4345883245bf572215866f80ea3273c78f1590ac047e8f252",
+    "muxi-zombie-challenge-0.1.3-task14-social-qa.1.jar": "5f18a625214e37c60265808f6eb0c36aa9ad89e732a87fed98ef2fae4b78fc7b",
+    "muxi-outbreak-0.4.0-equipment.1.jar": "bafabf983dcc11f3e18218938f4616c9a7764e270018c2dc38e3a33c0a7536e8",
+    "LesRaisins-Tactical-Equipements-1.21.1-0.4.3.jar": "b492f2d37a993d76a8ffd6b79bea89a64de91d4710b1b4841f63d65982f610ac"
+  },
+  "sourceSelection": "Current committed dev plus owned constructor fix; no other owner dirty copied",
+  "defaultFix": "Explicit vanilla and NeoForge leaf constructor descriptors; observed TACZ loaded F but old Reset O is now fixed",
+  "deployed": false
+}
