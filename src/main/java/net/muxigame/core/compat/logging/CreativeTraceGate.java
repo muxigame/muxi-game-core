@@ -13,12 +13,8 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.fml.Logging;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -37,8 +33,7 @@ import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 import org.apache.logging.log4j.message.ReusableParameterizedMessage;
 
-/** Opt-in removal of work for creative-phase TRACE that no current output accepts. */
-@EventBusSubscriber(modid = "muxi_game_core", value = Dist.CLIENT)
+/** Guarded removal of work for creative-phase TRACE that no current output accepts; explicit false restores native filtering. */
 public final class CreativeTraceGate {
     private static final String PROPERTY = "muxi.creativeTraceGate";
     private static final String NATIVE_LOGGER = "net.neoforged.fml.ModContainer";
@@ -67,9 +62,13 @@ public final class CreativeTraceGate {
 
     private CreativeTraceGate() {}
 
-    @SubscribeEvent
-    public static void onClientTick(ClientTickEvent.Post event) {
-        boolean next = Boolean.getBoolean(PROPERTY);
+    private static boolean configured() {
+        return Boolean.parseBoolean(System.getProperty(PROPERTY, "true"));
+    }
+
+    /** Called only by the subscriber for the current physical side. */
+    public static void update() {
+        boolean next = configured();
         if (current != null && !current.valid()) {
             current.close();
             current = null;
@@ -85,6 +84,17 @@ public final class CreativeTraceGate {
         } catch (ReflectiveOperationException | java.io.IOException | RuntimeException | LinkageError failure) {
             // Unsupported profiles keep the original logger and event behavior.
             unavailableReason = failure.getClass().getSimpleName();
+        }
+    }
+
+    /** Releases this installation; a later server lifecycle may install again. */
+    public static void shutdown() {
+        try {
+            if (current != null) current.close();
+        } finally {
+            current = null;
+            requested = false;
+            unavailableReason = "off";
         }
     }
 
@@ -195,7 +205,7 @@ public final class CreativeTraceGate {
         boolean valid() { return live && context.getConfiguration() == configuration; }
 
         boolean rejectsTrace() throws IllegalAccessException {
-            if (!valid() || !Boolean.getBoolean(PROPERTY) || configuration.getLoggerConfig(NATIVE_LOGGER) != root || root.getParent() != null)
+            if (!valid() || !configured() || configuration.getLoggerConfig(NATIVE_LOGGER) != root || root.getParent() != null)
                 return false;
             Filter chain = root.getFilter();
             boolean found = false;

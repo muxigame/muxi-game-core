@@ -22,24 +22,28 @@ already be fast, so binary caching has no guaranteed whole-transfer benefit.
 
 ## Guarded reconnect refresh
 
-The reconnect extension checks eight public provider classes and reads the
+The reconnect extension checks ten public provider classes and reads the
 vendor's actual `lastDimension` state. A matching current native pack may be
 reused only when its root, options, zip mode and single target-dimension macro
 match. Other supported target dimensions receive freshly validated defines.
 Native GPU pipelines are still destroyed and rebuilt; only the matching vendor
 dimension-reload callback is consumed after a successful refresh.
 
-A true first join keeps the native path. A pack containing
-`EUPHORIA_PATCHES_FIRST_LOADED` also keeps native reload behavior. In the pinned
-cold-start sequence the first reconnect still falls back; the second reconnect
-can use the stable pack created by that native reload. Unknown providers and
-failed guards retain native behavior. A failed attempt cannot retry every frame
-and repeatedly advance the vendor's macro counter. Manual reloads remain native,
-and logout clears the parsed-pack map and pending level references.
+A true first join keeps the native path. Reconnect requires ten pinned provider
+classes, the vendor's initialized `lastDimension`, and its actual macro counter
+at least two. A pack containing `EUPHORIA_PATCHES_FIRST_LOADED` cannot be reused;
+it is rebuilt with fresh validated target macros after initialization is complete.
+The pinned constructor's second macro generation is included in the lifecycle
+model. No vendor counter is reset or written. Unknown fields/providers,
+incomplete initialization, invalid macros and failures retain native behavior.
+A failed attempt cannot retry each frame, although one failed generation or
+construction may still schedule bounded extra native macro/settings work before
+fallback. Manual reloads remain native; logout clears parsed packs and level
+references.
 
-CPU lifecycle coverage: 21 assertions against the actual implementation and
-controlled vendor doubles. These do not model every internal vendor macro call
-and do not substitute for native login validation.
+CPU coverage: 33 lifecycle assertions plus a missing-counter fallback check
+against the actual implementation and controlled vendor doubles. These include
+both native macro generations and do not replace native validation.
 
 ## Compatibility and native fallback
 
@@ -84,7 +88,26 @@ Shader-pack source metadata follows the native pack owner, allowing a direct
 saved-home join after the Core capture slot was cleared. It does not retain a
 global native pack or extend a GPU lifetime.
 
-## Default-on and reconnect native validation
+## Guarded first-login TRACE filtering
+
+The existing `CreativeTraceGate` defaults on. Explicit
+`-Dmuxi.creativeTraceGate=false` restores native filtering; invalid values also
+disable it. Thirteen public provider/message class pins, current logger/filter
+identity, unchanged Log Begone settings and every output threshold must match.
+Only the two native creative-event TRACE formats that no output accepts are
+rejected before costly filtering. Event listeners and creative items are still
+built normally. Unknown configurations and any output accepting TRACE retain
+native behavior. A live lease alone does not prove the per-event guard accepts
+optimization, so QA records `rejectsTrace` separately.
+
+Client ticks maintain the gate in client processes (including integrated
+servers). A separate dedicated-server subscriber installs it at ServerStarted,
+maintains it on server ticks and releases/reset state at ServerStopped. The
+shared helper contains no client event types. This closes a dedicated-server
+coverage gap; integrated-server timings do not establish dedicated-server
+performance savings. Provider pins and per-event fallback remain unchanged.
+
+## Earlier default-on and reconnect native validation (f49a2d7)
 
 The private candidate passed three measured native logins and eight transfers
 with no `muxi.veilShaderEventDispatch` property, binary caching off and the
@@ -158,3 +181,26 @@ dependencies and client-library metadata (no account files are read):
 ```text
 python tests/run_shader_program_cache_tests.py --javac <javac> --java <java> --dependencies <dependencies.jar> --client-libraries <libraries-directory> --client-version-json <public-version-json>
 ```
+
+## Cold reconnect follow-up validation
+
+The guarded Euphoria initial-load refresh avoids reusing a parsed pack that still
+carries FIRST_LOADED state. On the current explicit loopback profile, the first
+connection and both reconnects each constructed exactly one native Iris pipeline;
+four same-dimension moves constructed none, and four cross-dimension moves each
+constructed one. Actual target macros, native movement/server receipts, three
+logout cleanups, Iris/resource reloads and logging false/invalid/default rollback
+passed. Both JVMs exited normally. The candidate passed 6995 Core checks.
+
+This establishes shader behavior and compatibility, not total first-login
+performance: first handleLogin-to-visible was 147.734 seconds, versus
+9.298/6.445 seconds on reconnect. Login-period resource reload overlapped most
+of the first window; existing sparse shader spans cannot attribute that tail.
+Game startup is excluded. The dedicated logging gate was active before the
+recorded login event; early client installation was not timestamped. The fixture
+uses an existing account and does not cover new-account random-spawn generation.
+See the operational handoff for exact profile conditions, artifacts and timings.
+
+## Operational sampling handoff
+
+See [the shader QA operations handoff](shader-qa-operations.md) for the validated runner sources and contracts to integrate into the shared QA tooling.

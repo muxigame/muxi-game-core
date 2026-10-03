@@ -50,8 +50,13 @@ public final class DimensionShaderSwap {
             Field pack=iris().getDeclaredField("currentPack");pack.setAccessible(true);
             if(!(pack.get(null) instanceof ShaderPackSourceCarrier carrier))return false;
             var source=carrier.muxi$shaderPackSource();
-            return source!=null&&source.root()!=null&&!source.defines().isEmpty()
-                &&!source.defines().containsKey("EUPHORIA_PATCHES_FIRST_LOADED");
+            if(source==null||source.root()==null||source.defines().isEmpty())return false;
+            // Generating defines changes vendor state. Do not probe across its first-load
+            // threshold: a failed attempt must not consume the native FIRST_LOADED window.
+            Field count=Class.forName("com.euphoriapatches.euphoria_patcher.integration.DefineHelper").getDeclaredField("injectCount");
+            if(!Modifier.isStatic(count.getModifiers())||count.getType()!=int.class)return false;
+            count.setAccessible(true);
+            return count.getInt(null)>=2;
         }catch(ReflectiveOperationException|RuntimeException|LinkageError unavailable){return false;}
     }
     private static boolean validMacros(Set<String> keys,String expected){
@@ -95,6 +100,8 @@ public final class DimensionShaderSwap {
             boolean cached=PACKS.containsKey(pendingDimension);Object target=PACKS.get(pendingDimension);
             String dimensionMacro="CURRENT_EUPHORIA_PATCHES_DIMENSION_"+String.valueOf(invoke(Class.forName("com.euphoriapatches.euphoria_patcher.util.mod.ModLoaderSpecifics"),"getCurrentDimensionStatic")).toUpperCase(Locale.ROOT);
             boolean reusedCurrent=false;
+            // An early native pack may enter refresh, but validMacros forbids reusing it.
+            // Its replacement gets fresh defines here and the vendor's second set in its constructor.
             if(target==null&&reconnecting&&current instanceof ShaderPackSourceCarrier carrier){
                 var source=carrier.muxi$shaderPackSource();
                 if(source!=null&&Objects.equals(root,source.root())&&options.equals(source.options())&&zipped==source.zipped()

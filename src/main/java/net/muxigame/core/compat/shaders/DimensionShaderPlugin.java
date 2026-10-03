@@ -15,6 +15,8 @@ public final class DimensionShaderPlugin implements IMixinConfigPlugin {
         Map.entry("com.euphoriapatches.euphoria_patcher.integration.iris.IrisReloadManager","50347e202a562db91753eae6da218c3a2e490806862fa0f85388d9a951aea7f8"),
         Map.entry("net.irisshaders.iris.mixin.MixinMinecraft_PipelineManagement","d9a7cf9356856b1722f5b8cba89639e76f9f7647a9b7b39223a5482adaca67a8"),
         Map.entry("net.irisshaders.iris.gl.shader.StandardMacros","0492c44ee26513039139c8fdc9f669cbccaefbdcdd648c32f466d1b254f63892"),
+        Map.entry("net.irisshaders.iris.shaderpack.ShaderPack","b5e8548bf3fd6a2d4fa352bf710618ef7216cb0129ca86b26a21964a402a0630"),
+        Map.entry("net.irisshaders.iris.shaderpack.IrisDefines","0cef2f24a4d2b498b2cc4256db1b4423ca6a516bdceced868304f11bfd07033d"),
         Map.entry("net.irisshaders.iris.pipeline.PipelineManager","9688ac772f3d6f1db13162d560f7c8a8afe0e520af1c7401621e386467b57b4f"));
     private static boolean pin(String name,String expected){
         try(var in=DimensionShaderPlugin.class.getClassLoader().getResourceAsStream(name.replace('.','/')+".class")){

@@ -6,19 +6,45 @@ import net.irisshaders.iris.Iris;
 import net.irisshaders.iris.shaderpack.ShaderPack;
 import net.irisshaders.iris.gl.shader.StandardMacros;
 import net.muxigame.core.compat.shaders.*;
+import com.euphoriapatches.euphoria_patcher.integration.DefineHelper;
 public final class DimensionShaderSwapTest {
  static int checks;
  static void check(boolean v,String message){checks++;if(!v)throw new AssertionError(message);}
  static Map<String,String> macros(String dim){return Map.of("CURRENT_EUPHORIA_PATCHES_DIMENSION_"+dim,"1");}
- static void reset(){DimensionShaderSwap.clear();Minecraft.getInstance().level=null;Minecraft.euphoriaPatcher$lastDimension="overworld";ShaderBinaryBootstrap.owner("dimension-reconnect",true);Iris.enabled=true;Iris.euphoria=true;Iris.manager.destroys=0;Iris.manager.fail=false;StandardMacros.calls=0;StandardMacros.invalid=false;ShaderPack.builds=0;Iris.currentPack=new ShaderPack(new ShaderPackSourceCarrier.Source(Path.of("pack"),Map.of("quality","high"),false,macros("OVERWORLD")));}
+ static void reset(){DimensionShaderSwap.clear();Minecraft.getInstance().level=null;Minecraft.euphoriaPatcher$lastDimension="overworld";ShaderBinaryBootstrap.owner("dimension-reconnect",true);Iris.enabled=true;Iris.euphoria=true;Iris.manager.destroys=0;Iris.manager.fail=false;StandardMacros.calls=0;StandardMacros.invalid=false;ShaderPack.builds=0;ShaderPack.fail=false;DefineHelper.seed(2);Iris.currentPack=new ShaderPack(new ShaderPackSourceCarrier.Source(Path.of("pack"),Map.of("quality","high"),false,macros("OVERWORLD")));}
  static ClientLevel begin(String dim){var next=new ClientLevel(dim);DimensionShaderSwap.changingLevel(next);Minecraft.getInstance().level=next;DimensionShaderSwap.beforePipeline();return next;}
  static boolean pending(){return (boolean)DimensionShaderSwap.diagnosticLifecycleSnapshot().get("pendingLevel");}
+ static void early(){Iris.currentPack=new ShaderPack(new ShaderPackSourceCarrier.Source(Path.of("pack"),Map.of("quality","high"),false,Map.of("CURRENT_EUPHORIA_PATCHES_DIMENSION_OVERWORLD","1","EUPHORIA_PATCHES_FIRST_LOADED","1")));}
+ // Native reload's audited two-call order, independent of DimensionShaderSwap.refresh.
+ static void nativePackReload(){
+  DimensionShaderSwap.genuineReload();
+  var defines=StandardMacros.createStandardEnvironmentDefines();
+  Iris.currentPack=new ShaderPack(Path.of("pack"),Map.of("quality","high"),defines,false);
+ }
  public static void main(String[] args){
+  if(args.length>0){reset();early();begin("minecraft:overworld");check(!pending()&&StandardMacros.calls==0&&DefineHelper.effects.isEmpty(),"missing counter field retains native path without side effects");System.out.println("DimensionShaderSwap missing-field fallback checks passed: "+checks);return;}
+
   reset();Minecraft.euphoriaPatcher$lastDimension=null;begin("minecraft:overworld");check(!pending()&&Iris.manager.destroys==0&&StandardMacros.calls==0,"first vendor callback only initializes: native pipeline unchanged");
   reset();ShaderBinaryBootstrap.owner("dimension-reconnect",false);begin("minecraft:overworld");check(!pending()&&Iris.manager.destroys==0,"unknown provider preserves native join");
-  reset();Iris.currentPack=new ShaderPack(new ShaderPackSourceCarrier.Source(Path.of("pack"),Map.of(),false,Map.of("EUPHORIA_PATCHES_FIRST_LOADED","1")));begin("minecraft:overworld");check(!pending()&&StandardMacros.calls==0,"early source rejected without advancing define counter");
+  for(int count:new int[]{0,1}){reset();early();DefineHelper.seed(count);begin("minecraft:overworld");check(!pending()&&StandardMacros.calls==0&&DefineHelper.count()==count&&DefineHelper.effects.isEmpty(),"partial initialization preserves native first-load window "+count);}
+  reset();early();Minecraft.euphoriaPatcher$lastDimension=null;begin("minecraft:overworld");check(!pending()&&StandardMacros.calls==0,"early pack on true first join stays native");
+  reset();early();Object earlyPack=Iris.currentPack;begin("minecraft:overworld");
+  check(Iris.currentPack!=earlyPack&&ShaderPack.builds==1&&StandardMacros.calls==2&&DefineHelper.count()==4,"first reconnect replaces early pack via fresh outer and constructor defines");
+  check(!((ShaderPack)Iris.currentPack).muxi$shaderPackSource().defines().containsKey("EUPHORIA_PATCHES_FIRST_LOADED"),"replacement has no first-load macro");
+  check(!(boolean)DimensionShaderSwap.diagnosticSnapshot().get("reusedCurrentPack")&&Iris.manager.destroys==1,"early source never reused and native GPU rebuild retained");
+  var optimizedEffects=List.copyOf(DefineHelper.effects);var optimizedMacros=((ShaderPack)Iris.currentPack).muxi$shaderPackSource().defines();
+  check(Minecraft.lambda$onDimensionChange$euphoria_patcher$0(),"first reconnect vendor callback consumed after successful rebuild");
+  reset();early();Minecraft.getInstance().level=new ClientLevel("minecraft:overworld");nativePackReload();
+  check(optimizedEffects.equals(DefineHelper.effects)&&DefineHelper.effects.equals(List.of("defines:3","scheduleSettingsMark:3","defines:4","scheduleSettingsMark:4")),"successful optimization preserves native macro/mark call order and count");
+  check(optimizedMacros.equals(((ShaderPack)Iris.currentPack).muxi$shaderPackSource().defines()),"successful optimization matches native replacement macro map");
+  reset();early();StandardMacros.invalid=true;begin("minecraft:overworld");DimensionShaderSwap.beforePipeline();
+  check(!Minecraft.lambda$onDimensionChange$euphoria_patcher$0()&&StandardMacros.calls==1&&DefineHelper.count()==3&&ShaderPack.builds==0,"invalid fresh macros fall back once without retry or vendor counter reset");
+  StandardMacros.invalid=false;nativePackReload();check(DefineHelper.count()==5&&!((ShaderPack)Iris.currentPack).muxi$shaderPackSource().defines().containsKey("EUPHORIA_PATCHES_FIRST_LOADED"),"fallback remains beyond first-load threshold despite attempted generation");
+  reset();early();ShaderPack.fail=true;Object retained=Iris.currentPack;begin("minecraft:overworld");DimensionShaderSwap.beforePipeline();
+  check(Iris.currentPack==retained&&Iris.manager.destroys==0&&DefineHelper.count()==4&&!Minecraft.lambda$onDimensionChange$euphoria_patcher$0(),"constructor failure retains original pack and native callback without repeated macros");
+  ShaderPack.fail=false;nativePackReload();check(DefineHelper.count()==6&&StandardMacros.calls==4&&DefineHelper.effects.size()==8,"failed constructor then native fallback exposes bounded extra side effects rather than rolling back vendor state");
   reset();Object original=Iris.currentPack;begin("minecraft:overworld");check(Iris.currentPack==original&&ShaderPack.builds==0&&StandardMacros.calls==0,"matching reconnect reuses parsed native pack without generating macros");check(Iris.manager.destroys==1,"GPU pipeline still destroyed");check(!DimensionShaderSwap.consumeDimensionReload()&&pending(),"manual reload is not vendor callback");check(Minecraft.lambda$onDimensionChange$euphoria_patcher$0()&&!pending(),"matching completed vendor callback consumed once");check(!Minecraft.lambda$onDimensionChange$euphoria_patcher$0(),"second callback native");
-  reset();begin("muxi_game_core:adventure");check(ShaderPack.builds==1&&StandardMacros.calls==1&&Iris.manager.destroys==1,"different source rebuilt with target defines");check(((ShaderPack)Iris.currentPack).muxi$shaderPackSource().defines().containsKey("CURRENT_EUPHORIA_PATCHES_DIMENSION_MUXI_GAME_CORE_ADVENTURE"),"target pack macros correct");
+  reset();begin("muxi_game_core:adventure");check(ShaderPack.builds==1&&StandardMacros.calls==2&&Iris.manager.destroys==1,"different source rebuilt with target defines");check(((ShaderPack)Iris.currentPack).muxi$shaderPackSource().defines().containsKey("CURRENT_EUPHORIA_PATCHES_DIMENSION_MUXI_GAME_CORE_ADVENTURE"),"target pack macros correct");
   reset();StandardMacros.invalid=true;begin("muxi_game_core:adventure");for(int i=0;i<3;i++)DimensionShaderSwap.beforePipeline();check(!Minecraft.lambda$onDimensionChange$euphoria_patcher$0(),"macro failure retains vendor reload");check(StandardMacros.calls==1&&ShaderPack.builds==0&&Iris.manager.destroys==0,"failed macro validation cannot retry after initial native pipeline");
   reset();Iris.manager.fail=true;begin("minecraft:overworld");DimensionShaderSwap.beforePipeline();check(!Minecraft.lambda$onDimensionChange$euphoria_patcher$0()&&Iris.manager.destroys==1,"destroy failure cannot suppress vendor or retry");
   reset();begin("minecraft:the_nether");check(!pending()&&Iris.manager.destroys==0,"unsupported reconnect native");
