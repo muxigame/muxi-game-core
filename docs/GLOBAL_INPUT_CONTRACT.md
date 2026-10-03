@@ -37,3 +37,12 @@ Core 在原生 Options.load(boolean) 后逐键迁移旧默认值（包含 NeoFor
 回归脚本：Core `tests/run_global_keybindings_tests.py`；启动器 `client/tests/global-input-seed-smoke/InputSeedSmoke.csproj`（.NET 9，参数为隔离输出目录及 packspec 文件路径）。检查范围须注明：文件/逻辑 fixtures、原生完整包启动与物理输入各自独立。
 
 当前会话无 node_repl，Workspace 列表为空，control_status 返回 Unknown tool。原生回调或代码模拟不算真实键鼠验收；本任务明确保留物理 Tab/F/Alt+B 与实际玩法组合测试缺口。
+
+
+## 2026-10-03 原生网络联验
+
+迁移后的统一目录使用 `better-mc-remake/scripts/local_mc_debug.py`，独立回环服务端加一个原生客户端；Core 为已提交 `1b6467b` 构件，小游戏框架 `aa9b47d`、枪战 `88829cc` 从各自当前提交冻结编译，性能未提交源码未混入构件。输入探针及实际退出结果见 `tests/evidence/global-input-link-native-20261003.json`。
+
+65 项检查（含真实回调成功及逐次 finally 清理）通过：普通 F 仅进一次 TACZ 原入口、O 不触发；Tab 发一份副手交换包且实际服务端双手物品交换；Ctrl+Tab 同事件只允许列表绑定且不交换；Alt+B 拒绝真实背包绑定并允许原生轮盘，裸 B 反向保持背包。Outbreak 等待房不占 F，服务端开始后上下文跨网络下发；F 加一次 repeat 只发一份原 `Action("outbreak","interact","")`，真实服务端只收一份且 TACZ 入口为零，Shift/Ctrl+F 同样成立，Alt+F 两条业务路径均不走。离场后上下文清除，普通 F 恢复。两个自己的进程正常退出，均 exit 0；未部署。
+
+这是原生键盘回调与真实网络联验，`physicalOSInput=false`。没有注入硬件修饰键状态；Ctrl+Tab 只证明同事件仲裁，不证明列表 HUD 可见。隐藏窗口中的 Alt+B 只证明绑定仲裁，不证明轮盘可见交互。实体 Tab/F、按住 Ctrl+Tab 显示列表、Alt+B 可见轮盘及普通 B 实物背包仍需有 OS 输入通道的 owner 短时协调焦点验收。探针用法见 `tests/input-link-qa/README.md`。

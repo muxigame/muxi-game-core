@@ -1,0 +1,1182 @@
+{
+  "recordedUtc": "2026-10-03T08:16:04.013583+00:00",
+  "scope": "real loopback native client + dedicated server; assisted keyboard callbacks and original game payloads",
+  "physicalOSInput": false,
+  "visualAcceptance": false,
+  "hardwareModifierStateInjected": false,
+  "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+  "instanceRoot": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\better-mc-remake\\build\\local-mc-debug\\131-input-link-20261003-161107",
+  "coreHead": "1b6467bd3426088a06c8214915fcd0e2f62ae46d",
+  "otherSourceHeads": {
+    "muxi-minigames": "aa9b47d532bb84e4ac14f644f78a3fe68eacbc04",
+    "muxi-zombie-challenge": "88829cc1925111445b83c8a108bc6f99e5fa3d94"
+  },
+  "mods": [
+    {
+      "file": "tacz-neoforge-1.21.1-1.1.8-hotfix-r6.jar",
+      "sha256": "58f6ab47c59218bdb10bb9eee1905b6cd27f3bc98d4af13982a6002a99b1d3e7"
+    },
+    {
+      "file": "balm-neoforge-1.21.1-21.0.65.jar",
+      "sha256": "490fa5fcb7ca83a9b5a84e33c2832298db99d189131001b9277a1de7fdc0bf91"
+    },
+    {
+      "file": "waystones-neoforge-1.21.1-21.1.42.jar",
+      "sha256": "d21662ac840f42d66ce7d4c41c6efebc4abc911f8c6337383c43ac61aea64e07"
+    },
+    {
+      "file": "architectury-13.0.11-neoforge.jar",
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb"
+    },
+    {
+      "file": "[冠军强敌再续]champions-neoforge-21.1.1.7.jar",
+      "sha256": "a618cc8743f6b4f695bdaf00d9dea67afe92f1895c827c2d46d82c560ca7bc49"
+    },
+    {
+      "file": "[精妙背包]sophisticatedbackpacks-1.21.1-3.26.3.2158.jar",
+      "sha256": "3690359cc3bb2aa43e40db6ca047ca7d5feda5141c8b9fd647c4355678e971e2"
+    },
+    {
+      "file": "[精妙背包前置]sophisticatedcore-1.21.1-1.5.1.2341.jar",
+      "sha256": "f627b497fc0a2b50da9f20b77e13073df9245718660259d8f559aa184c4418a1"
+    },
+    {
+      "file": "curios-neoforge-9.5.1+1.21.1.jar",
+      "sha256": "a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde"
+    },
+    {
+      "file": "LesRaisins-Tactical-Equipements-1.21.1-0.4.3.jar",
+      "sha256": "b492f2d37a993d76a8ffd6b79bea89a64de91d4710b1b4841f63d65982f610ac"
+    },
+    {
+      "file": "muxi-minigames.jar",
+      "sha256": "3ecdacb102f15d73c3c3219ad9da12be5befffa3f454dff392d97c3aaa491591"
+    },
+    {
+      "file": "muxi-zombie-challenge.jar",
+      "sha256": "fb3bc153d567c6e8aa59af508c20ed14cd5c70b8d8514295d298ccf5a09041f6"
+    },
+    {
+      "file": "muxi-game-core-131-public-integration-qa.jar",
+      "sha256": "32620fc82104157e0aad69b4791921d8237640c67752396cadef53c2585d5f01"
+    },
+    {
+      "file": "muxi-outbreak-0.4.0-equipment.1.jar",
+      "sha256": "bafabf983dcc11f3e18218938f4616c9a7764e270018c2dc38e3a33c0a7536e8"
+    },
+    {
+      "file": "input-link-QA-ONLY.jar",
+      "sha256": "e61d259f6084a21792679aaf09391a7143d03d7ab3312d6e096d0709479de1ec"
+    }
+  ],
+  "resources": {
+    "availableMemoryMiB": 92670,
+    "gpuAdapters": [
+      {
+        "name": "AMD Radeon(TM) Graphics",
+        "dedicatedMemoryMiB": 2048
+      },
+      {
+        "name": "NVIDIA GeForce RTX 4090",
+        "dedicatedMemoryMiB": 49140
+      }
+    ],
+    "minecraftProcesses": [],
+    "minecraftProcessInspection": "unavailable (optional psutil not installed)",
+    "totalMemoryMiB": 194105,
+    "gpuTelemetry": [
+      {
+        "index": "0",
+        "name": "NVIDIA GeForce RTX 4090",
+        "totalMiB": 49140,
+        "freeMiB": 47081,
+        "usedMiB": 1538,
+        "utilizationPercent": 0
+      },
+      {
+        "index": "1",
+        "name": "NVIDIA GeForce RTX 4090",
+        "totalMiB": 49140,
+        "freeMiB": 47412,
+        "usedMiB": 1207,
+        "utilizationPercent": 41
+      }
+    ],
+    "requestedClients": 1,
+    "requestedHeapMiB": 7168,
+    "reservedPhysicalMiB": 11008,
+    "gpuBudgetMiB": 47412,
+    "gpuReservationPerClientMiB": 512,
+    "gpuBudgetSource": "nvidia-smi measured free",
+    "gpuReservationIsEstimate": true,
+    "fixedJavaCountLimit": false
+  },
+  "realNetworkClients": 1,
+  "checks": 65,
+  "passedChecks": 65,
+  "passed": true,
+  "normalExit": true,
+  "exitCodes": {
+    "server": 0,
+    "host": 0
+  },
+  "normalStopBlocked": [],
+  "assertions": [
+    {
+      "check": "callback.1.observe",
+      "passed": true
+    },
+    {
+      "check": "realNetworkConnection",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.1",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.1",
+      "passed": true
+    },
+    {
+      "check": "ordinaryContextNotOutbreak",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.2",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.2",
+      "passed": true
+    },
+    {
+      "check": "ordinaryFUsesTaczEntryOnce",
+      "passed": true
+    },
+    {
+      "check": "ordinaryFNoOutbreak",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.3",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.3",
+      "passed": true
+    },
+    {
+      "check": "oldONoTaczEntry",
+      "passed": true
+    },
+    {
+      "check": "callback.5.inventory-set",
+      "passed": true
+    },
+    {
+      "check": "callback.6.inventory-set",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.4",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.4",
+      "passed": true
+    },
+    {
+      "check": "tabSendsOneSwapPacket",
+      "passed": true
+    },
+    {
+      "check": "callback.8.observe",
+      "passed": true
+    },
+    {
+      "check": "actualServerTabSwapsBothHands",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.5",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.5",
+      "passed": true
+    },
+    {
+      "check": "ctrlTabNoSwap",
+      "passed": true
+    },
+    {
+      "check": "ctrlTabFrameAllowsListOnly",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.6",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.6",
+      "passed": true
+    },
+    {
+      "check": "altBFrameRejectsBackpack",
+      "passed": true
+    },
+    {
+      "check": "altBAllowsNativeWheel",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.7",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.7",
+      "passed": true
+    },
+    {
+      "check": "bareBRejectsNativeWheel",
+      "passed": true
+    },
+    {
+      "check": "bareBPreservesBackpack",
+      "passed": true
+    },
+    {
+      "check": "callback.12.execute",
+      "passed": true
+    },
+    {
+      "check": "callback.13.game-action",
+      "passed": true
+    },
+    {
+      "check": "callback.14.game-snapshot",
+      "passed": true
+    },
+    {
+      "check": "callback.15.game-snapshot",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.8",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.8",
+      "passed": true
+    },
+    {
+      "check": "waitingRoomDoesNotClaimF",
+      "passed": true
+    },
+    {
+      "check": "callback.17.game-action",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.9",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.9",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.10",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.10",
+      "passed": true
+    },
+    {
+      "check": "actualServerIssuedOutbreakContext",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.11",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.11",
+      "passed": true
+    },
+    {
+      "check": "outbreakFOneOriginalPacketWithRepeat",
+      "passed": true
+    },
+    {
+      "check": "outbreakFSuppressesTaczSameEvent",
+      "passed": true
+    },
+    {
+      "check": "outbreakFServerReceivesExactlyOne",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.12",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.12",
+      "passed": true
+    },
+    {
+      "check": "outbreak.shiftFOneRequest",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.13",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.13",
+      "passed": true
+    },
+    {
+      "check": "outbreak.ctrlFOneRequest",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.14",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.14",
+      "passed": true
+    },
+    {
+      "check": "altFNeitherOutbreakNorTacz",
+      "passed": true
+    },
+    {
+      "check": "callback.24.game-action",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.15",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.15",
+      "passed": true
+    },
+    {
+      "check": "leaveContextCleared",
+      "passed": true
+    },
+    {
+      "check": "nativeCallback.16",
+      "passed": true
+    },
+    {
+      "check": "frameFinally.16",
+      "passed": true
+    },
+    {
+      "check": "leaveRestoresOrdinaryFPath",
+      "passed": true
+    }
+  ],
+  "nativeReceipts": [
+    {
+      "id": 1,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": -1,
+      "modifiers": 0,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "net.minecraft.client.gui.screens.ReceivingLevelScreen",
+      "windowActive": true,
+      "pressFrame": {},
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 2,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 70,
+      "modifiers": 0,
+      "gunLogicEntries": 1,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.tacz.interact.desc": {
+          "allowed": true,
+          "matches": true
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 3,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 79,
+      "modifiers": 0,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {},
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 4,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 258,
+      "modifiers": 0,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 1,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.playerlist": {
+          "allowed": false,
+          "matches": false
+        },
+        "key.swapOffhand": {
+          "allowed": true,
+          "matches": true
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 5,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 258,
+      "modifiers": 2,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.playerlist": {
+          "allowed": true,
+          "matches": true
+        },
+        "key.swapOffhand": {
+          "allowed": false,
+          "matches": false
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 6,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 66,
+      "modifiers": 4,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.sophisticatedbackpacks.open_backpack": {
+          "allowed": false,
+          "matches": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "allowed": true,
+          "matches": true
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 7,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 66,
+      "modifiers": 0,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.sophisticatedbackpacks.open_backpack": {
+          "allowed": true,
+          "matches": true
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "allowed": false,
+          "matches": false
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 8,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": -1,
+      "modifiers": 0,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {},
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 9,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": -1,
+      "modifiers": 0,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "net.minecraft.client.gui.screens.ReceivingLevelScreen",
+      "windowActive": true,
+      "pressFrame": {},
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 10,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": -1,
+      "modifiers": 0,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": true,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {},
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 11,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 70,
+      "modifiers": 0,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 1,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": true,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.tacz.interact.desc": {
+          "allowed": false,
+          "matches": false
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 12,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 70,
+      "modifiers": 1,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 1,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": true,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.tacz.interact.desc": {
+          "allowed": false,
+          "matches": false
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 13,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 70,
+      "modifiers": 2,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 1,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": true,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.tacz.interact.desc": {
+          "allowed": false,
+          "matches": false
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 14,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 70,
+      "modifiers": 4,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": true,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.tacz.interact.desc": {
+          "allowed": false,
+          "matches": false
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 15,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": -1,
+      "modifiers": 0,
+      "gunLogicEntries": 0,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "net.minecraft.client.gui.screens.ReceivingLevelScreen",
+      "windowActive": true,
+      "pressFrame": {},
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    },
+    {
+      "id": 16,
+      "ok": true,
+      "nativeKeyboardCallback": true,
+      "hardwareModifierStateInjected": false,
+      "key": 70,
+      "modifiers": 0,
+      "gunLogicEntries": 1,
+      "outbreakInteractSent": 0,
+      "swapPacketsSent": 0,
+      "frameCleared": true,
+      "contextClaimsOutbreak": false,
+      "screen": "",
+      "windowActive": true,
+      "pressFrame": {
+        "key.tacz.interact.desc": {
+          "allowed": true,
+          "matches": true
+        }
+      },
+      "mappings": {
+        "key.playerlist": {
+          "key": 258,
+          "modifier": "CONTROL",
+          "down": false
+        },
+        "key.swapOffhand": {
+          "key": 258,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.sophisticatedbackpacks.open_backpack": {
+          "key": 66,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.tacz.interact.desc": {
+          "key": 70,
+          "modifier": "NONE",
+          "down": false
+        },
+        "key.muxi_game_core.challenge_wheel": {
+          "key": 66,
+          "modifier": "ALT",
+          "down": false
+        }
+      },
+      "runId": "39c1a7305e7341b4a01b494dbbc1462b",
+      "physicalOSInput": false
+    }
+  ],
+  "serverInteractTotal": 3,
+  "remainingAcceptance": [
+    "physical Tab and F key input",
+    "physical Ctrl+Tab held player-list HUD",
+    "physical Alt+B visible wheel interaction with no backpack opening",
+    "ordinary B backpack with real item"
+  ],
+  "noProductionDeployment": true
+}
