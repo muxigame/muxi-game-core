@@ -1,9 +1,0 @@
-{
-  "required": false,
-  "minVersion": "0.8",
-  "package": "net.muxigame.core.compat.shaders.mixin",
-  "plugin": "net.muxigame.core.compat.shaders.DimensionShaderPlugin",
-  "compatibilityLevel": "JAVA_21",
-  "client": ["MinecraftDimensionShaderMixin","ShaderPackCaptureMixin","IrisDimensionShaderMixin","PipelineDimensionShaderMixin","EuphoriaDimensionShaderMixin"],
-  "injectors": {"defaultRequire": 0}
-}

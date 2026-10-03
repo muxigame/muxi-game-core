@@ -65,14 +65,17 @@ versionRange="[0.1.0,0.3)"
 ordering="AFTER"
 side="BOTH"
 
-[[mixins]]
-config="muxi_game_core.compat.shaders.mixins.json"
 
-[[mixins]]
-config="muxi_game_core.program_binary.mixins.json"
 
 [[mixins]]
 config="muxi_game_core.input.mixins.json"
 
 [[mixins]]
 config="muxi_game_core.adventure_protection.mixins.json"
+
+[[dependencies.muxi_game_core]]
+modId="muxi_performance"
+type="optional"
+versionRange="[0.1.0,)"
+ordering="AFTER"
+side="BOTH"

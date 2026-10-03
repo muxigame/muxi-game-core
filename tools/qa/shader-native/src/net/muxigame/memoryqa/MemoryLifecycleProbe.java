@@ -25,7 +25,7 @@ public final class MemoryLifecycleProbe {
  }
  private static JsonObject usage(MemoryUsage usage){JsonObject out=new JsonObject();out.addProperty("usedBytes",usage.getUsed());out.addProperty("committedBytes",usage.getCommitted());out.addProperty("maxBytes",usage.getMax());return out;}
  private static JsonObject read(String name,String method){
-  JsonObject result=new JsonObject();try{Class<?> type=Class.forName(name,false,MemoryLifecycleProbe.class.getClassLoader());Object value=type.getMethod(method).invoke(null);result.addProperty("status","available");result.add("value",JSON.toJsonTree(value));}
+  JsonObject result=new JsonObject();try{Class<?> type=net.muxigame.shadernative.PerformanceProbe.type(name);Object value=type.getMethod(method).invoke(null);result.addProperty("status","available");result.add("value",JSON.toJsonTree(value));}
   catch(ClassNotFoundException missing){result.addProperty("status","absent");}
   catch(ReflectiveOperationException|LinkageError|RuntimeException failure){Throwable root=failure;while(root instanceof InvocationTargetException&&root.getCause()!=null)root=root.getCause();result.addProperty("status","failed");result.addProperty("failureClass",root.getClass().getName());}
   return result;
