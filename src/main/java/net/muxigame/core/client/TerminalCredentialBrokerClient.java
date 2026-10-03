@@ -23,11 +23,11 @@ public final class TerminalCredentialBrokerClient {
                     try (RandomAccessFile channel = new RandomAccessFile("\\\\.\\pipe\\" + pipe, "rw")) {
                         channel.write((secret + "\n").getBytes(StandardCharsets.US_ASCII));
                         StringBuilder response = new StringBuilder();
-                        for (int i = 0; i < 44; i++) {
+                        for (int i = 0; i < 55; i++) {
                             int value = channel.read();
                             if (value == 10) {
                                 String credential = response.toString();
-                                return credential.matches("[A-Za-z0-9_-]{43}") ? credential : "";
+                                return credential.matches("[A-Za-z0-9_-]{54}") ? credential : "";
                             }
                             if (value < 0 || value > 127) return "";
                             response.append((char) value);

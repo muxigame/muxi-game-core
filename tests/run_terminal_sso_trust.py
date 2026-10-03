@@ -35,7 +35,7 @@ public class ServerPlayer {
  public com.mojang.authlib.GameProfile getGameProfile(){return profile;}public java.util.UUID getUUID(){return profile.id();}
 }''',
 "net/muxigame/core/feature/login/TerminalPassportNetwork.java":'''package net.muxigame.core.feature.login;
-public class TerminalPassportNetwork {public record Request(String requestId,String proof){}public record Result(String requestId,String ticket){}}''',
+public class TerminalPassportNetwork {public record Request(String requestId,String gameSession,int action){}public record Result(String requestId,String gameSession,long uid,int status){}}''',
 "net/neoforged/neoforge/network/PacketDistributor.java":'''package net.neoforged.neoforge.network;
 public class PacketDistributor {public record Delivery(net.minecraft.server.level.ServerPlayer player,net.muxigame.core.feature.login.TerminalPassportNetwork.Result packet){}
  public static final java.util.List<Delivery> deliveries=new java.util.ArrayList<>();
@@ -52,6 +52,7 @@ def main():
     parser.add_argument('--truststore',type=Path)
     args=parser.parse_args()
     suffix='.exe' if os.name=='nt' else ''
+    FILES['net/neoforged/neoforge/event/tick/ServerTickEvent.java']='package net.neoforged.neoforge.event.tick; public class ServerTickEvent {public static class Post {}}'
     with tempfile.TemporaryDirectory(prefix='terminal-sso-trust-') as directory:
         tmp=Path(directory);classes=tmp/'classes';classes.mkdir();generated=[]
         for relative,text in FILES.items():

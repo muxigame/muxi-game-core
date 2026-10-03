@@ -11,7 +11,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 public final class TerminalPassportFeature implements ServerFeature {
     public TerminalPassportFeature(CoreConfig.TerminalSso config){TerminalPassportServer.configure(config);}
     @Override public String id(){return "terminalSso";}
-    @Override public void register(IEventBus gameBus){gameBus.addListener(this::loggedIn);gameBus.addListener(this::loggedOut);}
+    @Override public void register(IEventBus gameBus){gameBus.addListener(this::loggedIn);gameBus.addListener(this::loggedOut);gameBus.addListener(TerminalPassportServer::tick);}
     private void loggedIn(PlayerEvent.PlayerLoggedInEvent event){
         if(event.getEntity() instanceof ServerPlayer player && !(player instanceof FakePlayer))TerminalPassportServer.admit(player);
     }
