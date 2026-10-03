@@ -23,7 +23,7 @@ public final class DimensionShaderSwap {
     private static Class<?> packClass;
     private static ClientLevel pendingLevel,handledLevel;
     private static String pendingDimension;
-    private static boolean successful;
+    private static boolean successful,reconnecting;
     private static final Map<String,Object> last=new LinkedHashMap<>();
     private DimensionShaderSwap() {}
     private static String dimension(ClientLevel level){return level==null?null:level.dimension().location().toString();}
@@ -39,16 +39,36 @@ public final class DimensionShaderSwap {
         Set<String> keys=new HashSet<>();for(Object pair:(Iterable<?>)defines)keys.add((String)pair.getClass().getMethod("key").invoke(pair));return keys;
     }
 
+    // Read the pinned vendor's own state; a first-ever setLevel has no reload callback.
+    private static boolean reconnectEligible(){
+        if(!ShaderBinaryBootstrap.owner("dimension-reconnect"))return false;
+        try{
+            Field lastDimension=Minecraft.class.getDeclaredField("euphoriaPatcher$lastDimension");
+            if(!Modifier.isStatic(lastDimension.getModifiers())||lastDimension.getType()!=String.class)return false;
+            lastDimension.setAccessible(true);
+            if(lastDimension.get(null)==null)return false;
+            Field pack=iris().getDeclaredField("currentPack");pack.setAccessible(true);
+            if(!(pack.get(null) instanceof ShaderPackSourceCarrier carrier))return false;
+            var source=carrier.muxi$shaderPackSource();
+            return source!=null&&source.root()!=null&&!source.defines().isEmpty()
+                &&!source.defines().containsKey("EUPHORIA_PATCHES_FIRST_LOADED");
+        }catch(ReflectiveOperationException|RuntimeException|LinkageError unavailable){return false;}
+    }
+    private static boolean validMacros(Set<String> keys,String expected){
+        return keys.contains(expected)&&keys.stream().filter(k->k.startsWith("CURRENT_EUPHORIA_PATCHES_DIMENSION_")).count()==1
+            &&!keys.contains("EUPHORIA_PATCHES_FIRST_LOADED");
+    }
     public static void changingLevel(ClientLevel next){
         ClientLevel old=Minecraft.getInstance().level;
-        pendingLevel=null;pendingDimension=null;successful=false;handledLevel=null;
+        pendingLevel=null;pendingDimension=null;successful=false;handledLevel=null;reconnecting=false;
         if(next==null){clear();return;}
         String from=dimension(old),to=dimension(next);
-        if(from!=null&&!from.equals(to)&&DIMENSIONS.contains(from)&&DIMENSIONS.contains(to)){
+        reconnecting=from==null&&DIMENSIONS.contains(to)&&reconnectEligible();
+        if(reconnecting||(from!=null&&!from.equals(to)&&DIMENSIONS.contains(from)&&DIMENSIONS.contains(to))){
             pendingLevel=next;pendingDimension=to;
         }
     }
-    public static void clear(){root=null;packClass=null;options=Map.of();PACKS.clear();pendingLevel=null;handledLevel=null;pendingDimension=null;successful=false;last.clear();}
+    public static void clear(){root=null;packClass=null;options=Map.of();PACKS.clear();pendingLevel=null;handledLevel=null;pendingDimension=null;successful=false;reconnecting=false;last.clear();}
     public static void genuineReload(){if(!building)clear();}
     public static void captured(Path path,Map<String,String> changed,Object defines,boolean zip,Object pack){
         if(building)return;
@@ -60,6 +80,9 @@ public final class DimensionShaderSwap {
         refresh();
     }
     private static boolean refresh(){
+        // Any failure, including a macro guard, is terminal for this setLevel.
+        // StandardMacros advances vendor state and must not be retried each frame.
+        handledLevel=pendingLevel;
         long begin=System.nanoTime();
         try{
             Class<?> iris=iris();
@@ -71,10 +94,18 @@ public final class DimensionShaderSwap {
             if(current==null)return false;
             boolean cached=PACKS.containsKey(pendingDimension);Object target=PACKS.get(pendingDimension);
             String dimensionMacro="CURRENT_EUPHORIA_PATCHES_DIMENSION_"+String.valueOf(invoke(Class.forName("com.euphoriapatches.euphoria_patcher.util.mod.ModLoaderSpecifics"),"getCurrentDimensionStatic")).toUpperCase(Locale.ROOT);
+            boolean reusedCurrent=false;
+            if(target==null&&reconnecting&&current instanceof ShaderPackSourceCarrier carrier){
+                var source=carrier.muxi$shaderPackSource();
+                if(source!=null&&Objects.equals(root,source.root())&&options.equals(source.options())&&zipped==source.zipped()
+                    &&validMacros(source.defines().keySet(),dimensionMacro)){
+                    target=current;reusedCurrent=true;PACKS.put(pendingDimension,target);
+                }
+            }
             if(target==null){
                 Object defines=invoke(Class.forName("net.irisshaders.iris.gl.shader.StandardMacros"),"createStandardEnvironmentDefines");
                 Set<String> keys=macroKeys(defines);
-                if(!keys.contains(dimensionMacro)||keys.stream().filter(k->k.startsWith("CURRENT_EUPHORIA_PATCHES_DIMENSION_")).count()!=1||keys.contains("EUPHORIA_PATCHES_FIRST_LOADED"))return false;
+                if(!validMacros(keys,dimensionMacro))return false;
                 Constructor<?> ctor=Arrays.stream(packClass.getConstructors()).filter(c->c.getParameterCount()==4&&Map.class.isAssignableFrom(c.getParameterTypes()[1])).findFirst().orElseThrow();
                 building=true;
                 try{target=ctor.newInstance(root,new HashMap<>(options),defines,zipped);}finally{building=false;}
@@ -87,7 +118,7 @@ public final class DimensionShaderSwap {
             field.set(null,target);
             handledLevel=pendingLevel;successful=true;
             last.clear();last.put("dimension",pendingDimension);last.put("cachedParsedPack",cached);last.put("parsedPacks",PACKS.size());
-            last.put("dimensionMacro",dimensionMacro);
+            last.put("dimensionMacro",dimensionMacro);last.put("reconnecting",reconnecting);last.put("reusedCurrentPack",reusedCurrent);
             last.put("packRefreshMs",(built-begin)/1e6);last.put("pipelineDestroyMs",(System.nanoTime()-built)/1e6);
             LOG.info("MUXI_DIMENSION_SHADER_SWAP {}",last);
             return true;
@@ -104,7 +135,7 @@ public final class DimensionShaderSwap {
         if(!successful)return false;
         LOG.info("MUXI_DIMENSION_SHADER_EXTRA_RELOAD_AVOIDED {}",pendingDimension);
         // Only this completed setLevel's callback is consumed; manual reloads remain untouched.
-        pendingLevel=null;pendingDimension=null;return true;
+        pendingLevel=null;pendingDimension=null;reconnecting=false;return true;
     }
     public static Map<String,Object> diagnosticSnapshot(){return Map.copyOf(last);}
     public static Map<String,Object> diagnosticLifecycleSnapshot(){return Map.of("parsedPacks",PACKS.size(),"capturedPackRoot",root!=null,"pendingLevel",pendingLevel!=null);}

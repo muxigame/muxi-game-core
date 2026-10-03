@@ -1,21 +1,45 @@
 # Optional shader program cache and Veil event dispatch
 
-Both client options default to **off**. This source candidate does not enable
-either option in a production launcher or change server teleport permissions.
+Veil's guarded empty-phase dispatch optimization defaults to **on** after
+bootstrap and only for the pinned runtime below. Use
+`-Dmuxi.veilShaderEventDispatch=false` to restore native dispatch. Program binary
+caching remains **off** by default. This changes no server teleport permissions
+and does not deploy a production launcher or client.
 
 | JVM option | Optional behavior |
 | --- | --- |
 | `-Dmuxi.programBinaryCache=true` | Restore validated native program binaries for pinned Iris Extended/Composite, Iris-owned Sodium and Colorwheel programs. |
-| `-Dmuxi.veilShaderEventDispatch=true` | Skip empty native priority listener arrays for Veil shader-processor registration, retaining fresh events and processor lists. |
+| `-Dmuxi.veilShaderEventDispatch=false` | Disable the default optimization that skips empty native priority listener arrays for Veil shader-processor registration, retaining fresh events and processor lists. |
 | `-Dmuxi.programBinaryCache.diagnostics=true` | Retain bounded content-key diagnostics for local QA; unnecessary for normal use. |
 
-Enable only after validating the matching runtime and the intended shader pack,
-driver, resource refresh and login flow. The options are independent. Current
+Enable program binary caching only after validating the matching runtime and
+shader pack, driver, resource refresh and login flow. The options are independent. Current
 earlier native Veil OFF/ON measurements kept binary caching **on in both
 phases**. The exact committed candidate now also passed binary OFF / Veil OFF
-and binary OFF / Veil ON native transfers. A fresh-process first login with
-Veil enabled remains an additional validation configuration. Driver-warm native linking can
+and binary OFF / Veil ON native transfers. The default-on validation below also covers a fresh-process first login
+without an explicit Veil option. Driver-warm native linking can
 already be fast, so binary caching has no guaranteed whole-transfer benefit.
+
+## Guarded reconnect refresh
+
+The reconnect extension checks eight public provider classes and reads the
+vendor's actual `lastDimension` state. A matching current native pack may be
+reused only when its root, options, zip mode and single target-dimension macro
+match. Other supported target dimensions receive freshly validated defines.
+Native GPU pipelines are still destroyed and rebuilt; only the matching vendor
+dimension-reload callback is consumed after a successful refresh.
+
+A true first join keeps the native path. A pack containing
+`EUPHORIA_PATCHES_FIRST_LOADED` also keeps native reload behavior. In the pinned
+cold-start sequence the first reconnect still falls back; the second reconnect
+can use the stable pack created by that native reload. Unknown providers and
+failed guards retain native behavior. A failed attempt cannot retry every frame
+and repeatedly advance the vendor's macro counter. Manual reloads remain native,
+and logout clears the parsed-pack map and pending level references.
+
+CPU lifecycle coverage: 21 assertions against the actual implementation and
+controlled vendor doubles. These do not model every internal vendor macro call
+and do not substitute for native login validation.
 
 ## Compatibility and native fallback
 
@@ -60,6 +84,30 @@ Shader-pack source metadata follows the native pack owner, allowing a direct
 saved-home join after the Core capture slot was cleared. It does not retain a
 global native pack or extend a GPU lifetime.
 
+## Default-on and reconnect native validation
+
+The private candidate passed three measured native logins and eight transfers
+with no `muxi.veilShaderEventDispatch` property, binary caching off and the
+independent logging optimization off. Veil dispatch was enabled without a
+failure latch on every sample. Actual successful GPU pipeline constructions
+were **1 / 2 / 1** for first join / first reconnect / second reconnect. The
+last join reused the current parsed pack and consumed the identified redundant
+vendor callback. The first reconnect retained the early-macro fallback.
+
+Four same-dimension transfers built no new pipeline. Four cross-dimension
+transfers covering the main world and both Core dimensions built one pipeline
+each, with the expected target macro. Native Iris rendering remained enabled
+without fallback, movement reached the server, logout cleared owned parsed
+packs and pending state, and the client exited normally.
+
+This profile uses the current 0.2.1 framework required by the integrated Core
+SSO code. Two legacy private-test game addons restricted to framework 0.1.x
+were excluded; shader providers were retained. Concurrent clients and this
+dependency adjustment preclude a controlled whole-login timing comparison.
+These are native offline client/server checks, not production authentication
+or resource-sync validation, and do not establish that total first-login
+latency is solved. Game startup and local-server boot are outside this metric.
+
 ## Validation and measured limits
 
 The private offline profile passed 24 native transfers with resource/manual
@@ -67,7 +115,7 @@ reload, checksum corruption, driver rejection, native shader rendering and
 server-observed movement. The final cleanup build passed six native logins and
 logout/normal-exit checks: binary entries/bytes, actual weak scopes and binding
 metadata were zero. CPU integrity/fallback checks: 34; native event-bus ordering,
-inheritance and dynamic-listener checks: 9.
+inheritance, dynamic-listener and default/rollback guard checks: 16.
 
 Veil OFF/ON cross-transfer warm medians were 6.20/2.90 seconds; rollback OFF was
 6.64 seconds. Client login medians were 29.36/19.44 seconds, excluding local

@@ -22,7 +22,24 @@ public final class VeilDispatchCorrectnessTest {
   List<String> nativeOrder=route(false),optimizedOrder=route(true);check(nativeOrder.equals(optimizedOrder),"phase-major mod order and dynamic registration preserved");check(nativeOrder.equals(List.of("first-high","second-high","first-low","first-dynamic-low")),"fixture covers ordering and dynamically added lower phase");
   var unsupported=(IEventBus)java.lang.reflect.Proxy.newProxyInstance(IEventBus.class.getClassLoader(),new Class[]{IEventBus.class},(proxy,method,values)->null);check(!VeilShaderEventDispatch.empty(unsupported,EventPriority.NORMAL,event),"unknown event bus requests native delivery");
   check(!VeilShaderEventDispatch.empty(null,EventPriority.NORMAL,event),"missing bus stays native");
-  check(!VeilShaderEventDispatch.enabled(),"default disabled and post-bootstrap/version guards required");
+  String property="muxi.veilShaderEventDispatch",saved=System.getProperty(property);
+  boolean ready=ShaderBinaryBootstrap.ready,owner=ShaderBinaryBootstrap.owner("veil-event-dispatch");
+  try{
+   System.clearProperty(property);ShaderBinaryBootstrap.ready=false;ShaderBinaryBootstrap.owner("veil-event-dispatch",true);
+   check(!VeilShaderEventDispatch.enabled(),"default still requires completed bootstrap");
+   ShaderBinaryBootstrap.ready=true;ShaderBinaryBootstrap.owner("veil-event-dispatch",false);
+   check(!VeilShaderEventDispatch.enabled(),"default still rejects unverified providers");
+   ShaderBinaryBootstrap.owner("veil-event-dispatch",true);
+   check(VeilShaderEventDispatch.enabled(),"verified runtime enables default without launcher flag");
+   System.setProperty(property,"false");check(!VeilShaderEventDispatch.enabled(),"explicit rollback retains native dispatch");
+   System.setProperty(property,"true");check(VeilShaderEventDispatch.enabled(),"explicit enable remains supported");
+   System.setProperty(property,"TRUE");check(VeilShaderEventDispatch.enabled(),"existing case-insensitive option preserved");
+   var disabledField=VeilShaderEventDispatch.class.getDeclaredField("disabled");disabledField.setAccessible(true);
+   boolean oldDisabled=disabledField.getBoolean(null);
+   try{disabledField.setBoolean(null,true);check(!VeilShaderEventDispatch.enabled(),"runtime failure latch overrides default and explicit enable");}
+   finally{disabledField.setBoolean(null,oldDisabled);}
+   System.setProperty(property,"invalid");check(!VeilShaderEventDispatch.enabled(),"unknown option value falls back conservatively");
+  }finally{if(saved==null)System.clearProperty(property);else System.setProperty(property,saved);ShaderBinaryBootstrap.ready=ready;ShaderBinaryBootstrap.owner("veil-event-dispatch",owner);}
   System.out.println("Veil native bus correctness checks passed: "+checks);
  }
 }

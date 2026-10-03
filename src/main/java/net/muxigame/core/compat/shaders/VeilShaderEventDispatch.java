@@ -15,7 +15,7 @@ public final class VeilShaderEventDispatch {
  private static long calls,skipped,delivered,fallbacks,elapsedNs,probeNs;
  private static boolean disabled;
  private VeilShaderEventDispatch(){}
- public static boolean enabled(){return ShaderBinaryBootstrap.ready&&Boolean.getBoolean("muxi.veilShaderEventDispatch")&&!disabled&&ShaderBinaryBootstrap.owner("veil-event-dispatch");}
+ public static boolean enabled(){return ShaderBinaryBootstrap.ready&&Boolean.parseBoolean(System.getProperty("muxi.veilShaderEventDispatch","true"))&&!disabled&&ShaderBinaryBootstrap.owner("veil-event-dispatch");}
  /** Uses exactly the native EventBus.post(priority,event) listener lookup, never a cached subscription. */
  public static boolean empty(IEventBus bus,EventPriority priority,Event event)throws ReflectiveOperationException {
   if(bus==null||!bus.getClass().getName().equals("net.neoforged.bus.EventBus"))return false;
