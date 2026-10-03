@@ -1,0 +1,200 @@
+{
+  "purpose": "Source handoff for Outbreak owner integrating the shared QA runner; not a second general runner",
+  "validatedLab": "native-on-fix-pctrl-20261003-055919-0a8f7758",
+  "nativeCoreSha256": "36a9ad2737faf3f03b0c96932751855aa71d6fbf3e9917a6728e1acc55baf213",
+  "nativeResults": {
+    "joins": 3,
+    "routes": 8,
+    "exitCode": 0
+  },
+  "files": [
+    {
+      "file": "run_transfer_native.py",
+      "sha256": "450a9fb711e2fcc9b9b05d9173a2df88a1a003e931c6ed91c40f266a1edd4d3d"
+    },
+    {
+      "file": "launch_prepared_transfer.py",
+      "sha256": "01a63c5f8b0ab0d7f18f3e6170bf67f993aa7d0f381f80c20734814202aed384"
+    },
+    {
+      "file": "binary-audit/prepare_latency_round.py",
+      "sha256": "5100f7bde1016a7c7e5044c52bb644cf243502e50bbcc0efaa62797ecc24aabc"
+    },
+    {
+      "file": "binary-audit/prepare_shader_fix_round.py",
+      "sha256": "f0255bc73908ab708707e695098dbb9a433297786f634e9e07d9e93c6f58671c"
+    },
+    {
+      "file": "binary-audit/read_shader_fix_progress.py",
+      "sha256": "ec12df125fe396e1899358e5f2a30cacfc9b6cde1dc9492bde2629a337bff5cd"
+    },
+    {
+      "file": "binary-audit/verify_shader_fix_native.py",
+      "sha256": "a9f77b801e286413d5938bfe6e10d4e3ae2dc04f0e3849df6475a7df38d7f4f2"
+    },
+    {
+      "file": "binary-audit/qa-src/net/muxigame/binaryqa/Trace.java",
+      "sha256": "33bbb50b1b245e95de800b71854cf028c415c6116257bcf056e03a01b1ece27b"
+    },
+    {
+      "file": "binary-audit/qa-src/net/muxigame/binaryqa/mixin/TraceClientPackets.java",
+      "sha256": "9a6b5725bd8ce5adf60947b036d7c6dc95c907c7e91b52e2ff452a65499a53dd"
+    },
+    {
+      "file": "binary-audit/qa-src/net/muxigame/binaryqa/mixin/TraceColorwheel.java",
+      "sha256": "9555bd5bccf02a9a931f353f4db34845e862f41de5fb7f3617ab8b1eacd4c5e6"
+    },
+    {
+      "file": "binary-audit/qa-src/net/muxigame/binaryqa/mixin/TraceFirstDraw.java",
+      "sha256": "4a8ac44cf9972c61d228153edb6e34b7091219ee0b1800e8f55953727447ecff"
+    },
+    {
+      "file": "binary-audit/qa-src/net/muxigame/binaryqa/mixin/TraceGlCompile.java",
+      "sha256": "3150f9f689f7ad42d8bc1b899b99cd03c28b5c8712eaf7491f600cdd31215f63"
+    },
+    {
+      "file": "binary-audit/qa-src/net/muxigame/binaryqa/mixin/TraceMinecraft.java",
+      "sha256": "b93536a6078483831bf5e734e04ec63a63a771c27242c51695654c6280f82705"
+    },
+    {
+      "file": "binary-audit/qa-src/net/muxigame/binaryqa/mixin/TracePipeline.java",
+      "sha256": "b09aa64d614f6a302563b43df0c351de777cf1841da634edc140e8cb5b30b7d9"
+    },
+    {
+      "file": "binary-audit/qa-src/net/muxigame/binaryqa/mixin/TraceSodiumCompile.java",
+      "sha256": "c6671ab57220261f3be9abe13bd1e4a5b31fb9e45be504d44ce9d91006d50db4"
+    },
+    {
+      "file": "binary-audit/qa-src/net/muxigame/binaryqa/mixin/TraceVeilRegistration.java",
+      "sha256": "8904cac0c790dd16b26c0063f56530aaa43f01e98ff698945c2678d127705fa2"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/route_timeline.mixins.json",
+      "sha256": "ca37812264eeadc29acab9edfc277dc3ca1b73ac74798314061967ac1d03018d"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/tests/RouteTimelineSelfTest.java",
+      "sha256": "d275a5ac5feeffe32493676ea93251f18e579155d86b62575b746c072a3e5293"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/net/muxigame/binaryqa/route/RouteTimeline.java",
+      "sha256": "d3ea5bab5edeca594fa21cd40e28bda5b78279285f27cc92cd2c81f4690d0ca0"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/net/muxigame/binaryqa/route/TaskTag.java",
+      "sha256": "d8b3d1af9fe0a00f481c3f40e0ab0d9d4832296327fb559d0b12940fabefa258"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/net/muxigame/binaryqa/route/mixin/RouteFrame.java",
+      "sha256": "2b17f1820f17e358c6bdcdcf830c9bdcce6f2b41cb7c5441f545674684d08982"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/net/muxigame/binaryqa/route/mixin/RouteMeshManager.java",
+      "sha256": "6dc1ae6f33418a2d35ddad78c312c148c6f972a569b64cea9f6ecc3038587c2d"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/net/muxigame/binaryqa/route/mixin/RouteMeshTask.java",
+      "sha256": "978601df215170856b5c3309e78409e94cbac293789953092f10f79c1cb25b07"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/net/muxigame/binaryqa/route/mixin/RoutePackets.java",
+      "sha256": "64ab8b80f05240d051a0ca22c2e9a2b70a65dfb52c8366c1b57849d90af843cf"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/net/muxigame/binaryqa/route/mixin/RouteSectionUpload.java",
+      "sha256": "9219389b20b29cfcfaa0a4ea234116b79b9070e967dec3ca796e0007512ba05f"
+    },
+    {
+      "file": "binary-audit/route-timeline-src/net/muxigame/binaryqa/route/mixin/RouteServerSend.java",
+      "sha256": "b0c710b6e82801e28b3e4557ce79385ccdedd16f3e7a9c1fc1ed691464fccef2"
+    },
+    {
+      "file": "binary-audit/binary-io-probe-src/muxi-binary-io-probe.mixins.json",
+      "sha256": "bf6657c1b23fa3cfa22f5d070bfc422280e2bf884c6e007c642512d04b2e12d2"
+    },
+    {
+      "file": "binary-audit/binary-io-probe-src/net/muxigame/binaryqa/mixin/TraceBinaryDriver.java",
+      "sha256": "5b97180bcff5610ff47abefc15f96fc3f5aa07bac4bb81bfb9c4e4bdbc1d01e1"
+    },
+    {
+      "file": "binary-audit/binary-io-probe-src/net/muxigame/binaryqa/mixin/TraceBinaryKey.java",
+      "sha256": "4f4390d2e05dfb209f94c011f2ed0e8168f7c5be3daa075f2074b54631aed8de"
+    },
+    {
+      "file": "binary-audit/binary-io-probe-src/net/muxigame/binaryqa/mixin/TraceBinaryStore.java",
+      "sha256": "8d3dd863de56391c3b78d38104978482b527334fc4168445883bfa16f72c3450"
+    },
+    {
+      "file": "binary-audit/binary-io-probe-src/net/muxigame/binaryqa/mixin/TraceNativeShaderQueries.java",
+      "sha256": "cd856615a08a9e8c3e9ee98608f0fb2637293b67dc1737046daf7eb9f7f5efa9"
+    },
+    {
+      "file": "binary-audit/shader-fix-probe-src/shader_fix_qa.mixins.json",
+      "sha256": "9a108374c6f0af305cb9d4bfb4c367c2a4a5a794364f1d2b6c5589620958e1c5"
+    },
+    {
+      "file": "binary-audit/shader-fix-probe-src/net/muxigame/shaderfixqa/PipelineConstructionProbe.java",
+      "sha256": "9b393a954e64844fb3f8363114b135678cb006a2f7bfb371a49ccfc691118142"
+    },
+    {
+      "file": "validated-qa-source/CreativeOrigins.java",
+      "sha256": "8be9dcf51227d5ca24ae203479287e1ede6a42ee35388e5dbdddda0b8485f48c"
+    },
+    {
+      "file": "validated-qa-source/HardwareWmiTimeoutQAMixin.java",
+      "sha256": "63906652b07d356fcd90a89dded7f0cd713d52fdd9dd18ce3314c3bd1830fdb8"
+    },
+    {
+      "file": "validated-qa-source/HiddenWindowMixin.java",
+      "sha256": "ae979a516eca62e6ce733b79940be0e18043fa15cfbd2859350f409f5362946b"
+    },
+    {
+      "file": "validated-qa-source/JoinNativeQA.java",
+      "sha256": "d1157c3ec7d082962f4da09989fbc26c91dfcc2d6822b77ca67270441be62bb4"
+    },
+    {
+      "file": "validated-qa-source/NativeProbe.java",
+      "sha256": "00245ae5e90858ba1fcd3bb54c5ed913f066d5f5d1d8c52d7d2f4de073888392"
+    },
+    {
+      "file": "validated-qa-source/OfflineMcefMixin.java",
+      "sha256": "cd30781791e35730dd5e32e71d0e277ef6627cf8209c66385d0a59d42fda3da7"
+    },
+    {
+      "file": "validated-qa-source/Trace.java",
+      "sha256": "598b28618bfdd74694227c3d87a13fac0dcee2dafb006369cf94285b53017038"
+    },
+    {
+      "file": "validated-qa-source/TraceChunkPackets.java",
+      "sha256": "fc192460af8d0d83a2e71a8a280cfab812b2c5dd7bd58cce0a7c71f67c15fb9e"
+    },
+    {
+      "file": "validated-qa-source/TraceCreativeEvent.java",
+      "sha256": "27a2b03af15d95b63edfa71aa2ee971ad01bcab22ccf7f34740c480ba191160f"
+    },
+    {
+      "file": "validated-qa-source/TraceJeiItems.java",
+      "sha256": "6635a6fb50518e92b9de056949f203f578fe88decf3bf989f5d5d256e11e14b9"
+    },
+    {
+      "file": "validated-qa-source/TraceMinecraft.java",
+      "sha256": "a80284e4332fe07a0ab4aa08ab836f8359dbc3e827d145143f3e414e9f0f388f"
+    },
+    {
+      "file": "validated-qa-source/TraceServerChunks.java",
+      "sha256": "2219dd0a267333b56b6b010b4dedae3f9b227e1446842a5ce0aa96e8cdf8068f"
+    },
+    {
+      "file": "validated-qa-source/TraceServerSend.java",
+      "sha256": "550b22eaa42d799cc9fe821513163ad27a8679a35f2cdc3594127615c119facd"
+    },
+    {
+      "file": "validated-qa-source/TraceSodiumMesh.java",
+      "sha256": "d6e2873f88c6862e2e002cc096b460afa7d36abdb5c253f6bdaf1227ab4dd908"
+    },
+    {
+      "file": "validated-qa-source/TransferNativeQA.java",
+      "sha256": "72b51daaca68285211ec8510140d2c2b733f24767d458c2de95ed93eddc44434"
+    }
+  ]
+}

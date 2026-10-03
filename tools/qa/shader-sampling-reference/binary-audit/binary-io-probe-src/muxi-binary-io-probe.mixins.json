@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.muxigame.binaryqa.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "TraceBinaryDriver",
+    "TraceBinaryStore",
+    "TraceBinaryKey",
+    "TraceNativeShaderQueries"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

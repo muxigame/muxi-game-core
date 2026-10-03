@@ -1,0 +1,24 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="Private QA only"
+[[mods]]
+modId="muxi_shader_native_qa"
+version="0.0.1"
+displayName="Muxi private native shader QA"
+[[mixins]]
+config="shader_native_client.mixins.json"
+[[mixins]]
+config="shader_native_stages.mixins.json"
+[[mixins]]
+config="shader_native_routes.mixins.json"
+[[mixins]]
+config="shader_native_server.mixins.json"
+[[dependencies.muxi_shader_native_qa]]
+modId="muxi_game_core"
+type="required"
+versionRange="[1,)"
+ordering="AFTER"
+side="BOTH"
+
+[[mixins]]
+config="shader_native_creative.mixins.json"

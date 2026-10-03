@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "plugin": "net.muxigame.shadernative.QAMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "package": "net.muxigame.shadernative.mixin",
+  "client": [
+    "ConnectBoundary",
+    "PipelineCreated",
+    "ClientLevelSpan",
+    "JoinReload",
+    "JoinLoginBoundary"
+  ],
+  "server": []
+}

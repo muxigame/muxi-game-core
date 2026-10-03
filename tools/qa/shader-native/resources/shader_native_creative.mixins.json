@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.muxigame.binaryqa.creative.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "net.muxigame.shadernative.QAMixinPlugin",
+  "mixins": [
+    "CreativeBuildPhasesMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

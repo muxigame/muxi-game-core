@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "plugin": "net.muxigame.shadernative.QAMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "package": "net.muxigame.binaryqa.route.mixin",
+  "client": [
+    "RouteFrame",
+    "RouteMeshManager",
+    "RouteMeshTask",
+    "RoutePackets",
+    "RouteSectionUpload"
+  ],
+  "server": [
+    "RouteServerSend"
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "oldSourcesReadOnly": true,
+  "files": [
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\route-timeline-src\\net\\muxigame\\binaryqa\\route\\RouteTimeline.java",
+      "sha256": "d3ea5bab5edeca594fa21cd40e28bda5b78279285f27cc92cd2c81f4690d0ca0",
+      "destination": "src/net/muxigame/binaryqa/route/RouteTimeline.java",
+      "adapted": false
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\route-timeline-src\\net\\muxigame\\binaryqa\\route\\TaskTag.java",
+      "sha256": "d8b3d1af9fe0a00f481c3f40e0ab0d9d4832296327fb559d0b12940fabefa258",
+      "destination": "src/net/muxigame/binaryqa/route/TaskTag.java",
+      "adapted": false
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\route-timeline-src\\net\\muxigame\\binaryqa\\route\\mixin\\RouteFrame.java",
+      "sha256": "2b17f1820f17e358c6bdcdcf830c9bdcce6f2b41cb7c5441f545674684d08982",
+      "destination": "src/net/muxigame/binaryqa/route/mixin/RouteFrame.java",
+      "adapted": false
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\route-timeline-src\\net\\muxigame\\binaryqa\\route\\mixin\\RouteMeshManager.java",
+      "sha256": "6dc1ae6f33418a2d35ddad78c312c148c6f972a569b64cea9f6ecc3038587c2d",
+      "destination": "src/net/muxigame/binaryqa/route/mixin/RouteMeshManager.java",
+      "adapted": false
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\route-timeline-src\\net\\muxigame\\binaryqa\\route\\mixin\\RouteMeshTask.java",
+      "sha256": "978601df215170856b5c3309e78409e94cbac293789953092f10f79c1cb25b07",
+      "destination": "src/net/muxigame/binaryqa/route/mixin/RouteMeshTask.java",
+      "adapted": false
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\route-timeline-src\\net\\muxigame\\binaryqa\\route\\mixin\\RoutePackets.java",
+      "sha256": "64ab8b80f05240d051a0ca22c2e9a2b70a65dfb52c8366c1b57849d90af843cf",
+      "destination": "src/net/muxigame/binaryqa/route/mixin/RoutePackets.java",
+      "adapted": false
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\route-timeline-src\\net\\muxigame\\binaryqa\\route\\mixin\\RouteSectionUpload.java",
+      "sha256": "9219389b20b29cfcfaa0a4ea234116b79b9070e967dec3ca796e0007512ba05f",
+      "destination": "src/net/muxigame/binaryqa/route/mixin/RouteSectionUpload.java",
+      "adapted": false
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\create_native_probe.py",
+      "sha256": "5659c9f143d044f4e1658cd4b34d75d7a42dd29f450006e75f3f0313088df887",
+      "destination": "src/net/muxigame/binaryqa/mixin/TraceClientPackets.java",
+      "adapted": false,
+      "extractedLiteral": "mixin/TraceClientPackets.java"
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\create_native_probe.py",
+      "sha256": "5659c9f143d044f4e1658cd4b34d75d7a42dd29f450006e75f3f0313088df887",
+      "destination": "src/net/muxigame/binaryqa/mixin/TracePipeline.java",
+      "adapted": false,
+      "extractedLiteral": "mixin/TracePipeline.java"
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\create_native_probe.py",
+      "sha256": "5659c9f143d044f4e1658cd4b34d75d7a42dd29f450006e75f3f0313088df887",
+      "destination": "src/net/muxigame/binaryqa/mixin/TraceColorwheel.java",
+      "adapted": false,
+      "extractedLiteral": "mixin/TraceColorwheel.java"
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\create_native_probe.py",
+      "sha256": "5659c9f143d044f4e1658cd4b34d75d7a42dd29f450006e75f3f0313088df887",
+      "destination": "src/net/muxigame/binaryqa/mixin/TraceGlCompile.java",
+      "adapted": false,
+      "extractedLiteral": "mixin/TraceGlCompile.java"
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\create_native_probe.py",
+      "sha256": "5659c9f143d044f4e1658cd4b34d75d7a42dd29f450006e75f3f0313088df887",
+      "destination": "src/net/muxigame/binaryqa/mixin/TraceSodiumCompile.java",
+      "adapted": false,
+      "extractedLiteral": "mixin/TraceSodiumCompile.java"
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\server-transfer-probe-src\\net\\muxigame\\binaryqa\\serverroute\\ServerRouteScope.java",
+      "sha256": "81cd491bcc9a28f1aac505018170c3b12a29d364be812d71136d49bae948a031",
+      "destination": "src/net/muxigame/binaryqa/serverroute/ServerRouteScope.java",
+      "adapted": true
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\server-transfer-probe-src\\net\\muxigame\\binaryqa\\serverroute\\mixin\\ServerRouteChange.java",
+      "sha256": "d4ee98f53512ea35de017507d569d4be94af31761ac5730d8905713aff79cea7",
+      "destination": "src/net/muxigame/binaryqa/serverroute/mixin/ServerRouteChange.java",
+      "adapted": true
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\server-transfer-probe-src\\net\\muxigame\\binaryqa\\serverroute\\mixin\\ServerRouteChunks.java",
+      "sha256": "7b3ea6669ce51cdf2764330b94182a760f2e7a93ebd75ea4e66ea8efc75262fc",
+      "destination": "src/net/muxigame/binaryqa/serverroute/mixin/ServerRouteChunks.java",
+      "adapted": true
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\route-timeline-src\\net\\muxigame\\binaryqa\\route\\mixin\\RouteServerSend.java",
+      "sha256": "b0c710b6e82801e28b3e4557ce79385ccdedd16f3e7a9c1fc1ed691464fccef2",
+      "destination": "src/net/muxigame/binaryqa/route/mixin/RouteServerSend.java",
+      "adapted": true
+    },
+    {
+      "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\memory-lifecycle-probe-src\\net\\muxigame\\memoryqa\\MemoryLifecycleProbe.java",
+      "sha256": "583e62e2ed32b47aef4e54c3c1df4cb3b3ba6ae055d3ce322abb43c72c048a0d",
+      "destination": "src/net/muxigame/memoryqa/MemoryLifecycleProbe.java",
+      "adapted": false
+    },
+    {
+      "source": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\muxi-game-core\\build\\shader-qa\\creative-phase-draft\\src\\net\\muxigame\\binaryqa\\creative\\CreativeBuildPhases.java",
+      "sha256": "1225f70a8fb518cdd4452f1d3b1c020866b054ff1a58bb8babb85391047c2d03",
+      "destination": "src/net/muxigame/binaryqa/creative/CreativeBuildPhases.java",
+      "adapted": false
+    },
+    {
+      "source": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\muxi-game-core\\build\\shader-qa\\creative-phase-draft\\src\\net\\muxigame\\binaryqa\\creative\\mixin\\CreativeBuildPhasesMixin.java",
+      "sha256": "398ef7af5c0a65ef8dc6389b7d2adbe3e4b62a97812e53f48e481c63eb411412",
+      "destination": "src/net/muxigame/binaryqa/creative/mixin/CreativeBuildPhasesMixin.java",
+      "adapted": false
+    }
+  ],
+  "businessReference": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\transfer-lab\\native-on-fix-pctrl-20261003-064541-0306f393\\qa-source",
+  "businessAdaptation": "New TCP state machine preserves original 8 route coordinates, native teleport/changeDimension and qualified-visible/movement conditions; no integrated-server access.",
+  "postNativeSourceNormalization": {
+    "path": "tools/qa/shader-native/src/net/muxigame/binaryqa/serverroute/mixin/ServerRouteChange.java",
+    "change": "CRCRLF to LF only; token bytes unchanged",
+    "testedRawSha256": "4dc700d4270857539f71a76ef793e71ae0210b2ba6daf5a331090f770cec2af1",
+    "normalizedSha256": "1d612e4eac818247a9a569023e54a308cdf559b9f2362f8a3fb795ef73162552"
+  }
+}

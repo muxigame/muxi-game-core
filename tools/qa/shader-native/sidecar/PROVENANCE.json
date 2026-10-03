@@ -1,0 +1,15 @@
+{
+  "source": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-02\\task-5\\binary-audit\\memory-lifecycle-probe-src\\sample_owned_memory.py",
+  "sourceSha256": "d2f0937e7328089727e9079477defce15beb1f910f0eb70a286dcecf512aea39",
+  "adaptation": "common owned_lab marker and host identity; fixed independent shader sidecar evidence path; no legacy runtime path defaults",
+  "historicalMetrics": "own PID CPU/system totals and PDH per adapter/engine retained",
+  "nativeIntegrationRun": {
+    "instance": "first-spawn-20261003-094748-184b5f",
+    "runId": "bdea1ca2ec2b45d58ffad4cc4f235e84",
+    "sampleCount": 255,
+    "samplerExitCode": 0,
+    "commonServerExitCode": 0,
+    "commonHostExitCode": 0
+  },
+  "sharedRuntimeModified": false
+}

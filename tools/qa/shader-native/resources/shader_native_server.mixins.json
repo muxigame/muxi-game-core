@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "plugin": "net.muxigame.shadernative.QAMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "package": "net.muxigame.binaryqa.serverroute.mixin",
+  "client": [],
+  "server": [
+    "ServerRouteChange",
+    "ServerRouteChunks"
+  ]
+}
