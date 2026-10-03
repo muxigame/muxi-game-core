@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.muxigame.core.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AdventureFirePlacementMixin",
+    "AdventureFireTickMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

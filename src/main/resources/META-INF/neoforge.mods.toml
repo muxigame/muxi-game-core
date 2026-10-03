@@ -73,3 +73,6 @@ config="muxi_game_core.program_binary.mixins.json"
 
 [[mixins]]
 config="muxi_game_core.input.mixins.json"
+
+[[mixins]]
+config="muxi_game_core.adventure_protection.mixins.json"
