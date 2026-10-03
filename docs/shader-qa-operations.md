@@ -159,3 +159,33 @@ runner's marked instance directory. `attempt4-timing-review.json` identifies
 its source hash, interval unions, dropped events and exact sample boundaries.
 Earlier attempts with missing dependency overrides, or a manually corrected
 wrong-dimension fixture, remain failures/exclusions and are not acceptance.
+
+## Fresh-account follow-up acceptance
+
+Run `first-spawn-20261003-094748-184b5f`, runId
+`bdea1ca2ec2b45d58ffad4cc4f235e84`, passed the separate first-spawn mode.
+Core SHA256: `c05a6bdb6cb97befb6e1d76e9120c7d1d6916028a0c9d759d21814ff728febbd`.
+QA SHA256: `9d022424120ad21342cf16d5a5e1290937950998e1cd03dd790fbe01c45b18e4`.
+The candidate includes async initial-survival preparation and the guarded
+first-custom-dimension macro correction. Full Core checks: 6995; shader lifecycle
+checks: 49 plus missing-counter fallback. The QA mode records its exact profile
+inside the hashed jar; the common runner remains the sole process owner.
+
+First game login selected Core overworld directly with a fresh account and a
+native safe random landing. The observed search completed in 6.316 seconds /
+126 advancing server ticks, then its owned connection request was consumed and
+removed. Both reconnects retained the saved position without another search.
+The three handleLogin-to-visible times were 96.136/10.898/6.699 seconds,
+ConnectScreen-to-visible 106.314/12.439/7.717 seconds. Pipeline creations were
+1/1/1; exact active dimension macros matched all three times; FIRST_LOADED was
+true/false/false. Iris and resource reloads, default/false/invalid/restored logging,
+three logout cleanups/server-absence receipts and normal exit codes 0/0 passed.
+
+This mode does not issue movement input, QA teleports or player-NBT edits, and
+has no fixed eight-route matrix. The earlier existing-account matrix above
+remains separate evidence. Early client logging was valid before the first
+handleLogin on this run. The first login's resource reload lasted 89.763 seconds;
+total first-login latency is still unresolved. Startup/mod loading is excluded.
+Neither the change in total time versus prior attempts nor the resource reload's
+whole duration is a measured shader-only speedup/cost. The older macro-failing
+first-spawn attempt is retained as a failure, not promoted to acceptance.

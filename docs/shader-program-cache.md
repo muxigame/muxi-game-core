@@ -29,7 +29,8 @@ match. Other supported target dimensions receive freshly validated defines.
 Native GPU pipelines are still destroyed and rebuilt; only the matching vendor
 dimension-reload callback is consumed after a successful refresh.
 
-A true first join keeps the native path. Reconnect requires ten pinned provider
+A first vanilla-overworld join keeps the native path; first Core custom-world
+entry uses the separately guarded branch below. Reconnect requires ten pinned provider
 classes, the vendor's initialized `lastDimension`, and its actual macro counter
 at least two. A pack containing `EUPHORIA_PATCHES_FIRST_LOADED` cannot be reused;
 it is rebuilt with fresh validated target macros after initialization is complete.
@@ -41,7 +42,7 @@ construction may still schedule bounded extra native macro/settings work before
 fallback. Manual reloads remain native; logout clears parsed packs and level
 references.
 
-CPU coverage: 33 lifecycle assertions plus a missing-counter fallback check
+CPU coverage: 49 lifecycle assertions plus a missing-counter fallback check
 against the actual implementation and controlled vendor doubles. These include
 both native macro generations and do not replace native validation.
 
@@ -200,6 +201,43 @@ Game startup is excluded. The dedicated logging gate was active before the
 recorded login event; early client installation was not timestamped. The fixture
 uses an existing account and does not cover new-account random-spawn generation.
 See the operational handoff for exact profile conditions, artifacts and timings.
+
+## First entry into a custom dimension
+
+The native Euphoria first-dimension callback only records the dimension when
+its previous dimension is null. A menu-created pack can therefore retain its
+vanilla-overworld macro when the first login packet selects a Core custom world.
+The new guarded branch handles only first null-to-Core entries with a complete
+source and the native define counter already at least two. At the first target
+pipeline it rechecks the active pack; if another reload has already corrected
+the macro, it does nothing.
+
+For a mismatched pack, the normal four-argument constructor generates current
+environment and dimension defines through its own native factory. The input
+contains only the previous FIRST_LOADED and two update-notification hints; it
+never copies stale environment/presence macros or changes the native counter.
+The constructed source must have exactly the expected dimension macro, matching
+root/options/zip and the preserved hint values before normal GPU destruction
+and publication. This retains the actual pack's first-use animation timing.
+The first-entry pack never enters the ordinary dimension cache, and pending
+state is cleared on both success and failure. Correct first vanilla-overworld
+entry, later reconnect handling and manual resource reload remain unchanged.
+
+Focused checks cover 49 lifecycle cases plus the missing-counter fallback.
+Candidate c05a6bdb passed a fresh Core-survival first login plus two saved-position
+reconnects in first-spawn-20261003-094748-184b5f. Each actual first login packet
+and active pack selected Core survival with one pipeline and exactly one correct
+dimension macro. FIRST_LOADED was preserved on first entry, absent on both
+reconnects; the second reconnect reused the same parsed pack. Native shaders
+remained enabled without fallback. Real Iris/resource reloads, logging rollback,
+three logout cleanups and normal server/client exits zero also passed.
+The previous macro-failing attempt remains a failure. This new candidate's
+three-login acceptance does not claim a repeated eight-route matrix.
+
+HandleLogin-to-qualified-visible was 96.136/10.898/6.699 seconds. The first
+login still overlapped an 89.763-second resource reload and is not considered a
+solved latency result. Different random terrain and concurrent workloads make
+these runs unsuitable for a controlled before/after speedup claim.
 
 ## Operational sampling handoff
 

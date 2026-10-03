@@ -28,7 +28,6 @@ public final class DimensionsFeature implements ServerFeature {
     private static final String FIRST_JOIN_BOOK = "muxiFirstJoinBook";
     private static final String INITIAL_SURVIVAL_PENDING = "muxiInitialSurvivalPending";
     private static final String INITIAL_SURVIVAL_DONE = "muxiInitialSurvivalDone";
-    private static final int INITIAL_SURVIVAL_RADIUS = 10_000;
     public String id() { return "dimensions"; }
     public void register(IEventBus bus) {
         WorldPortals.registerEvents(bus);
@@ -55,28 +54,6 @@ public final class DimensionsFeature implements ServerFeature {
         // No handbook marker means genuinely new player. Existing players already handled by the
         // old first-join script keep their saved dimension and position.
         return !persisted.getBoolean(FIRST_JOIN_BOOK);
-    }
-    /** Uniform disk sampling. Each sample explicitly generates one target chunk before height/safety checks. */
-    public static BlockPos findInitialSurvivalLanding(ServerLevel target, ServerPlayer player) {
-        var random = player.getRandom();
-        int[][] offsets = {{0,0},{4,0},{-4,0},{0,4},{0,-4},{4,4},{4,-4},{-4,4},{-4,-4}};
-        for (int attempt = 0; attempt < 24; attempt++) {
-            double radius = Math.sqrt(random.nextDouble()) * INITIAL_SURVIVAL_RADIUS;
-            double angle = random.nextDouble() * Math.PI * 2.0;
-            int originX = (int)Math.floor(Math.cos(angle) * radius);
-            int originZ = (int)Math.floor(Math.sin(angle) * radius);
-            target.getChunk(originX >> 4, originZ >> 4);
-            for (int[] offset : offsets) {
-                int x = originX + offset[0], z = originZ + offset[1];
-                if ((long)x*x + (long)z*z > (long)INITIAL_SURVIVAL_RADIUS*INITIAL_SURVIVAL_RADIUS) continue;
-                BlockPos column = new BlockPos(x, 0, z);
-                if (!target.getWorldBorder().isWithinBounds(column)) continue;
-                int y = target.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-                BlockPos landing = new BlockPos(x, y, z);
-                if (safeInitialSpawn(target, landing)) return landing;
-            }
-        }
-        return null;
     }
     public static boolean safeInitialSpawn(ServerLevel level, BlockPos pos) {
         if (!safe(level, pos) || level.getBiome(pos).is(BiomeTags.IS_OCEAN)) return false;

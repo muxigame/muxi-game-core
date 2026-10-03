@@ -22,6 +22,15 @@ STUBS = {
  'com/euphoriapatches/euphoria_patcher/integration/ShaderLoader.java': 'package com.euphoriapatches.euphoria_patcher.integration;public class ShaderLoader {public static java.nio.file.Path getCurrentShaderpackPath(){return java.nio.file.Path.of("pack");}}',
  'com/euphoriapatches/euphoria_patcher/EuphoriaPatcher.java': 'package com.euphoriapatches.euphoria_patcher;public class EuphoriaPatcher {public static EuphoriaPatcher getInstance(){return new EuphoriaPatcher();}public Detector getShaderDetector(){return new Detector();}public static class Detector {public boolean isEuphoriaPatchesShader(java.nio.file.Path p){return net.irisshaders.iris.Iris.euphoria;}}}',
 }
+
+# Model the pinned constructor's ImmutableList signature and in-place effective macro merge.
+STUBS['com/google/common/collect/ImmutableList.java']='package com.google.common.collect;import java.util.*;public class ImmutableList<E> extends ArrayList<E>{private ImmutableList(Collection<? extends E> c){super(c);}public static <E> ImmutableList<E> copyOf(Collection<? extends E> c){return new ImmutableList<>(c);}}'
+STUBS['net/irisshaders/iris/helpers/StringPair.java']='package net.irisshaders.iris.helpers;public class StringPair{private final String k,v;public StringPair(String k,String v){this.k=k;this.v=v;}public String key(){return k;}public String value(){return v;}}'
+STUBS['net/irisshaders/iris/gl/shader/StandardMacros.java']=STUBS['net/irisshaders/iris/gl/shader/StandardMacros.java'].replace('public record Pair(String key,String value){}','public static class Pair extends net.irisshaders.iris.helpers.StringPair{public Pair(String k,String v){super(k,v);}}')
+STUBS['net/irisshaders/iris/shaderpack/ShaderPack.java']=STUBS['net/irisshaders/iris/shaderpack/ShaderPack.java'].replace('public ShaderPack(Path root,Map<String,String> options,List<Pair> defines,boolean zip){','public ShaderPack(Path root,Map<String,String> options,com.google.common.collect.ImmutableList<net.irisshaders.iris.helpers.StringPair> defines,boolean zip){this(root,options,new ArrayList<net.irisshaders.iris.helpers.StringPair>(defines),zip);}public ShaderPack(Path root,Map<String,String> options,List<? extends net.irisshaders.iris.helpers.StringPair> defines,boolean zip){').replace('new ArrayList<Pair>(defines)','new ArrayList<net.irisshaders.iris.helpers.StringPair>(defines)')
+
+STUBS['net/irisshaders/iris/gl/shader/StandardMacros.java']=STUBS['net/irisshaders/iris/gl/shader/StandardMacros.java'].replace('public static boolean invalid;','public static boolean invalid,wrongDimension;').replace('var values=new ArrayList<Pair>();','if(wrongDimension)d="WRONG";var values=new ArrayList<Pair>();')
+
 def main():
  parser=argparse.ArgumentParser(description=__doc__)
  parser.add_argument('--javac',default=shutil.which('javac'))

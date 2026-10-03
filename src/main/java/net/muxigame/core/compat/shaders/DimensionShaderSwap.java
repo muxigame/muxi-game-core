@@ -23,7 +23,8 @@ public final class DimensionShaderSwap {
     private static Class<?> packClass;
     private static ClientLevel pendingLevel,handledLevel;
     private static String pendingDimension;
-    private static boolean successful,reconnecting;
+    private static boolean successful,reconnecting,firstEntry;
+    private static final Set<String> FIRST_HINTS=Set.of("EUPHORIA_PATCHES_FIRST_LOADED","NEW_EUPHORIA_PATCHES_UPDATE","NEXT_EUPHORIA_PATCHES_VERSION");
     private static final Map<String,Object> last=new LinkedHashMap<>();
     private DimensionShaderSwap() {}
     private static String dimension(ClientLevel level){return level==null?null:level.dimension().location().toString();}
@@ -40,13 +41,14 @@ public final class DimensionShaderSwap {
     }
 
     // Read the pinned vendor's own state; a first-ever setLevel has no reload callback.
-    private static boolean reconnectEligible(){
+    private static boolean reconnectEligible(){return entryEligible(false);}
+    private static boolean entryEligible(boolean first){
         if(!ShaderBinaryBootstrap.owner("dimension-reconnect"))return false;
         try{
             Field lastDimension=Minecraft.class.getDeclaredField("euphoriaPatcher$lastDimension");
             if(!Modifier.isStatic(lastDimension.getModifiers())||lastDimension.getType()!=String.class)return false;
             lastDimension.setAccessible(true);
-            if(lastDimension.get(null)==null)return false;
+            if((lastDimension.get(null)==null)!=first)return false;
             Field pack=iris().getDeclaredField("currentPack");pack.setAccessible(true);
             if(!(pack.get(null) instanceof ShaderPackSourceCarrier carrier))return false;
             var source=carrier.muxi$shaderPackSource();
@@ -65,15 +67,16 @@ public final class DimensionShaderSwap {
     }
     public static void changingLevel(ClientLevel next){
         ClientLevel old=Minecraft.getInstance().level;
-        pendingLevel=null;pendingDimension=null;successful=false;handledLevel=null;reconnecting=false;
+        pendingLevel=null;pendingDimension=null;successful=false;handledLevel=null;reconnecting=false;firstEntry=false;
         if(next==null){clear();return;}
         String from=dimension(old),to=dimension(next);
+        firstEntry=from==null&&to!=null&&to.startsWith("muxi_game_core:")&&DIMENSIONS.contains(to)&&entryEligible(true);
         reconnecting=from==null&&DIMENSIONS.contains(to)&&reconnectEligible();
-        if(reconnecting||(from!=null&&!from.equals(to)&&DIMENSIONS.contains(from)&&DIMENSIONS.contains(to))){
+        if(firstEntry||reconnecting||(from!=null&&!from.equals(to)&&DIMENSIONS.contains(from)&&DIMENSIONS.contains(to))){
             pendingLevel=next;pendingDimension=to;
         }
     }
-    public static void clear(){root=null;packClass=null;options=Map.of();PACKS.clear();pendingLevel=null;handledLevel=null;pendingDimension=null;successful=false;reconnecting=false;last.clear();}
+    public static void clear(){root=null;packClass=null;options=Map.of();PACKS.clear();pendingLevel=null;handledLevel=null;pendingDimension=null;successful=false;reconnecting=false;firstEntry=false;last.clear();}
     public static void genuineReload(){if(!building)clear();}
     public static void captured(Path path,Map<String,String> changed,Object defines,boolean zip,Object pack){
         if(building)return;
@@ -82,7 +85,59 @@ public final class DimensionShaderSwap {
     }
     public static void beforePipeline(){
         if(pendingLevel==null||pendingLevel!=Minecraft.getInstance().level||handledLevel==pendingLevel)return;
-        refresh();
+        if(firstEntry){
+            try{refreshFirstEntry();}finally{pendingLevel=null;pendingDimension=null;firstEntry=false;successful=false;}
+        }else refresh();
+    }
+    /** Only the first custom entry: no vendor reload callback exists to consume. */
+    private static void refreshFirstEntry(){
+        handledLevel=pendingLevel;
+        try{
+            if(!ShaderBinaryBootstrap.owner("dimension-reconnect")||!euphoriaPack())return;
+            Class<?> iris=iris();
+            Object config=invoke(iris,"getIrisConfig");
+            if(!(Boolean)config.getClass().getMethod("areShadersEnabled").invoke(config))return;
+            Field field=iris.getDeclaredField("currentPack");field.setAccessible(true);
+            Object current=field.get(null);
+            if(!(current instanceof ShaderPackSourceCarrier carrier))return;
+            var source=carrier.muxi$shaderPackSource();
+            if(source==null||source.root()==null||source.defines().isEmpty()
+                    ||source.defines().keySet().stream().filter(k->k.startsWith("CURRENT_EUPHORIA_PATCHES_DIMENSION_")).count()!=1)return;
+            Field count=Class.forName("com.euphoriapatches.euphoria_patcher.integration.DefineHelper").getDeclaredField("injectCount");
+            count.setAccessible(true);if(count.getInt(null)<2)return;
+            String expected="CURRENT_EUPHORIA_PATCHES_DIMENSION_"+String.valueOf(invoke(Class.forName("com.euphoriapatches.euphoria_patcher.util.mod.ModLoaderSpecifics"),"getCurrentDimensionStatic")).toUpperCase(Locale.ROOT);
+            if(dimensionMatches(source.defines().keySet(),expected))return;
+            // Do not carry stale environment/presence macros. The normal constructor appends
+            // its native environment factory exactly once, while these hints retain first-use UI.
+            Class<?> pair=Class.forName("net.irisshaders.iris.helpers.StringPair");
+            var hints=new ArrayList<Object>();
+            for(String key:FIRST_HINTS)if(source.defines().containsKey(key))
+                hints.add(pair.getConstructor(String.class,String.class).newInstance(key,source.defines().get(key)));
+            Class<?> list=Class.forName("com.google.common.collect.ImmutableList");
+            Object defines=list.getMethod("copyOf",Collection.class).invoke(null,hints);
+            Constructor<?> ctor=current.getClass().getConstructor(Path.class,Map.class,list,boolean.class);
+            Object target;
+            building=true;
+            try{target=ctor.newInstance(source.root(),new HashMap<>(source.options()),defines,source.zipped());}finally{building=false;}
+            if(!(target instanceof ShaderPackSourceCarrier result))return;
+            var actual=result.muxi$shaderPackSource();
+            if(actual==null||!Objects.equals(source.root(),actual.root())||!source.options().equals(actual.options())
+                    ||source.zipped()!=actual.zipped()||!dimensionMatches(actual.defines().keySet(),expected))return;
+            for(String key:FIRST_HINTS)if(!Objects.equals(source.defines().get(key),actual.defines().get(key)))return;
+            Object manager=invoke(iris,"getPipelineManager");
+            manager.getClass().getMethod("destroyPipeline").invoke(manager);
+            field.set(null,target);
+            root=source.root();options=new HashMap<>(source.options());zipped=source.zipped();packClass=target.getClass();
+            PACKS.clear(); // FIRST_LOADED packs must not enter the normal per-dimension reuse cache.
+            last.clear();last.put("dimension",pendingDimension);last.put("dimensionMacro",expected);
+            last.put("firstEntry",true);last.put("preservedFirstHints",true);
+            LOG.info("MUXI_DIMENSION_SHADER_SWAP {}",last);
+        }catch(ReflectiveOperationException|RuntimeException|LinkageError failure){
+            LOG.warn("Initial dimension shader refresh unavailable; retaining native behavior: {}",failure.getClass().getSimpleName());
+        }
+    }
+    private static boolean dimensionMatches(Set<String> keys,String expected){
+        return keys.contains(expected)&&keys.stream().filter(k->k.startsWith("CURRENT_EUPHORIA_PATCHES_DIMENSION_")).count()==1;
     }
     private static boolean refresh(){
         // Any failure, including a macro guard, is terminal for this setLevel.

@@ -65,21 +65,6 @@ public final class DimensionsSmoke {
         NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
         return player;
     }
-    @SuppressWarnings("unchecked")
-    private ServerPlayer newcomer(MinecraftServer server, GameProfile profile) throws Exception {
-        ServerPlayer player = new ServerPlayer(server, server.overworld(), profile, ClientInformation.createDefault());
-        Connection transport = new Connection(PacketFlow.SERVERBOUND); new EmbeddedChannel(transport);
-        player.connection = new ServerGamePacketListenerImpl(server, transport, player, CommonListenerCookie.createInitial(profile, false)) {
-            @Override public void send(Packet<?> packet) {}
-        };
-        var players = net.minecraft.server.players.PlayerList.class.getDeclaredField("players"); players.setAccessible(true);
-        ((List<ServerPlayer>)players.get(server.getPlayerList())).add(player);
-        var ids = net.minecraft.server.players.PlayerList.class.getDeclaredField("playersByUUID"); ids.setAccessible(true);
-        ((Map<UUID,ServerPlayer>)ids.get(server.getPlayerList())).put(player.getUUID(), player);
-        server.overworld().addNewPlayer(player);
-        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
-        return player;
-    }
     private int command(ServerPlayer p, String arg) throws Exception {
         return p.server.getCommands().getDispatcher().execute(("muxiworld " + arg).strip(), p.createCommandSourceStack().withPermission(2));
     }
@@ -106,27 +91,8 @@ public final class DimensionsSmoke {
         home.setBlockAndUpdate(base.offset(4,0,0), Blocks.DIAMOND_BLOCK.defaultBlockState());
         check("generated normal terrain in new world", !world.getBlockState(new BlockPos(0,-60,0)).isAir());
         check("generated normal terrain in adventure world", !adventure.getBlockState(new BlockPos(0,-60,0)).isAir());
-        var newProfile = new GameProfile(UUID.randomUUID(), "FirstJoinQA");
-        ServerPlayer newcomer = newcomer(server, newProfile);
-        check("new player is marked for initial survival spawn",
-            DimensionsFeature.needsInitialSurvival(newcomer));
-        BlockPos initial = DimensionsFeature.findInitialSurvivalLanding(world,newcomer);
-        check("random initial survival landing exists", initial != null);
-        check("random initial survival landing is safe", DimensionsFeature.safeInitialSpawn(world,initial));
-        long spawnDistance = (long)initial.getX() * initial.getX() + (long)initial.getZ() * initial.getZ();
-        check("new player spawn is within 10000-block radius", spawnDistance <= 10000L * 10000L);
-        check("new player spawn is not ocean", !world.getBiome(initial).is(net.minecraft.tags.BiomeTags.IS_OCEAN));
-        check("new player spawn has two-block air headroom", world.isEmptyBlock(initial) && world.isEmptyBlock(initial.above()));
-        check("new player spawn has no fluid", world.getFluidState(initial).isEmpty() && world.getFluidState(initial.above()).isEmpty());
-        newcomer.setServerLevel(world);
-        DimensionsFeature.applyInitialSurvivalSpawn(newcomer,initial);
-        check("new player receives survival position", newcomer.level() == world && newcomer.blockPosition().equals(initial));
-        check("new player initial respawn stays in survival", newcomer.getRespawnDimension().equals(WorldDimensions.OVERWORLD));
-        check("new player initial respawn position matches landing", newcomer.getRespawnPosition().equals(newcomer.blockPosition()));
-        check("successful onboarding is one-shot",
-            newcomer.getPersistentData().getCompound("PlayerPersisted").getBoolean("muxiInitialSurvivalDone")
-                && !newcomer.getPersistentData().getCompound("PlayerPersisted").getBoolean("muxiInitialSurvivalPending")
-                && !DimensionsFeature.needsInitialSurvival(newcomer));
+        // This embedded-player harness has no native configuration connection.
+        // First-login preparation is covered only by the separate real TCP firstSpawn QA.
         var profile = new GameProfile(UUID.randomUUID(), "DimensionQA");
         ServerPlayer p = player(server, profile); p.setPos(0.5,180,0.5);
         check("existing player is not migrated by new onboarding",
@@ -194,6 +160,7 @@ public final class DimensionsSmoke {
         var result = new LinkedHashMap<String,Object>();
         try { exercise(event.getServer()); result.put("success", true); }
         catch (Throwable error) { error.printStackTrace(); result.put("success", false); result.put("error", error.toString()); }
+        result.put("scope", "existing-player dimension travel; excludes first-login preparation");
         result.put("passed", passed);
         try { Files.writeString(Path.of("tasks-smoke-result.json"), new GsonBuilder().setPrettyPrinting().create().toJson(result)); }
         catch (Exception error) { error.printStackTrace(); }
