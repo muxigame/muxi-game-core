@@ -6,6 +6,7 @@ public final class MinigameTravelSelfTest {
     public static int run() {
         String[][] pairs={{"zombie-challenge","muxi_game_core:quarantine","muxi_challenge_return"},
             {"outbreak","muxi_outbreak:campaign","muxi_outbreak_return_v1"},
+            {"tower_defense","muxi_tower_defense:board","muxi_tower_return_v1"},
             {"horse_racing","muxi_minigames:horse_lab","muxi_horse_spectator_return_v1"},
             {"horse_racing","muxi_minigames:horse_stadium_lab","muxi_horse_spectator_return_v1"},
             {"flight","muxi_minigames:flight_lab","muxi_flight_return_v1"}};
