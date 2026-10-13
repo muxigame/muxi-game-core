@@ -16,6 +16,7 @@ FILES = dict(SSO_FILES)
 FILES['net/minecraft/server/MinecraftServer.java'] = FILES['net/minecraft/server/MinecraftServer.java'].replace(
     'public void execute(Runnable r){work.add(r);}',
     'public final java.util.concurrent.atomic.AtomicInteger enqueued=new java.util.concurrent.atomic.AtomicInteger();public void execute(Runnable r){enqueued.incrementAndGet();work.add(r);}')
+FILES['net/neoforged/neoforge/event/tick/ServerTickEvent.java']='package net.neoforged.neoforge.event.tick; public class ServerTickEvent {public static class Post {}}'
 FILES.update({
 "net/minecraft/network/Connection.java": '''package net.minecraft.network;
 public class Connection {public boolean connected=true;public Object listener;public int refused;
@@ -82,6 +83,7 @@ def main():
                          'feature/identity/IdentityRules.java', 'feature/login/ConnectionAdmissions.java',
                          'feature/login/LoginGate.java'):
             sources.append(ROOT / 'src/main/java/net/muxigame/core' / relative)
+        sources.extend((ROOT/'src/main/java/net/muxigame/core/feature/ysmassets').glob('*.java'))
         arguments = ['--release', '21', '-encoding', 'UTF-8', '-proc:none', '-cp', str(args.gson), '-d', str(classes), *map(str, sources)]
         argfile = tmp / 'compile.args'
         argfile.write_text('\n'.join('"' + a.replace('\\', '/') + '"' for a in arguments), encoding='utf-8')

@@ -63,6 +63,7 @@ def main():
         for relative in ('config/CoreConfig.java','feature/identity/IdentityRules.java',
                          'feature/login/TerminalSsoIdentity.java','feature/login/TerminalPassportServer.java'):
             generated.append(ROOT/'src/main/java/net/muxigame/core'/relative)
+        generated.extend((ROOT/'src/main/java/net/muxigame/core/feature/ysmassets').glob('*.java'))
         arguments=['--release','21','-encoding','UTF-8','-proc:none','-cp',str(args.gson),'-d',str(classes),*map(str,generated)]
         argfile=tmp/'compile.args'
         argfile.write_text('\n'.join('"'+a.replace('\\','/')+'"' for a in arguments),encoding='utf-8')

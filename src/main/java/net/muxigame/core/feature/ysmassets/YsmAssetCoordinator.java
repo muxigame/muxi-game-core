@@ -3,7 +3,7 @@ package net.muxigame.core.feature.ysmassets;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 
-/** Isolated protocol core. Unregistered; no importer, file distributor, credentials or reload. */
+/** Asset protocol core. Existing Auth hooks own its lifecycle; runtime/import remains disabled by default. */
 public final class YsmAssetCoordinator implements AutoCloseable {
     public record Identity(String uid,UUID playerId,Object listener) {
         public Identity {YsmAssetSnapshot.uid(uid);Objects.requireNonNull(playerId);Objects.requireNonNull(listener);}

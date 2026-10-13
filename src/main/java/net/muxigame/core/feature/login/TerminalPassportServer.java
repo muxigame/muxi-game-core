@@ -23,12 +23,13 @@ public final class TerminalPassportServer {
     private static HttpClient http;
     private static final class Session {
         final ServerPlayer player;
+        final ServerGamePacketListenerImpl listener;
         final String uid,id=UUID.randomUUID().toString();
         final AtomicBoolean pending=new AtomicBoolean(),checking=new AtomicBoolean();
         volatile String request="";
         volatile long last,expires,nextCheck,authorizationGeneration;
         volatile boolean authenticated;
-        Session(ServerPlayer player){this.player=player;uid=player.getGameProfile().getName();}
+        Session(ServerPlayer player){this.player=player;listener=player.connection;uid=player.getGameProfile().getName();}
     }
     private TerminalPassportServer() {}
     static synchronized void configure(CoreConfig.TerminalSso value){
@@ -79,6 +80,7 @@ public final class TerminalPassportServer {
                             reply(player,packet.requestId(),session.id,Long.parseLong(session.uid),1);
                         }else{
                             TrustedAccounts.admitTerminal(player,Long.parseLong(session.uid));
+                            net.muxigame.core.feature.ysmassets.YsmAuthBindings.terminalVerified(player);
                             session.authorizationGeneration++;session.authenticated=true;session.nextCheck=System.nanoTime()+15_000_000_000L;session.request="";
                             reply(player,packet.requestId(),session.id,Long.parseLong(session.uid),2);
                         }
@@ -87,6 +89,7 @@ public final class TerminalPassportServer {
         }catch(RuntimeException ignored){session.pending.set(false);session.request="";reply(player,packet.requestId(),"",0,0);}
     }
     static void tick(ServerTickEvent.Post event){
+        net.muxigame.core.feature.ysmassets.YsmAuthBindings.tick(event);
         var authority=config;var transport=http;if(authority==null || transport==null)return;
         long now=System.nanoTime();
         for(var entry:sessions.entrySet()){
@@ -114,12 +117,13 @@ public final class TerminalPassportServer {
     private static void reply(ServerPlayer player,String id,String session,long uid,int status){
         if(player.connection!=null && player.connection.isAcceptingMessages())PacketDistributor.sendToPlayer(player,new TerminalPassportNetwork.Result(id,session,uid,status));
     }
-    private static void clearTerminal(Session session){session.authorizationGeneration++;session.authenticated=false;session.request="";TrustedAccounts.revokeTerminal(session.player);}
+    private static void clearTerminal(Session session){session.authorizationGeneration++;session.authenticated=false;session.request="";TrustedAccounts.revokeTerminal(session.player);net.muxigame.core.feature.ysmassets.YsmAuthBindings.terminalRevoked(session.player,session.listener);}
     private static CompletableFuture<?> revokeRemote(Session session,CoreConfig.TerminalSso authority,HttpClient transport,String route){
         return transport.sendAsync(post(authority,route,body(session)),HttpResponse.BodyHandlers.discarding());
     }
     static void disconnect(ServerPlayer player){
         var session=player.connection==null?null:sessions.remove(player.connection);TrustedAccounts.revokeTerminal(player);
+        net.muxigame.core.feature.ysmassets.YsmAuthBindings.disconnected(player,session==null?player.connection:session.listener);
         var authority=config;var transport=http;if(session==null || authority==null || transport==null)return;
         try{revokeRemote(session,authority,transport,"disconnect");}catch(RuntimeException ignored){}
     }
@@ -127,6 +131,7 @@ public final class TerminalPassportServer {
         var authority=config;var transport=http;var retiring=new ArrayList<>(sessions.values());sessions.clear();config=null;http=null;
         var revocations=new ArrayList<CompletableFuture<?>>();
         for(var session:retiring){clearTerminal(session);if(authority!=null && transport!=null)try{revocations.add(revokeRemote(session,authority,transport,"disconnect"));}catch(RuntimeException ignored){}}
+        net.muxigame.core.feature.ysmassets.YsmAuthBindings.sourceStopped(net.muxigame.core.feature.ysmassets.YsmAuthBindings.Source.TERMINAL);
         if(transport!=null){try{CompletableFuture.allOf(revocations.toArray(CompletableFuture[]::new)).orTimeout(2,TimeUnit.SECONDS).join();}catch(RuntimeException ignored){}transport.shutdownNow();}
     }
 }

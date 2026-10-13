@@ -76,8 +76,10 @@ public final class LoginGate implements ServerFeature {
     @Override public String id() { return "login"; }
 
     @Override public void register(IEventBus gameBus) {
+        net.muxigame.core.feature.ysmassets.YsmAuthBindings.sourceStarted(net.muxigame.core.feature.ysmassets.YsmAuthBindings.Source.JOIN);
         gameBus.addListener(this::onLoggedIn);
         gameBus.addListener(this::onLoggedOut);
+        gameBus.addListener(net.muxigame.core.feature.ysmassets.YsmAuthBindings::tick);
         LOG.info("Join-grant verification enabled; unverified logins are refused (timeout {}s)", config.timeoutSeconds());
     }
 
@@ -175,10 +177,12 @@ public final class LoginGate implements ServerFeature {
         if (!stopped && admitted.consume(player.connection.getConnection(),
             new VerifiedIdentity(player.getGameProfile().getName(),player.getGameProfile().getId()))) {
             net.muxigame.minigames.TrustedAccounts.admit(player);
+            net.muxigame.core.feature.ysmassets.YsmAuthBindings.joinVerified(player);
             return;
         }
         LOG.warn("UID {} reached login without a verified join grant; disconnecting late",
             player.getGameProfile().getName());
+        net.muxigame.core.feature.ysmassets.YsmAuthBindings.disconnected(player,player.connection);
         player.connection.disconnect(NO_GRANT);
     }
 
@@ -186,6 +190,7 @@ public final class LoginGate implements ServerFeature {
         if(event.getEntity() instanceof ServerPlayer player && !(player instanceof FakePlayer) && player.connection!=null){
             admitted.discard(player.connection.getConnection());
             net.muxigame.minigames.TrustedAccounts.revoke(player);
+            net.muxigame.core.feature.ysmassets.YsmAuthBindings.disconnected(player,player.connection);
         }
     }
 
@@ -199,5 +204,6 @@ public final class LoginGate implements ServerFeature {
         stopped = true;
         http.shutdownNow();
         admitted.clear();
+        net.muxigame.core.feature.ysmassets.YsmAuthBindings.sourceStopped(net.muxigame.core.feature.ysmassets.YsmAuthBindings.Source.JOIN);
     }
 }

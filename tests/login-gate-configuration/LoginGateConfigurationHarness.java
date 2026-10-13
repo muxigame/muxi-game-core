@@ -67,7 +67,7 @@ public final class LoginGateConfigurationHarness {
     }
     static void successfulTwoConnections()throws Exception {
         try(Fixture f=new Fixture()){
-            check("mod bus registration",f.modBus.listeners.size()==1);check("game bus only player lifecycle",f.gameBus.listeners.size()==2);
+            check("mod bus registration",f.modBus.listeners.size()==1);check("game bus player lifecycle and passive YSM identity cleanup",f.gameBus.listeners.size()==3);
             for(String uid:List.of("10000","10001")){
                 ServerConfigurationPacketListenerImpl listener=f.listener(uid,IdentityRules.offlineUuid(uid));
                 Reply r=f.plan(200,identity(uid),true);ConfigurationTask task=f.task(listener);
@@ -78,7 +78,9 @@ public final class LoginGateConfigurationHarness {
                 r.release.countDown();f.await(listener);check("advances exactly once",listener.finished==1);
                 ServerPlayer p=f.player(uid,listener.raw);f.login(p);
                 check("same connection admitted to normal account",Long.parseLong(uid)==TrustedAccounts.uid(p));
+                check("actual join hook binds verified YSM UID",net.muxigame.core.feature.ysmassets.YsmAuthBindings.claimFor(p).uid().equals(uid));
                 f.logout(p);check("logout revokes normal account",untrusted(p));
+                try{net.muxigame.core.feature.ysmassets.YsmAuthBindings.claimFor(p);throw new AssertionError("YSM logout retained binding");}catch(IllegalArgumentException denied){checks++;}
                 f.login(p);check("late admission cannot replay",!listener.raw.isConnected());
             }
             check("both UID routes used",f.paths.equals(List.of("/join/10000","/join/10001")));

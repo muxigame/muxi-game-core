@@ -7,6 +7,7 @@ import java.util.*;
 /** Machine wire binding metadata, not credentials. Issuer hooks must bind/revoke each authorization generation. */
 public final class YsmConnectionRegistry implements AutoCloseable {
     public record Claim(String serverId,String connectionId,String bindingGeneration,String uid) {}
+    public static final class UidMismatch extends IllegalArgumentException {public UidMismatch(){super("YSM UID claim mismatch");}}
     private record Binding(ServerPlayer player,YsmAssetCoordinator.Connection connection,Claim claim,Object listener) {}
     private final MinecraftServer server;private final String serverId;
     private final Map<String,Binding> bindings=new HashMap<>();private final Map<Object,String> byListener=new IdentityHashMap<>();private boolean closed;
@@ -27,8 +28,9 @@ public final class YsmConnectionRegistry implements AutoCloseable {
     }
     public YsmAssetCoordinator.Connection connectionFor(ServerPlayer player){return resolve(claimFor(player));}
     public YsmAssetCoordinator.Connection resolve(Claim claim){
-        thread();if(claim==null||!serverId.equals(claim.serverId()))throw denied();var binding=bindings.get(claim.connectionId());if(binding==null||!binding.claim().equals(claim))throw denied();
-        try{var who=binding.connection().current();if(who.listener()!=binding.listener()||!who.uid().equals(claim.uid()))throw denied();}catch(RuntimeException stale){retire(binding.claim());throw denied();}
+        thread();if(claim==null||!serverId.equals(claim.serverId()))throw denied();var binding=bindings.get(claim.connectionId());if(binding==null||!binding.claim().serverId().equals(claim.serverId())||!binding.claim().bindingGeneration().equals(claim.bindingGeneration()))throw denied();
+        try{var who=binding.connection().current();if(who.listener()!=binding.listener())throw denied();if(!who.uid().equals(claim.uid()))throw new UidMismatch();}
+        catch(UidMismatch mismatch){throw mismatch;}catch(RuntimeException stale){retire(binding.claim());throw denied();}
         // Recheck registry generation AND actual trust every time a previously returned handle is used.
         return new YsmAssetCoordinator.Connection(){
             @Override public YsmAssetCoordinator.Identity current(){

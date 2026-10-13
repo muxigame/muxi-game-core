@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.muxigame.core.config.CoreConfig;
 import net.muxigame.core.feature.identity.IdentityRules;
 import net.muxigame.minigames.TrustedAccounts;
+import net.muxigame.core.feature.ysmassets.YsmAuthBindings;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import java.lang.reflect.*;
@@ -22,6 +23,7 @@ public final class TerminalTrustHarness {
  static final String KEY="synthetic-terminal-server-key-32-long",ENDPOINT="https://account.muxigame.com/api/internal/minecraft/";
  static void check(boolean b,String message){if(!b)throw new AssertionError(message);assertions++;}
  static boolean social(ServerPlayer p){try{TrustedAccounts.socialUid(p);return true;}catch(IllegalArgumentException absent){return false;}}
+ static boolean binding(ServerPlayer p){try{YsmAuthBindings.claimFor(p);return true;}catch(IllegalArgumentException absent){return false;}}
  static boolean join(ServerPlayer p){try{TrustedAccounts.uid(p);return true;}catch(IllegalArgumentException absent){return false;}}
  static ServerPlayer player(MinecraftServer s){return new ServerPlayer(s,"10000",IdentityRules.offlineUuid("10000"));}
  record Response<T>(HttpRequest request,int statusCode,T body) implements HttpResponse<T>{
@@ -43,6 +45,7 @@ public final class TerminalTrustHarness {
  }
  static Object field(Object owner,String name)throws Exception{Field f=owner.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(owner);}
  static void set(Object owner,String name,Object value)throws Exception{Field f=owner.getClass().getDeclaredField(name);f.setAccessible(true);f.set(owner,value);}
+ static void setStatic(String name,Object value)throws Exception{Field f=TerminalPassportServer.class.getDeclaredField(name);f.setAccessible(true);f.set(null,value);}
  static Object session(ServerPlayer p)throws Exception{Field f=TerminalPassportServer.class.getDeclaredField("sessions");f.setAccessible(true);return ((Map<?,?>)f.get(null)).get(p.connection);}
  static class Fixture implements AutoCloseable {
   final MinecraftServer server=new MinecraftServer();final ServerPlayer player=player(server);final Transport http=new Transport();
@@ -54,7 +57,7 @@ public final class TerminalTrustHarness {
   void claim()throws Exception{TerminalPassportServer.request(player,new TerminalPassportNetwork.Request(id,gameSession(),1));}
   void reply(int status,String body){http.pending.remove().complete(new Response<>(http.calls.getLast(),status,body));}
   void flush(){server.flush();}
-  void establish()throws Exception{create();reply(200,result().toString());flush();check(!social(player),"public challenge never grants social trust");claim();reply(200,result().toString());check(!social(player),"claim must return to server thread");flush();check(social(player),"Auth accepted existing access establishes social trust");}
+  void establish()throws Exception{create();reply(200,result().toString());flush();check(!social(player),"public challenge never grants social trust");check(!binding(player),"unclaimed challenge never grants YSM binding");claim();reply(200,result().toString());check(!social(player),"claim must return to server thread");flush();check(social(player),"Auth accepted existing access establishes social trust");check(binding(player),"actual Auth claim callback binds YSM identity");}
   void checkStatus()throws Exception{set(session(player),"nextCheck",0L);TerminalPassportServer.tick(new ServerTickEvent.Post());}
   public void close(){TerminalPassportServer.close();}
  }
@@ -62,14 +65,15 @@ public final class TerminalTrustHarness {
   try(var f=new Fixture()){
    check(!social(f.player) && !join(f.player),"numeric offline profile is not an authenticated account");f.establish();
    check(!join(f.player),"terminal access cannot grant settlement admission");
+   var oldYsm=YsmAuthBindings.claimFor(f.player);check(YsmAuthBindings.resolve(f.server,oldYsm).uid().equals("10000"),"resolver returns actual verified UID");
    check(f.http.calls.getFirst().uri().toString().equals(ENDPOINT+"terminal-context/create"),"dedicated context endpoint");
    check(f.http.calls.stream().allMatch(r->r.headers().firstValue("X-Muxi-Server-Key").orElse("").equals(KEY) && r.headers().firstValue("Authorization").isEmpty()),"only machine key reaches server transport");
    var result=PacketDistributor.deliveries.getLast().packet();check(result.status()==2 && result.uid()==10000 && result.gameSession().equals(f.gameSession()),"game packet contains correlation and UID only");
-   f.checkStatus();var status=f.result();status.addProperty("authenticated",false);f.reply(200,status.toString());f.flush();check(!social(f.player),"source expiry revokes social trust");
+   f.checkStatus();var status=f.result();status.addProperty("authenticated",false);f.reply(200,status.toString());f.flush();check(!social(f.player),"source expiry revokes social trust");check(!binding(f.player),"Auth expiry immediately retires YSM binding");
   }
   try(var f=new Fixture()){
-   f.establish();TrustedAccounts.admit(f.player);f.checkStatus();var status=f.result();status.addProperty("authenticated",false);f.reply(200,status.toString());f.flush();
-   check(join(f.player),"native account expiry preserves independent verified game admission");TrustedAccounts.revoke(f.player);
+   f.establish();TrustedAccounts.admit(f.player);YsmAuthBindings.joinVerified(f.player);var mixed=YsmAuthBindings.claimFor(f.player);f.checkStatus();var status=f.result();status.addProperty("authenticated",false);f.reply(200,status.toString());f.flush();
+   check(join(f.player),"native account expiry preserves independent verified game admission");check(!YsmAuthBindings.claimFor(f.player).bindingGeneration().equals(mixed.bindingGeneration()),"terminal expiry rotates remaining verified join binding");TrustedAccounts.revoke(f.player);YsmAuthBindings.sourceStopped(YsmAuthBindings.Source.JOIN);
   }
   for(String key:List.of("uid","requestId","gameSession","expiresInSeconds"))for(boolean missing:List.of(false,true))try(var f=new Fixture()){
    f.create();var b=f.result();if(missing)b.remove(key);else b.addProperty(key,"invalid");f.reply(200,b.toString());f.flush();check(!social(f.player),"malformed context denied "+key);check(PacketDistributor.deliveries.getLast().packet().status()==0,"malformed context yields denial");
@@ -85,7 +89,7 @@ public final class TerminalTrustHarness {
   try(var f=new Fixture()){
    f.establish();f.checkStatus();var stale=f.http.pending.remove();set(session(f.player),"last",0L);f.id=UUID.randomUUID().toString();f.create();f.reply(200,f.result().toString());f.flush();f.claim();f.reply(200,f.result().toString());f.flush();
    var body=f.result();body.addProperty("authenticated",false);stale.complete(new Response<>(f.http.calls.getFirst(),200,body.toString()));f.flush();check(social(f.player),"late old heartbeat cannot revoke a newly accepted binding");
-   TerminalPassportServer.request(f.player,new TerminalPassportNetwork.Request(UUID.randomUUID().toString(),f.gameSession(),2));check(!social(f.player),"explicit native revocation clears social trust");
+   TerminalPassportServer.request(f.player,new TerminalPassportNetwork.Request(UUID.randomUUID().toString(),f.gameSession(),2));check(!social(f.player),"explicit native revocation clears social trust");check(!binding(f.player),"explicit native revoke retires exact YSM claim");
   }
   try(var f=new Fixture()){f.create();f.player.connection.online=false;f.reply(200,f.result().toString());f.flush();check(!social(f.player) && PacketDistributor.deliveries.isEmpty(),"offline listener cannot receive context");}
   try(var f=new Fixture()){f.player.profile=new com.mojang.authlib.GameProfile(UUID.randomUUID(),"10000");f.create();check(f.http.calls.isEmpty(),"UID/offline UUID mismatch never contacts Auth");}

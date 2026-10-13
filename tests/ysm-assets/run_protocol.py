@@ -26,6 +26,7 @@ def main():
   generated=[]
   for name in ['com/mojang/authlib/GameProfile.java','net/minecraft/server/network/ServerGamePacketListenerImpl.java','net/minecraft/server/MinecraftServer.java','net/minecraft/server/level/ServerPlayer.java']:
    target=tmp/'identity-fixture'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(fixture.FILES[name],encoding='utf-8');generated.append(target)
+  tick=tmp/'identity-fixture/net/neoforged/neoforge/event/tick/ServerTickEvent.java';tick.parent.mkdir(parents=True,exist_ok=True);tick.write_text('package net.neoforged.neoforge.event.tick; public class ServerTickEvent {public static class Post {}}',encoding='utf-8');generated.append(tick)
   sources=generated+list((CORE/'src/main/java/net/muxigame/core/feature/ysmassets').glob('*.java'))+[ROOT/'muxi-minigames/src/main/java/net/muxigame/minigames/TrustedAccounts.java',CORE/'tests/ysm-assets/YsmAssetProtocolTest.java'];classes=tmp/'classes';classes.mkdir();arguments=['--release','21','-encoding','UTF-8','-proc:none','-cp',str(args.gson),'-d',str(classes),*map(str,sources)];argfile=tmp/'compile.args';argfile.write_text('\n'.join('"'+v.replace('\\','/')+'"' for v in arguments),encoding='utf-8')
   subprocess.run([str(args.java_home/'bin/javac.exe'),'@'+str(argfile)],check=True)
   result=subprocess.run([str(args.java_home/'bin/java.exe'),'-cp',str(classes)+os.pathsep+str(args.gson),'net.muxigame.core.feature.ysmassets.YsmAssetProtocolTest',str(snapshot)],check=False,capture_output=True,text=True,encoding='utf-8');

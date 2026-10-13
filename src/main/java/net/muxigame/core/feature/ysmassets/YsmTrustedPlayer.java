@@ -6,6 +6,11 @@ import net.muxigame.minigames.TrustedAccounts;
 /** Current server-verified UID only; network inputs contain handles, never ownership UID. */
 public final class YsmTrustedPlayer {
     private YsmTrustedPlayer() {}
+    static boolean captureTransportCurrent(ServerPlayer player,YsmAssetCoordinator.Identity expected){
+        return player.server.isSameThread()&&player.server.getPlayerList().getPlayer(player.getUUID())==player
+            &&player.connection==expected.listener()&&player.connection!=null&&player.connection.isAcceptingMessages()
+            &&player.getUUID().equals(expected.playerId());
+    }
     public static YsmAssetCoordinator.Connection capture(ServerPlayer player){
         if(player==null||!player.server.isSameThread())throw new IllegalArgumentException("YSM identity requires server thread");
         Object listener=player.connection;String verified=Long.toString(TrustedAccounts.socialUid(player));

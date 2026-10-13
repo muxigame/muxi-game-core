@@ -22,9 +22,9 @@ YsmConnectionRegistry 对齐官网在制 game wire 的 serverId/connectionId/bin
 
 ## 文件边界及尚未接线
 
-这些类未注册，Default RuntimePort 不可激活。Core 的 shared registration/config 文件保持其他 owner 原状。后续须串行把 registry bind/retire 和 coordinator reconcile/disconnect 接入真实 Auth 授权/撤销、登录退出与 server stop；socialUid 本身不暴露授权代次，不能仅靠 UID/UUID 猜测同 listener 的重新授权。停止顺序应先 coordinator.close 完成回退，再 registry.close 清绑定。这个接线点需要与官网/登录/框架 owner 协调，不能从 HTTP 声明自行生成可信 bindingGeneration。
+初版 c07917ef 的数据协议保持未激活；后续身份接线已由现有 LoginGate / TerminalPassportFeature / TerminalPassportServer 真实注册调用。Default RuntimePort 仍不可激活。Core 的 shared registration/config 文件保持其他 owner 原状。现有 Auth 原源码现已把 registry bind/retire 和 coordinator reconcile/disconnect 接到成功核验、明确撤销、heartbeat 过期、登录退出、tick 与 feature close；socialUid 本身不暴露授权代次，不能仅靠 UID/UUID 猜测同 listener 的重新授权。停止顺序应先 coordinator.close 完成回退，再 registry.close 清绑定。这个接线点需要与官网/登录/框架 owner 协调，不能从 HTTP 声明自行生成可信 bindingGeneration。
 
-官网 server/app/ysm_game_api.py 在由其 owner 增补机器授权和 resolve_connection 接口，默认缺 hook 时503，用户 Bearer/cookie 不回退成 machine authority。Core 当前没有 HTTP 发送器、机器凭据或主动拉取任务；独立模型文件继续留在隔离根。不能借用音乐/社交 key。
+官网 server/app/ysm_game_api.py 在由其 owner 增补机器授权和 resolve_connection 接口，默认缺 hook 时503，用户 Bearer/cookie 不回退成 machine authority。新增机器身份 HTTPS handler 和启动期 hook 组件见 ysm-machine-auth-contract-20261013.md；它们不会自己开端口、读取/生成机器凭据或启动主动拉取任务。独立模型文件继续留在隔离根。不能借用音乐/社交 key。
 
 ## 隔离验证
 
@@ -49,4 +49,4 @@ python tests/ysm-assets/run_protocol.py --java-home <已有JDK21> --gson <已有
 3. 串行连接真实 issuer bind/revoke、机器 authority/connection resolver 及 Core lifecycle；配置和共同注册必须保留家园/传送 owner dirty。没有选择新的凭据来源。
 4. 获得隔离两真实 UID MC 窗口，证明网页及原 YSM native 直请求的访问/列举/选择拒绝、旧缓存/旧代次拒绝、穿戴中撤权回退和 tracking peer 画面、重复上传/删除引用、断线重连、重载失败/进行中与代际切换。未获得这些回执前，不写 live auth/custom 目录、不激活桥、不安排凌晨生产 reload。
 
-热加载与凌晨策略沿用官网隔离合同，stage 与运行时 ACK 分离；到凌晨也不能越过上述阻塞。协议 fixture 并非生产、真实 UID 身份或两客户端网络/画面验收。
+热加载与凌晨策略沿用官网隔离合同，stage 与运行时 ACK 分离；到凌晨也不能越过上述阻塞。原 Auth 接线另通过57项 SSO、121项进服 HTTP/lifecycle 与33项实际 MAC/Web/Core 联合检查，两个 UID 10000/10001 仍是隔离 issuer/MC listener fixture。协议 fixture 并非生产、真实 UID 身份或两客户端网络/画面验收。
