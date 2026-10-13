@@ -1,6 +1,22 @@
 # Core 用户 YSM 资产桥：隔离协议候选
 
-本候选只新增真实 muxi-game-core 的 feature/ysmassets、tests/ysm-assets 和本文；没有改 MuxiGameCore、CoreConfig、登录注册类、HomeSpawningFeature、mixin 配置、传送网络或 Terminal。YSM 格式、目录和资源减负仍由原 YSM owner 负责；官网 store/game wire 仍由官网 owner 负责。没有部署、凭据、生产目录写入、native 导入或 reload，也没有启动 MC。
+本候选位于真实 muxi-game-core 的 feature/ysmassets、tests/ysm-assets、tools/ysm-machine 和本文，并已接入原 LoginGate、TerminalPassportFeature、TerminalPassportServer 的认证事件路径。MuxiGameCore、CoreConfig、HomeSpawningFeature、共享 mixin、传送网络和 Terminal 未由本任务修改。YSM 格式、目录和资源减负仍由原 YSM owner 负责；官网 store/game wire 仍由官网 owner 负责。未部署、未变更生产凭据或模型目录、未 native 导入或 reload，也未启动 MC。
+
+## 当前交接状态
+
+身份接线提交：fe06d1b85e9f8b393d60c81f3168b6d82ebbae1d（19 文件，已推送 dev）；官网 wire 基线：742cedafa011cc11cfa830ae9cbd1e2093405a22。实际注册沿 MuxiGameCore 原有的 LoginGate / TerminalPassportFeature 路径执行，不需要另行注册身份原型；模型 RuntimePort 保持默认关闭。
+
+| 部分 | 已完成及证据 | 尚未完成 |
+| --- | --- | --- |
+| 官网 wire | 实际 Router/SQLite 接入 Core-owned HMAC plugin 与 signed Core resolver，33项联合检查通过 | 官网生产 bootstrap、批准 provider/replay/HTTPS host 尚未安装；缺 hook/provider 返回503 |
+| Auth 事件 | 原 join grant 成功及 terminal Auth callback 后绑定；原 SSO 57项、LoginGate localhost HTTP/lifecycle 121项通过 | issuer 响应与 MC listener 使用隔离 fixture，未验收真实账号会话 |
+| 连接生命周期 | exact player/listener/UID；每次授权换 generation；重连、换号、晚到旧回调、tick/close 失效路径已接入 | 真实 MC 双 UID 原生验收待协调；未给 respawn 信任迁移增加任何捷径 |
+| 撤权 | 原 explicit revoke/status expiry/logout/disconnect 会失效旧 claim；独立 JOIN 保留时重新发 generation；403伪造 UID 不撤销有效连接、409拒绝旧 claim | native 默认外观、旧 cache 与 tracking peers 的真正 ACK 尚未具备；pending fallback 不能成为成功回执 |
+| 格式验证 | 检查 SHA、size、opaque ID 与可信 validation receipt 元数据；109项 store/protocol 检查通过 | 无完整2.6.5模型格式 validator；fixture opaque bytes/receipt 不能代表有效 YSM 模型，27 selector profile checks 也不能替代 validator |
+
+本轮补强：Java复核 provider 返回的 key ID；Python Core resolver 流式限制4096字节，超限提前停止并关闭，错误/重定向响应不读取正文；非ASCII签名路径返回403。新增机器边界检查 Java15项、Python12项通过，并重新通过上述33项联合 wire。证据：build/ysm-assets-131/machine-boundaries-result.json、joint-wire-result.json。未改变 production admission、模型 canSelect 或 active。
+
+私有外观 A/B、完整格式 validator、private native distribution/cache+peer ACK、批准机器 bootstrap 和真实隔离 MC 验收仍是依赖。没有与冻结的家园267候选合包、部署或更新父仓 submodule。用户另外发起的建仓请求没有执行，并移交总仓负责人协调。
 
 ## 当前事实
 
@@ -46,7 +62,7 @@ python tests/ysm-assets/run_protocol.py --java-home <已有JDK21> --gson <已有
 
 1. YSM owner 提供 exact2.6.5格式验证器及限制、真实 catalog ID 映射、禁止授权包处理、每次 native 下载/列举/选用拦截和原生回退读回。当前只有 use auth 的字节码事实，不能承诺私有分发。
 2. 私有外观语义待确认：若旁观者收到完整模型资产以渲染，就不能承诺这些字节完全不离开所有者。严格私有字节门禁可拒绝未授权 remote-render 资产许可，但当前没有实现旁观默认外观适配器，也没有擅改产品外观；桥保持关闭。不能把 UI 隐藏当安全证明。
-3. 串行连接真实 issuer bind/revoke、机器 authority/connection resolver 及 Core lifecycle；配置和共同注册必须保留家园/传送 owner dirty。没有选择新的凭据来源。
+3. 原 Auth 事件注册、机器 authority/connection resolver 和 Core identity lifecycle 已在 fe06d1b 接入；后续仍需原 owner 协调批准 credential provider、原子 replay store、Core HTTPS host 与官网 bootstrap 的实际安装，并在真实隔离账号上验收。默认缺 provider 为503，不能借用其他用途密钥。共享配置、家园及传送 owner dirty 保持原状。
 4. 获得隔离两真实 UID MC 窗口，证明网页及原 YSM native 直请求的访问/列举/选择拒绝、旧缓存/旧代次拒绝、穿戴中撤权回退和 tracking peer 画面、重复上传/删除引用、断线重连、重载失败/进行中与代际切换。未获得这些回执前，不写 live auth/custom 目录、不激活桥、不安排凌晨生产 reload。
 
 热加载与凌晨策略沿用官网隔离合同，stage 与运行时 ACK 分离；到凌晨也不能越过上述阻塞。原 Auth 接线另通过57项 SSO、121项进服 HTTP/lifecycle 与33项实际 MAC/Web/Core 联合检查，两个 UID 10000/10001 仍是隔离 issuer/MC listener fixture。协议 fixture 并非生产、真实 UID 身份或两客户端网络/画面验收。

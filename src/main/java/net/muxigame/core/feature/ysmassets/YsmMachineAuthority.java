@@ -51,7 +51,7 @@ public final class YsmMachineAuthority {
     public Verified verify(Proof proof,String expectedPurpose,String method,String path,byte[] body){
         if(credentials==null||replay==null)throw new Unconfigured();if(proof==null)throw denied();
         String message=material(proof,method,path,body);var c=credentials.lookup(proof.keyId());
-        if(c==null||!c.serverId.equals(proof.serverId())||!c.purposes.contains(expectedPurpose)||!expectedPurpose.equals(proof.purpose())||!audience.equals(proof.audience())||!c.audiences.contains(audience)||!proof.signature().matches("[a-f0-9]{64}"))throw denied();
+        if(c==null||!c.keyId.equals(proof.keyId())||!c.serverId.equals(proof.serverId())||!c.purposes.contains(expectedPurpose)||!expectedPurpose.equals(proof.purpose())||!audience.equals(proof.audience())||!c.audiences.contains(audience)||!proof.signature().matches("[a-f0-9]{64}"))throw denied();
         long now=clock.getAsLong(),time;try{time=Long.parseLong(proof.timestamp());}catch(NumberFormatException e){throw denied();}
         if(time<now-WINDOW_MS||time>now+WINDOW_MS||!MessageDigest.isEqual(mac(c,message),HexFormat.of().parseHex(proof.signature())))throw denied();
         if(!replay.consume(audience+":"+c.serverId+":"+c.keyId,proof.nonce(),time+2*WINDOW_MS,now))throw denied();return new Verified(c.serverId,expectedPurpose,c.keyId);

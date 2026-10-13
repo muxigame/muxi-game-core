@@ -62,3 +62,9 @@ YSM负责人实际2.6.5交接 ../../muxi-ysm-compat/docs/ysm-production-adapter-
 私有旁观A/B仍待用户；本批签名与身份层不默认授予任何私有render广播。真实机器credential/replay/bootstrap部署未配置，生产模型目录和reload未动。后续两个真正隔离UID MC客户端仍需父会话协调，不与家园独立4GiB/2CPU测试抢资源。
 
 另一个需官网 owner确认的同步边界：当前 /blob 是player-read且需live claim，离线上传者的私有文件不能凭/snapshot清单直接通过它复制到异机夜间镜像。若需求包含上传者离线时的全量同步，应另定义只给approved sync机器的exact content/revision字节传输，不能伪造离线player或放宽现player-read接口。本批没有悄悄添加该权限或接口。
+
+## 机器协议边界补强
+
+Core authority 现在还复核 credential provider 返回的 key ID 等于签名中的注册 key ID，拒绝 provider 别名映射误放行。CoreConnectionResolver 使用流式 HTTP 响应，最大接受4096字节；超过上限会提前终止并关闭。错误状态及重定向响应在读取正文前关闭。非ASCII raw path 作为403拒绝，不进入应用500。
+
+tests/ysm-assets/run_machine_boundaries.py：Java15项、Python12项通过，覆盖注册 key/别名拒绝、拒绝不消耗有效 nonce、时钟边界、32并发重放仅成功一次、4096/4097响应边界、提早关闭、错误正文不读取、UID差异及缺 provider503。只使用固定 fixture 凭据和 MockTransport；没有 MC、生产凭据或 native 激活。修复后实际官网742cedafa联合 wire 33项重新通过；原57/121的 Auth 回归结论来自此前已完成证据，本轮未重复执行。

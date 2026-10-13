@@ -52,7 +52,8 @@ class HmacMachineAuthorizer:
  def configured(self):return self.provider is not None and self.replay is not None
  async def __call__(self,request,purpose):
   if not self.configured:raise HTTPException(503,'ysm_game_authority_not_configured')
-  raw_path=request.scope.get('raw_path',request.url.path.encode()).decode('ascii','strict')
+  try:raw_path=request.scope.get('raw_path',request.url.path.encode()).decode('ascii','strict')
+  except (UnicodeError,AttributeError):raise HTTPException(403,'invalid_machine_authority') from None
   if request.method!='POST' or request.url.query or ROUTES.get(raw_path)!=purpose or 'authorization' in request.headers or 'cookie' in request.headers:raise HTTPException(403,'invalid_machine_authority')
   body=bytearray()
   async for block in request.stream():
@@ -89,14 +90,18 @@ class CoreConnectionResolver:
   import json,httpx
   body=json.dumps(claim,separators=(',',':')).encode();headers=sign(self.credential,'connection-resolve','ysm-core:'+self.server_id,'POST','/internal/ysm/connection/resolve',body);headers['Content-Type']='application/json'
   try:
-   async with httpx.AsyncClient(verify=self.verify,timeout=3,follow_redirects=False,trust_env=False) as client:response=await client.post(self.endpoint,content=body,headers=headers)
+   async with httpx.AsyncClient(verify=self.verify,timeout=3,follow_redirects=False,trust_env=False) as client:
+    async with client.stream('POST',self.endpoint,content=body,headers=headers) as response:
+     if response.status_code!=200:
+      code=response.status_code if response.status_code in (400,403,409,503) else 503
+      raise HTTPException(code,'game_connection_changed' if code==409 else 'game_connection_lookup_unavailable')
+     raw=bytearray()
+     async for block in response.aiter_bytes(chunk_size=4097):
+      if len(raw)+len(block)>4096:raise HTTPException(503,'invalid_core_connection_response')
+      raw.extend(block)
   except httpx.HTTPError:raise HTTPException(503,'game_connection_lookup_unavailable') from None
-  if response.status_code!=200:
-   code=response.status_code if response.status_code in (400,403,409,503) else 503
-   raise HTTPException(code,'game_connection_changed' if code==409 else 'game_connection_lookup_unavailable')
-  if len(response.content)>4096:raise HTTPException(503,'invalid_core_connection_response')
   try:
-   actual=response.json()
+   actual=json.loads(raw)
    if set(actual)!=set(claim)|{'live'} or actual['live'] is not True or any(actual[k]!=claim[k] for k in claim):raise ValueError()
    return GameConnection(actual['serverId'],actual['connectionId'],actual['bindingGeneration'],actual['uid'],True)
   except (ValueError,KeyError,TypeError):raise HTTPException(409,'game_connection_changed') from None
