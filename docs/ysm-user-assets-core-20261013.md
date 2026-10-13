@@ -66,3 +66,5 @@ python tests/ysm-assets/run_protocol.py --java-home <已有JDK21> --gson <已有
 4. 获得隔离两真实 UID MC 窗口，证明网页及原 YSM native 直请求的访问/列举/选择拒绝、旧缓存/旧代次拒绝、穿戴中撤权回退和 tracking peer 画面、重复上传/删除引用、断线重连、重载失败/进行中与代际切换。未获得这些回执前，不写 live auth/custom 目录、不激活桥、不安排凌晨生产 reload。
 
 热加载与凌晨策略沿用官网隔离合同，stage 与运行时 ACK 分离；到凌晨也不能越过上述阻塞。原 Auth 接线另通过57项 SSO、121项进服 HTTP/lifecycle 与33项实际 MAC/Web/Core 联合检查，两个 UID 10000/10001 仍是隔离 issuer/MC listener fixture。协议 fixture 并非生产、真实 UID 身份或两客户端网络/画面验收。
+
+新增关闭态接线见 [intake／默认回退 Core 合同](ysm-intake-default-fallback-core-20261013.md)：实际官网pending store→原YSM intake→签名wire 42项、原reset事务→Core pending fallback 20项通过。原33项wire及真实MC/NeoForge API编译通过；没有完整格式validator、native激活或cache/peer ACK，生产bootstrap仍未安装。

@@ -8,7 +8,7 @@ def check(value,message):
  global checks;checks+=1
  if not value:raise AssertionError(message)
 def main():
- parser=argparse.ArgumentParser();parser.add_argument('--java-home',type=Path,required=True);parser.add_argument('--gson',type=Path,required=True);args=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--java-home',type=Path,required=True);parser.add_argument('--gson',type=Path,required=True);parser.add_argument('--with-intake-contract',action='store_true');args=parser.parse_args()
  sys.path.insert(0,str(ROOT/'better-mc-remake/server'));sys.path.insert(0,str(CORE/'tools/ysm-machine'))
  from fastapi import FastAPI,HTTPException
  from fastapi.testclient import TestClient
@@ -76,10 +76,16 @@ def main():
     cb_old=cb;cb=control('reconnect','10001')['claim'];check(cb['connectionId']!=cb_old['connectionId'] and catalog(cb_old).status_code==409 and catalog(cb).status_code==200,'replacement listener denies old connection')
     control('logout','10001');check(catalog(cb).status_code==409,'actual disconnect immediately retires claim')
     check(all(not x['canSelect'] for x in store.list_models('10000')['models']),'no runtime activation ACK')
+    if args.with_intake_contract:
+     from test_intake_bridge import exercise_intake_contract
+     intake_receipt=exercise_intake_contract(store,request,fresh,temp)
+     (OUT/'intake-wire-result.json').write_text(json.dumps(intake_receipt,indent=2),encoding='utf-8')
     disabled=HmacMachineAuthorizer();check(not install_identity_hooks(app,disabled,resolver),'missing provider not installed');check(client.post(prefix+'/snapshot',json={}).status_code==503,'unconfigured startup fails closed')
     check(core_secret.decode() not in repr(corekey),'credential repr redacted')
    control('stop');code=process.wait(timeout=8);check(code==0,'owned fixture normal exit');tail=process.stdout.read();check('OWNED_FIXTURE_NORMAL_EXIT' in tail,'fixture stop receipt')
-   receipt={'passed':True,'checks':checks,'actualCoreAuthSourceHooks':True,'actualScopedMacValidation':True,'actualWebRouter':True,'actualLoopbackCoreResolver':True,'issuerAndMinecraftListeners':'explicit isolated fixtures','testUids':['10000','10001'],'productionCredentialsReadOrCreated':False,'modelFormatValidated':False,'runtimeActivated':False,'minecraftStarted':False,'ownedFixtureExitCode':code,'webHead':subprocess.check_output(['git','-c','safe.directory='+str(ROOT/'better-mc-remake'),'-C',str(ROOT/'better-mc-remake'),'rev-parse','HEAD'],text=True).strip()};(OUT/'joint-wire-result.json').write_text(json.dumps(receipt,indent=2),encoding='utf-8');print(json.dumps(receipt))
+   receipt={'passed':True,'checks':checks,'actualCoreAuthSourceHooks':True,'actualScopedMacValidation':True,'actualWebRouter':True,'actualLoopbackCoreResolver':True,'issuerAndMinecraftListeners':'explicit isolated fixtures','testUids':['10000','10001'],'productionCredentialsReadOrCreated':False,'modelFormatValidated':False,'runtimeActivated':False,'minecraftStarted':False,'ownedFixtureExitCode':code,'webHead':subprocess.check_output(['git','-c','safe.directory='+str(ROOT/'better-mc-remake'),'-C',str(ROOT/'better-mc-remake'),'rev-parse','HEAD'],text=True).strip()};
+   if args.with_intake_contract:receipt['intakeContract']=intake_receipt
+   (OUT/'joint-wire-result.json').write_text(json.dumps(receipt,indent=2),encoding='utf-8');print(json.dumps(receipt))
   finally:
    if process.poll() is None and base:
     try:control('stop');process.wait(timeout=8)
