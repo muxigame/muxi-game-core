@@ -9,7 +9,7 @@
 | 部分 | 已完成及证据 | 尚未完成 |
 | --- | --- | --- |
 | 官网 wire | 实际 Router/SQLite 接入 Core-owned HMAC plugin 与 signed Core resolver，33项联合检查通过 | 官网生产 bootstrap、批准 provider/replay/HTTPS host 尚未安装；缺 hook/provider 返回503 |
-| Auth 事件 | 原 join grant 成功及 terminal Auth callback 后绑定；原 SSO 60项、LoginGate localhost HTTP/lifecycle 121项通过 | issuer 响应与 MC listener 使用隔离 fixture，未验收真实账号会话 |
+| Auth 事件 | 原 join grant 成功及 terminal Auth callback 后绑定；原 SSO 57项、LoginGate localhost HTTP/lifecycle 121项通过 | issuer 响应与 MC listener 使用隔离 fixture，未验收真实账号会话 |
 | 连接生命周期 | exact player/listener/UID；每次授权换 generation；重连、换号、晚到旧回调、tick/close 失效路径已接入 | 真实 MC 双 UID 原生验收待协调；未给 respawn 信任迁移增加任何捷径 |
 | 撤权 | 原 explicit revoke/status expiry/logout/disconnect 会失效旧 claim；独立 JOIN 保留时重新发 generation；403伪造 UID 不撤销有效连接、409拒绝旧 claim | native 默认外观、旧 cache 与 tracking peers 的真正 ACK 尚未具备；pending fallback 不能成为成功回执 |
 | 格式验证 | 检查 SHA、size、opaque ID 与可信 validation receipt 元数据；109项 store/protocol 检查通过 | 无完整2.6.5模型格式 validator；fixture opaque bytes/receipt 不能代表有效 YSM 模型，27 selector profile checks 也不能替代 validator |
@@ -65,7 +65,7 @@ python tests/ysm-assets/run_protocol.py --java-home <已有JDK21> --gson <已有
 3. 原 Auth 事件注册、机器 authority/connection resolver 和 Core identity lifecycle 已在 fe06d1b 接入；后续仍需原 owner 协调批准 credential provider、原子 replay store、Core HTTPS host 与官网 bootstrap 的实际安装，并在真实隔离账号上验收。默认缺 provider 为503，不能借用其他用途密钥。共享配置、家园及传送 owner dirty 保持原状。
 4. 获得隔离两真实 UID MC 窗口，证明网页及原 YSM native 直请求的访问/列举/选择拒绝、旧缓存/旧代次拒绝、穿戴中撤权回退和 tracking peer 画面、重复上传/删除引用、断线重连、重载失败/进行中与代际切换。未获得这些回执前，不写 live auth/custom 目录、不激活桥、不安排凌晨生产 reload。
 
-热加载与凌晨策略沿用官网隔离合同，stage 与运行时 ACK 分离；到凌晨也不能越过上述阻塞。原 Auth 接线另通过60项 SSO、121项进服 HTTP/lifecycle 与33项实际 MAC/Web/Core 联合检查，两个 UID 10000/10001 仍是隔离 issuer/MC listener fixture。协议 fixture 并非生产、真实 UID 身份或两客户端网络/画面验收。
+热加载与凌晨策略沿用官网隔离合同，stage 与运行时 ACK 分离；到凌晨也不能越过上述阻塞。原 Auth 接线另通过57项 SSO、121项进服 HTTP/lifecycle 与33项实际 MAC/Web/Core 联合检查，两个 UID 10000/10001 仍是隔离 issuer/MC listener fixture。协议 fixture 并非生产、真实 UID 身份或两客户端网络/画面验收。
 
 新增关闭态接线见 [intake／默认回退 Core 合同](ysm-intake-default-fallback-core-20261013.md)：实际官网pending store→原YSM intake→签名wire 42项、原reset事务→Core pending fallback 20项通过。原33项wire及真实MC/NeoForge API编译通过；没有完整格式validator、native激活或cache/peer ACK，生产bootstrap仍未安装。
 
