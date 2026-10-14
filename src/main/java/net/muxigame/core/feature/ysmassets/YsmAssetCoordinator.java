@@ -15,12 +15,17 @@ public final class YsmAssetCoordinator implements AutoCloseable {
             try{var now=current();return now.listener()==expected.listener()&&now.playerId().equals(expected.playerId());}catch(RuntimeException absent){return false;}
         }
     }
-    /** Native adapter must prove all incoming native use/download paths, not just this bridge. */
+    /** Prove native selection/restore authority and verified resource generations. Policy A permits observer render delivery. */
     public interface RuntimePort {
         default boolean exactGenerationReady(long revision,String generation){return false;}
         default boolean wear(Identity player,String logicalHandle,String contentId,long revision,String generation){return false;}
+        /** Actual server tracking relation, never a client render=true flag or byte-confidentiality whitelist. */
+        default boolean isTrackingObserver(Identity observer,Identity wearer){return false;}
+        /** Read actual native wearer state; a previous successful write alone does not survive external reset/reload. */
+        default boolean isCurrentWear(Identity wearer,String logicalHandle,String contentId,long revision,String generation){return false;}
         default Fallback fallbackAndInvalidate(Identity player,long revision,String generation){return new Fallback(false,false,false);}
     }
+    /** ownCacheInvalidated means stale selection/catalog authority, not secure erasure of render files. */
     public record Fallback(boolean defaultConfirmed,boolean ownCacheInvalidated,boolean trackingPeersAcknowledged) {
         public boolean complete(){return defaultConfirmed&&ownCacheInvalidated&&trackingPeersAcknowledged;}
     }
@@ -28,7 +33,25 @@ public final class YsmAssetCoordinator implements AutoCloseable {
     public record Permit(Identity identity,long epoch,long revision,String generation,String logicalHandle,String contentId,String sha256) {}
     public record Projection(String modelId,boolean ownReference,boolean canSelect) {}
     public record StageReceipt(long revision,String generation,int pendingFallbacks,boolean active) {}
-    private record Selected(Identity identity,String handle,String contentId,String sha256,Connection connection) {}
+    public enum PrivateAppearancePolicy { OWNER_SELECTION_OBSERVER_RENDER }
+    public static PrivateAppearancePolicy privateAppearancePolicy(){return PrivateAppearancePolicy.OWNER_SELECTION_OBSERVER_RENDER;}
+    private record Selected(Identity identity,String handle,String contentId,String sha256,Connection connection,boolean confirmed) {}
+    /** Server-only render grant, separate from Permit. Never accepts an observer's claimed ownership. */
+    public static final class RenderPermit {
+        private final YsmAssetCoordinator issuer;private final Connection observerBinding,wearerBinding;
+        private final Identity observer,wearer;private final Selected selection;
+        private final long epoch,revision;private final String generation;
+        private RenderPermit(YsmAssetCoordinator issuer,Connection observerBinding,Connection wearerBinding,
+                Identity observer,Identity wearer,Selected selection,long epoch,long revision,String generation){
+            this.issuer=issuer;this.observerBinding=observerBinding;this.wearerBinding=wearerBinding;
+            this.observer=observer;this.wearer=wearer;this.selection=selection;
+            this.epoch=epoch;this.revision=revision;this.generation=generation;
+        }
+        public Identity observer(){return observer;}public Identity wearer(){return wearer;}
+        public String contentId(){return selection.contentId();}public String sha256(){return selection.sha256();}
+        public long revision(){return revision;}public String generation(){return generation;}
+        public String usage(){return "render_only";}
+    }
     private record Replay(String handle,Permit permit) {}
     private final RuntimePort runtime;private final BooleanSupplier serverThread;
     private YsmAssetSnapshot snapshot=YsmAssetSnapshot.empty();private String generation="";private long epoch;
@@ -62,10 +85,13 @@ public final class YsmAssetCoordinator implements AutoCloseable {
         Permit permit=downloadPermit(connection,handle,expected);var replay=requests.computeIfAbsent(permit.identity().listener(),k->new HashMap<>());var prior=replay.get(requestKey);
         if(prior!=null){if(!prior.handle().equals(handle))throw denied();validatePermit(connection,prior.permit());return prior.permit();}
         if(replay.size()>=256)throw denied();validatePermit(connection,permit);
-        var tentative=new Selected(permit.identity(),handle,permit.contentId(),permit.sha256(),connection);selected.put(permit.identity().listener(),tentative);
+        var tentative=new Selected(permit.identity(),handle,permit.contentId(),permit.sha256(),connection,false);selected.put(permit.identity().listener(),tentative);
         try{
             if(!runtime.wear(permit.identity(),handle,permit.contentId(),permit.revision(),permit.generation()))throw denied();
-            validatePermit(connection,permit);replay.put(requestKey,new Replay(handle,permit));return permit;
+            validatePermit(connection,permit);
+            if(selected.get(permit.identity().listener())!=tentative)throw denied();
+            selected.put(permit.identity().listener(),new Selected(permit.identity(),handle,permit.contentId(),permit.sha256(),connection,true));
+            replay.put(requestKey,new Replay(handle,permit));return permit;
         }catch(RuntimeException failed){
             selected.remove(permit.identity().listener());pending.put(permit.identity().listener(),tentative);reconcile();throw denied();
         }
@@ -104,9 +130,39 @@ public final class YsmAssetCoordinator implements AutoCloseable {
     }
     /** Disconnect only that exact listener; old logout cannot clear the replacement connection. */
     public void disconnect(Identity identity){thread();selected.remove(identity.listener());requests.remove(identity.listener());pending.remove(identity.listener());}
-    /** Remote private appearance is NOT a byte-download grant. No render adapter is provided. */
+    private static boolean same(Identity a,Identity b){return a.listener()==b.listener()&&a.playerId().equals(b.playerId())&&a.uid().equals(b.uid());}
+    /** An unrelated actor awaiting fallback does not revoke an authorized wearer's existing appearance. */
+    private boolean renderReady(){return snapshot.revision()>=0&&runtime.exactGenerationReady(snapshot.revision(),generation);}
+    private Selected renderingTarget(Connection wearer,long expected){
+        Identity who=identity(wearer);if(expected!=snapshot.revision()||!renderReady()||pending.containsKey(who.listener()))throw denied();
+        var worn=selected.get(who.listener());
+        if(worn==null||!worn.confirmed()||!same(who,worn.identity())||!same(identity(worn.connection()),who))throw denied();
+        var content=permitted(who,worn.handle(),expected);
+        if(!content.contentId().equals(worn.contentId())||!content.sha256().equals(worn.sha256())||!runtime.isCurrentWear(who,worn.handle(),worn.contentId(),expected,generation))throw denied();return worn;
+    }
+    /** Policy A: a live observer may render an actual authorized wearer; this grants no list/select rights. */
+    public RenderPermit renderPermit(Connection observer,Connection wearer,long expected){
+        Identity seeing=identity(observer),wearing=identity(wearer);long issuedEpoch=epoch;String issuedGeneration=generation;
+        var worn=renderingTarget(wearer,expected);
+        if(!same(seeing,wearing)&&!runtime.isTrackingObserver(seeing,wearing))throw denied();
+        var permit=new RenderPermit(this,observer,wearer,seeing,wearing,worn,issuedEpoch,expected,issuedGeneration);
+        validateRenderPermit(observer,wearer,permit);return permit;
+    }
+    /** Recheck before native delivery/every chunk. Original native routing controls who tracks the wearer. */
+    public void validateRenderPermit(Connection observer,Connection wearer,RenderPermit permit){
+        Identity seeing=identity(observer),wearing=identity(wearer);
+        if(permit==null||permit.issuer!=this||permit.epoch!=epoch||permit.revision!=snapshot.revision()||!permit.generation.equals(generation)
+                ||!same(seeing,permit.observer)||!same(wearing,permit.wearer)
+                ||!same(identity(permit.observerBinding),seeing)||!same(identity(permit.wearerBinding),wearing)
+                ||(!same(seeing,wearing)&&!runtime.isTrackingObserver(seeing,wearing))
+                ||renderingTarget(wearer,permit.revision)!=permit.selection)throw denied();
+    }
+    /** Compatibility query derives a currently worn target from server state; a cached/guessed ID alone is insufficient. */
     public boolean canReceivePrivateRenderBytes(Connection observer,String targetHandle,long expected){
-        Identity who=identity(observer);return expected==snapshot.revision()&&snapshot.permitted(who.uid(),targetHandle)!=null&&ready();
+        identity(observer);
+        for(var worn:new ArrayList<>(selected.values()))if(worn.handle().equals(targetHandle))try{
+            renderPermit(observer,worn.connection(),expected);return true;
+        }catch(IllegalArgumentException|IllegalStateException absent){}return false;
     }
     public long revision(){thread();return snapshot.revision();}
     @Override public void close(){

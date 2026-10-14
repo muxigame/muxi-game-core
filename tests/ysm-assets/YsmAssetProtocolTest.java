@@ -19,10 +19,12 @@ public final class YsmAssetProtocolTest {
     static YsmAssetSnapshot state(String name){return YsmAssetSnapshot.parseTrusted(cases.get(name).get("snapshot").toString());}
     static String generation(YsmAssetSnapshot s){return "g_"+String.format("%032x",s.revision());}
     static final class NativeFixture implements YsmAssetCoordinator.RuntimePort {
-        long revision=-1;String gen="";boolean cache=true,peers=true,wear=true;int writes,resets;Runnable duringWear;
+        long revision=-1;String gen="";boolean cache=true,peers=true,wear=true,tracking=true;int writes,resets;Runnable duringWear,duringTracking;
         final Map<Object,String> worn=new IdentityHashMap<>();final List<Object> resetListeners=new ArrayList<>();
         void ready(YsmAssetSnapshot s){revision=s.revision();gen=generation(s);}
         @Override public boolean exactGenerationReady(long r,String g){return r==revision&&g.equals(gen);}
+        @Override public boolean isCurrentWear(YsmAssetCoordinator.Identity actor,String handle,String content,long r,String g){return r==revision&&g.equals(gen)&&handle.equals(worn.get(actor.listener()));}
+        @Override public boolean isTrackingObserver(YsmAssetCoordinator.Identity observer,YsmAssetCoordinator.Identity wearer){if(duringTracking!=null){var action=duringTracking;duringTracking=null;action.run();}return tracking;}
         @Override public boolean wear(YsmAssetCoordinator.Identity actor,String handle,String content,long r,String g){
             writes++;if(duringWear!=null){var action=duringWear;duringWear=null;action.run();}worn.put(actor.listener(),handle);return wear;
         }

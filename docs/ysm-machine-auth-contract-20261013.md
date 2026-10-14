@@ -59,7 +59,7 @@ python tests/ysm-assets/run_joint_wire.py --java-home <existing JDK21> --gson <e
 
 YSM负责人实际2.6.5交接 ../../muxi-ysm-compat/docs/ysm-production-adapter-handoff-20261013.md：27个selectors匹配只证明版本入口。没有完整单文件格式验证、没有逐content/generation的opaque native分发门禁，服务端reset也不代表own cache与tracking peer ACK。保持 exactGenerationReady=false，既不promote_verified真正上传，也不构造全部true的fallback回执；不以3.0迁移代替证明。
 
-私有旁观A/B仍待用户；本批签名与身份层不默认授予任何私有render广播。真实机器credential/replay/bootstrap部署未配置，生产模型目录和reload未动。后续两个真正隔离UID MC客户端仍需父会话协调，不与家园独立4GiB/2CPU测试抢资源。
+用户2026-10-14已选择A，旁观显示是render-only用途，不授予/catalog、/blob或select权限，不新增scope或用户token。Core新增许可合同见ysm-private-appearance-a-20261014.md；资源不可提取不作为验收条件。真实credential/replay/bootstrap仍未配置，未动生产模型目录或reload；原生双UID窗口仍由父会话协调。
 
 另一个需官网 owner确认的同步边界：当前 /blob 是player-read且需live claim，离线上传者的私有文件不能凭/snapshot清单直接通过它复制到异机夜间镜像。若需求包含上传者离线时的全量同步，应另定义只给approved sync机器的exact content/revision字节传输，不能伪造离线player或放宽现player-read接口。本批没有悄悄添加该权限或接口。
 

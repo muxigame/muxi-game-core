@@ -21,13 +21,13 @@ YsmProduction265Fallback：批准启动代码可显式注入原ServerDefaultRese
 
 ## 精确最小剩余操作
 
-仍有格式/native权限路径/cache/peer ACK的工程依赖，A/B或一次权限确认不能替代这些证据。私有广播、未知输入native执行和生产激活继续关闭。
+用户已选择A，旁观显示资源允许传输，不承诺客户端文件保密。仍有格式/native目录与选用授权/tracking画面ACK的工程依赖；未知输入native执行与生产激活保持关闭，当前没有实际发包。选用/目录授权失效不等同于抹除渲染文件，资源性能回收独立归原YSM owner。
 
 | 操作 | 目标与边界 | 凭据及身份 |
 | --- | --- | --- |
 | 合法样本原生观察，需owner协调窗口 | 原owner提供有权使用的单个原始.ysm及SHA/size；固定2.6.5 JAR SHA b285c73d4ec010d9a9be3c53c1bee890cf269645be5f1bcf1c27a2e8e82807cb和批准native；全新root/world=ysm-intake-world，零玩家、仅观察插件。起点wall120s/CPU60s/job4GiB/process1/log4MiB待校准，不改生产；ZIP不得改名冒充。 | 不需账号/SSO/机器密钥。只生成回执job token，非平台/机器凭据。合法样本和窗口尚需原owner提供。 |
 | 未知/恶意输入隔离，先安装验收 | 已验收VM/低权限环境，输入只读、有限临时写盘、拒绝出网、不可读生产凭据、外部超时/资源约束。Windows Job只有资源包络，network/filesystem/disk/GPU隔离仍false，本worker无执行入口。 | 可复用已验收隔离身份；不能用能读取生产凭据的宿主身份执行未知输入。未创建OS账号或新凭据。 |
 | 生产bootstrap，当前不执行 | 总仓/官网/Core批准已有key的serverId/keyId、sync/player-read/connection-resolve、ysm-web/ysm-core:<serverId> audience、原子replay、HTTPS host和hook安装；缺provider/hook仍503。 | 不新建/借用密钥，只有已批准对应scope的机器身份可复用；SSO/social/music key不能自动扩scope。玩家身份复用原批准JOIN/SSO事件。 |
-| 原生撤权验收 | 原owner实现exact content/generation/recipient、客户端cache释放及tracking peer确认，再协调真实双UID与用户A/B行为。 | 仅复用获准隔离测试账号，不借用其他运行会话。 |
+| 原生撤权验收 | 原owner验证content/native-ID/generation映射、owner正常菜单/选用权限、旧授权失效、默认穿戴和tracking画面更新，按用户已定A进行双UID验收；不要求召回渲染副本。 | 仅复用获准隔离测试账号，不借用其他会话，不新建凭据。 |
 
 跨主机pending intake/离线上传者全量同步尚无批准字节传输合同。本地pending_validation不是远程接口，/blob仍只给已验证内容与live claim；没有新增raw intake endpoint或扩大sync权限。完整格式validator仍缺失，成功观察不会签发passed=true。未部署、启动MC或修改生产凭据/模型树。

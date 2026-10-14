@@ -7,7 +7,7 @@ def export(store,uid,name,data,key):
  try:path.write_bytes(data);return store.ingest(uid,name,path,key,'private')
  finally:store.end_upload(uid,lease,path)
 def main():
- parser=argparse.ArgumentParser();parser.add_argument('--java-home',type=Path,required=True);parser.add_argument('--gson',type=Path,required=True);args=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--java-home',type=Path,required=True);parser.add_argument('--gson',type=Path,required=True);parser.add_argument('--with-appearance-a',action='store_true');args=parser.parse_args()
  sys.path.insert(0,str(ROOT/'better-mc-remake/server'));from app.ysm_assets import YsmAssetStore,ValidationReceipt
  with tempfile.TemporaryDirectory(prefix='two-accounts-',dir=OUT) as tmp:
   tmp=Path(tmp);store=YsmAssetStore(tmp/'web-store',validation_profile='explicit-protocol-fixture');cases=[];data=b'Core/Web opaque fixture ONLY; not a valid YSM model\x00';sha=hashlib.sha256(data).hexdigest()
@@ -27,10 +27,16 @@ def main():
   for name in ['com/mojang/authlib/GameProfile.java','net/minecraft/server/network/ServerGamePacketListenerImpl.java','net/minecraft/server/MinecraftServer.java','net/minecraft/server/level/ServerPlayer.java']:
    target=tmp/'identity-fixture'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(fixture.FILES[name],encoding='utf-8');generated.append(target)
   tick=tmp/'identity-fixture/net/neoforged/neoforge/event/tick/ServerTickEvent.java';tick.parent.mkdir(parents=True,exist_ok=True);tick.write_text('package net.neoforged.neoforge.event.tick; public class ServerTickEvent {public static class Post {}}',encoding='utf-8');generated.append(tick)
-  sources=generated+list((CORE/'src/main/java/net/muxigame/core/feature/ysmassets').glob('*.java'))+[ROOT/'muxi-minigames/src/main/java/net/muxigame/minigames/TrustedAccounts.java',CORE/'tests/ysm-assets/YsmAssetProtocolTest.java'];classes=tmp/'classes';classes.mkdir();arguments=['--release','21','-encoding','UTF-8','-proc:none','-cp',str(args.gson),'-d',str(classes),*map(str,sources)];argfile=tmp/'compile.args';argfile.write_text('\n'.join('"'+v.replace('\\','/')+'"' for v in arguments),encoding='utf-8')
+  sources=generated+list((CORE/'src/main/java/net/muxigame/core/feature/ysmassets').glob('*.java'))+[ROOT/'muxi-minigames/src/main/java/net/muxigame/minigames/TrustedAccounts.java',CORE/'tests/ysm-assets/YsmAssetProtocolTest.java'];sources+=([CORE/'tests/ysm-assets/YsmAppearanceATest.java'] if args.with_appearance_a else []);classes=tmp/'classes';classes.mkdir();arguments=['--release','21','-encoding','UTF-8','-proc:none','-cp',str(args.gson),'-d',str(classes),*map(str,sources)];argfile=tmp/'compile.args';argfile.write_text('\n'.join('"'+v.replace('\\','/')+'"' for v in arguments),encoding='utf-8')
   subprocess.run([str(args.java_home/'bin/javac.exe'),'@'+str(argfile)],check=True)
   result=subprocess.run([str(args.java_home/'bin/java.exe'),'-cp',str(classes)+os.pathsep+str(args.gson),'net.muxigame.core.feature.ysmassets.YsmAssetProtocolTest',str(snapshot)],check=False,capture_output=True,text=True,encoding='utf-8');
   if result.returncode:
    print(result.stdout);print(result.stderr,file=sys.stderr);raise SystemExit(result.returncode)
-  receipt=json.loads(result.stdout.strip());receipt['webHead']=subprocess.check_output(['git','-c','safe.directory='+str(ROOT/'better-mc-remake'),'-C',str(ROOT/'better-mc-remake'),'rev-parse','HEAD'],text=True).strip();receipt['testedWebStoreSha256']=hashlib.sha256((ROOT/'better-mc-remake/server/app/ysm_assets.py').read_bytes()).hexdigest();receipt['snapshotSha256']=hashlib.sha256(snapshot.read_bytes()).hexdigest();receipt['allWebAssetsRuntimeInactive']=True;(OUT/'protocol-result.json').write_text(json.dumps(receipt,indent=2),encoding='utf-8');print(json.dumps(receipt))
+  receipt=json.loads(result.stdout.strip())
+  if args.with_appearance_a:
+   appearance=subprocess.run([str(args.java_home/'bin/java.exe'),'-Xmx96m','-cp',str(classes)+os.pathsep+str(args.gson),'net.muxigame.core.feature.ysmassets.YsmAppearanceATest',str(snapshot)],capture_output=True,text=True,encoding='utf-8')
+   if appearance.returncode:
+    print(appearance.stdout);print(appearance.stderr,file=sys.stderr);raise SystemExit(appearance.returncode)
+   policy=json.loads(appearance.stdout);policy['webHead']=subprocess.check_output(['git','-C',str(ROOT/'better-mc-remake'),'rev-parse','HEAD'],text=True).strip();policy['snapshotSha256']=hashlib.sha256(snapshot.read_bytes()).hexdigest();policy['coordinatorSha256']=hashlib.sha256((CORE/'src/main/java/net/muxigame/core/feature/ysmassets/YsmAssetCoordinator.java').read_bytes()).hexdigest();(OUT/'appearance-a-result.json').write_text(json.dumps(policy,indent=2),encoding='utf-8');receipt['appearanceA']=policy
+  receipt['webHead']=subprocess.check_output(['git','-c','safe.directory='+str(ROOT/'better-mc-remake'),'-C',str(ROOT/'better-mc-remake'),'rev-parse','HEAD'],text=True).strip();receipt['testedWebStoreSha256']=hashlib.sha256((ROOT/'better-mc-remake/server/app/ysm_assets.py').read_bytes()).hexdigest();receipt['snapshotSha256']=hashlib.sha256(snapshot.read_bytes()).hexdigest();receipt['allWebAssetsRuntimeInactive']=True;(OUT/'protocol-result.json').write_text(json.dumps(receipt,indent=2),encoding='utf-8');print(json.dumps(receipt))
 if __name__=='__main__':main()
