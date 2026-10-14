@@ -1,0 +1,16 @@
+{
+  "registered350JarEquivalent": true,
+  "baselineVersion": "1.4.38",
+  "baselinePublishedManifestSha256": "157799764fbd5741684f879fb69d0150d73002d76eae89dd7de7ffccb0e4ce71",
+  "inputsMatch": true,
+  "queueGateRefusesUngrant": true,
+  "minecraftStarted": false,
+  "productionAccessed": false,
+  "productInputsPerStage": 350,
+  "qaModuleExtraPerStage": 1,
+  "debugAgentExtraPerStage": 1,
+  "deliberateProductDeltaOnly": "Core 46acc0ad -> 5e47f57e in new stages",
+  "manifestSha256": "604e3790d343023ffd3625c200735f7f33642cb8f5d69b91ccb4c5c16ce700e5",
+  "oldLocal340NoLongerSelected": true,
+  "sourceFramework": "c8818fece84986ddeb3878befb7edeafb2e69b432970bbf2b0c4c911182eb3b6"
+}

@@ -1,0 +1,2164 @@
+{
+  "schema": 1,
+  "releaseVersion": "1.4.38",
+  "productionJarCount": 350,
+  "registeredManifestSha256": "157799764fbd5741684f879fb69d0150d73002d76eae89dd7de7ffccb0e4ce71",
+  "publishedManifest": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-11\\task-3\\release1438-joint\\manifest.json",
+  "baselineInventory": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-11\\task-3\\release1438-joint\\production-baseline.json",
+  "releaseArtifacts": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\docs\\release-1.4.38-artifacts.json",
+  "releaseCompletion": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-11\\task-3\\release1438-joint\\COMPLETED-1.4.38.json",
+  "originalFrozenCount": 340,
+  "missingNamesFromOldLocal": [
+    "CustomNPCs-1.21.1.20251230-bmc-stock.4.jar",
+    "LesRaisins-Tactical-Equipements-1.21.1-0.4.3.jar",
+    "muxi-champion-companions-1.0.5.jar",
+    "muxi-flight-0.1.2-iwo-half.5-recovery.2.jar",
+    "muxi-game-core-1.12.3-task14-qa.1.jar",
+    "muxi-horse-racing-0.2.2-race.5-shop-ui-qa.4.jar",
+    "muxi-minigames-0.2.1-equipment.1.jar",
+    "muxi-outbreak-0.4.5-school.4-candidate.11.jar",
+    "muxi-performance-0.1.0-qa.4.jar",
+    "muxi-tower-defense-0.3.0-compact.2.jar",
+    "muxi-zombie-challenge-0.1.3-task14-social-qa.4.jar",
+    "nmbl-1.0.4-neoforge-mc1.21.1.jar",
+    "muxi-music-compat-0.4.1-repair-candidate.2.jar",
+    "muxi-terminal-0.2.4-window-ui.3.jar"
+  ],
+  "retiredOrReplacedOldLocal": [
+    "c2me-neoforge-mc1.21.1-0.4.0-alpha.0.120.jar",
+    "CustomNPCs-Unofficial-NeoForge-1.21.1.20251230.jar",
+    "muxi-champion-companions-1.0.3.jar",
+    "muxi-game-core-1.7.4.jar"
+  ],
+  "sameNameMismatch": [
+    {
+      "name": "[嵌入式框架]mcef-neoforge-2.1.6-1.21.1.jar",
+      "productionSha256": "0c7696216fa5cfee659d687475873c847a9a17cc8ce3a56119a69c946eeb8772",
+      "oldFrozenSha256": "fee3f495aa5c6566a252cdb2a6b0f153105624c125144d1cd257dbad044bdd1d"
+    }
+  ],
+  "exactMatchesOldLocal": 335,
+  "all350ExactSourcesResolved": true,
+  "unresolved": [],
+  "productInputs": [
+    {
+      "name": "AdvancedCoreInfo-neoforge-1.21.1-1.1.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\AdvancedCoreInfo-neoforge-1.21.1-1.1.0.jar",
+      "sha256": "c0c9695e84b136ef5bec02bedf1295472a809f8a288f1edfa5bf4df1bbddfc12",
+      "bytes": 105045
+    },
+    {
+      "name": "AdvancedLootInfo-neoforge-1.21.1-2.1.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\AdvancedLootInfo-neoforge-1.21.1-2.1.0.jar",
+      "sha256": "711a13fc5851980da0ef44edc1b16c1c78538fbf4322b83bd924bda9df6bfd08",
+      "bytes": 677250
+    },
+    {
+      "name": "AetherVillages-1.21.1-1.0.8-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\AetherVillages-1.21.1-1.0.8-neoforge.jar",
+      "sha256": "9f9837ec289bdcd016b0386374e7507503a5a7d78fb4941ac74cb44cad15cc34",
+      "bytes": 647447
+    },
+    {
+      "name": "Almanac-1.21.1-2-neoforge-1.5.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Almanac-1.21.1-2-neoforge-1.5.2.jar",
+      "sha256": "379893246c33aaa6dd8e4a8711e349cd6835e08c2bd5b8bd7b7e81be9822aacb",
+      "bytes": 25593
+    },
+    {
+      "name": "AureljPaintings-1.0.5-1.21.x-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\AureljPaintings-1.0.5-1.21.x-neoforge.jar",
+      "sha256": "d0e9c7f3579fe2a2efa221a8e8a690f3c18633627c7c75b8a456c94a6498867f",
+      "bytes": 109792
+    },
+    {
+      "name": "AutochefsDelight-1.21.1-NeoForge-2.0.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\AutochefsDelight-1.21.1-NeoForge-2.0.3.jar",
+      "sha256": "7c57b42e7fc6d2d1dd1c2993ba4413aebf4aa9cfa8f5a910b9ce66897a7f9ae9",
+      "bytes": 15969
+    },
+    {
+      "name": "BarteringStation-v21.1.0-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\BarteringStation-v21.1.0-1.21.1-NeoForge.jar",
+      "sha256": "1103e8ddca2223c89e62d793efffa4a25d0495ad6ec5a2b2fee0deefbc7fd91f",
+      "bytes": 98226
+    },
+    {
+      "name": "ClimateRivers-v21.1.3-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ClimateRivers-v21.1.3-1.21.1-NeoForge.jar",
+      "sha256": "54d6d6659e93bd5c1faeb83443da54befbf298c666cc997f410e3b7e5f5c33f4",
+      "bytes": 56642
+    },
+    {
+      "name": "Clumps-neoforge-1.21.1-19.0.0.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Clumps-neoforge-1.21.1-19.0.0.1.jar",
+      "sha256": "b524ccdace2ef8fd19f5b2074f7de1103ac5065c52553f064c00e098346c293e",
+      "bytes": 18382
+    },
+    {
+      "name": "ConfiguredDefaults-v21.1.3-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ConfiguredDefaults-v21.1.3-1.21.1-NeoForge.jar",
+      "sha256": "48b97dada951826b4abf9b2dcab79c0e701bb2980c5bca4977bac7ca0c264ea7",
+      "bytes": 43521
+    },
+    {
+      "name": "ConnectorExtras-1.12.1+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ConnectorExtras-1.12.1+1.21.1.jar",
+      "sha256": "ee89c3425b9a4bff766aaff02ccf8110c06f5da6ef5d71974556885cf25d4880",
+      "bytes": 86284
+    },
+    {
+      "name": "ConvenientEffects-v21.1.4-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ConvenientEffects-v21.1.4-1.21.1-NeoForge.jar",
+      "sha256": "6fd661a70afeec2725f597c7fd500a7d87db2013fe6d951ab7fb22503cc9b1e8",
+      "bytes": 58640
+    },
+    {
+      "name": "Corgilib-NeoForge-1.21.1-5.0.0.9.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Corgilib-NeoForge-1.21.1-5.0.0.9.jar",
+      "sha256": "5e058a4fcb29a538821351081fcf10172fc707767756774afed1bf0e1953c7e3",
+      "bytes": 309763
+    },
+    {
+      "name": "CustomNPCs-1.21.1.20251230-bmc-stock.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\.local-operations\\release-20261008-takeover\\production-clean-r2\\server\\mods\\CustomNPCs-1.21.1.20251230-bmc-stock.4.jar",
+      "sha256": "fe9f1ff4bb4c072f5df88e381904a63f0637c874b29e9e8a4c35a958f104b1f5",
+      "bytes": 10648355
+    },
+    {
+      "name": "DiagonalFences-v21.1.1-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\DiagonalFences-v21.1.1-1.21.1-NeoForge.jar",
+      "sha256": "361d1025a8a81f8e77d21da5332bd8390c80c316bae256f8513de97c9f6c9970",
+      "bytes": 171557
+    },
+    {
+      "name": "DiagonalWalls-v21.1.2-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\DiagonalWalls-v21.1.2-1.21.1-NeoForge.jar",
+      "sha256": "9ea9e986a09f72c5a40b0ec571c64b802e16f0b4d15b0be452c1d71ceddd1726",
+      "bytes": 167853
+    },
+    {
+      "name": "DiagonalWindows-v21.1.1-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\DiagonalWindows-v21.1.1-1.21.1-NeoForge.jar",
+      "sha256": "2c36dd055872aa7643f2a4cc787c998dcddf62910d17c4a166d250f6d55e6cbe",
+      "bytes": 172170
+    },
+    {
+      "name": "DnT-ancient-city-overhaul-v2 [NeoForge].jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\DnT-ancient-city-overhaul-v2 [NeoForge].jar",
+      "sha256": "890882ec1239fff1cd5cc5f1da1fe4be98a31e748d418220bee5f2b9f3d8fd91",
+      "bytes": 945778
+    },
+    {
+      "name": "DnT-swamp-hut-overhaul-v2 [NeoForge].jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\DnT-swamp-hut-overhaul-v2 [NeoForge].jar",
+      "sha256": "995978ec1916450568b3639ffbc8ae5e674329b5c9734786896b98114913631b",
+      "bytes": 112184
+    },
+    {
+      "name": "DnT-woodland-mansion-replacement-v1.2 [NeoForge].jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\DnT-woodland-mansion-replacement-v1.2 [NeoForge].jar",
+      "sha256": "27496934f832f92a1c4f099bb2fe54808ed7ab3d84316cd955cfebbe0eb24b3e",
+      "bytes": 4687725
+    },
+    {
+      "name": "DungeonsArise-1.21.1-2.1.68-release.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\DungeonsArise-1.21.1-2.1.68-release.jar",
+      "sha256": "7eee1eca7e3b2c6c1bede055934f391ae2e8349ffe33e106f451176d2cfcf0e4",
+      "bytes": 11842679
+    },
+    {
+      "name": "DyedFlames-v21.1.1-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\DyedFlames-v21.1.1-1.21.1-NeoForge.jar",
+      "sha256": "8f10d0673fe73dce0340f8bd8eca5010e15a2853c08c7d28b033e1b7ea55e0da",
+      "bytes": 97354
+    },
+    {
+      "name": "EasyAnvils-v21.1.0-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\EasyAnvils-v21.1.0-1.21.1-NeoForge.jar",
+      "sha256": "dcd0e562710a639b4fdd60a7500dc9404c6fbd1007215a088248ce1c57ccc6dc",
+      "bytes": 152297
+    },
+    {
+      "name": "EasyMagic-v21.1.4-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\EasyMagic-v21.1.4-1.21.1-NeoForge.jar",
+      "sha256": "e641a83dcd0dd1a66c545069a706349df94f5b64dc5a252944596439009a699f",
+      "bytes": 143992
+    },
+    {
+      "name": "EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar",
+      "sha256": "875647ca276c2cfc9418ee2d62398c61380eac8d79ab0e555aefa09ac3b07d18",
+      "bytes": 746263
+    },
+    {
+      "name": "EternalNether-v21.1.3-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\EternalNether-v21.1.3-1.21.1-NeoForge.jar",
+      "sha256": "9680efb45ec51250da820b8d525ab739fe0210458651ea87f13c3de9b2691a93",
+      "bytes": 7395290
+    },
+    {
+      "name": "ExplorersCompass-1.21.1-3.4.0-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ExplorersCompass-1.21.1-3.4.0-neoforge.jar",
+      "sha256": "71e7b47bd88c9c210d7c06fe5276736fc2e225e869778216537d584e6d1faf24",
+      "bytes": 174668
+    },
+    {
+      "name": "Explorify v1.6.5.mod.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Explorify v1.6.5.mod.jar",
+      "sha256": "2dc76398b48b2aae9b4024642da098b0880125572de160cb5ecf91d102890cad",
+      "bytes": 767884
+    },
+    {
+      "name": "FallingTree-1.21.1-1.21.1.11.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\FallingTree-1.21.1-1.21.1.11.jar",
+      "sha256": "70ee147602d2239e7a093e166fdf0c0abcef959d5d457c0f8f3669ef9b483dc4",
+      "bytes": 496356
+    },
+    {
+      "name": "FarmersDelight-1.21.1-1.3.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\FarmersDelight-1.21.1-1.3.4.jar",
+      "sha256": "139ad7696462c89c03eea463f805abffa552526c5dadaadae221dd9624cb197c",
+      "bytes": 3160490
+    },
+    {
+      "name": "FastItemFrames-v21.1.6-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\FastItemFrames-v21.1.6-1.21.1-NeoForge.jar",
+      "sha256": "e831a12ca075450295aa26c8862d641498f8031af10674d60a791d2f27be17be",
+      "bytes": 98320
+    },
+    {
+      "name": "ForgeConfigAPIPort-v21.1.6-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ForgeConfigAPIPort-v21.1.6-1.21.1-NeoForge.jar",
+      "sha256": "1fffe12e3e8343ef52d306ee29f7d6f6724d47a185a375c4a3c75aab3894c68d",
+      "bytes": 104654
+    },
+    {
+      "name": "Geophilic v3.6.mod.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Geophilic v3.6.mod.jar",
+      "sha256": "5df284ed678c8f44d5f9b015736c18858d8b5706128bbe129fc35bc23208bd84",
+      "bytes": 906446
+    },
+    {
+      "name": "GeophilicBackported-v1.3.3 1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\GeophilicBackported-v1.3.3 1.21.1.jar",
+      "sha256": "e6869edf6d91660f45d0eceb3db599161a35dcacadbf550b951d2c783f509631",
+      "bytes": 196983
+    },
+    {
+      "name": "GlitchCore-neoforge-1.21.1-2.1.0.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\GlitchCore-neoforge-1.21.1-2.1.0.2.jar",
+      "sha256": "d9ea421e7449a35cf3adc41c9f740156342b7b17a08b1be843660608af7b60f9",
+      "bytes": 90717
+    },
+    {
+      "name": "Hearths v1.0.5.mod.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Hearths v1.0.5.mod.jar",
+      "sha256": "97391792de6c404bf93d145cb213cdacb98cd0c0130cdb4012ba6dc63f51f3f5",
+      "bytes": 334560
+    },
+    {
+      "name": "HellishTrials-neoforge-1.0.5.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\HellishTrials-neoforge-1.0.5.jar",
+      "sha256": "7f28724652eedd275970455e37629758f7279bd3918a4f1d852676dcf392db63",
+      "bytes": 581988
+    },
+    {
+      "name": "Iceberg-1.21.1-neoforge-1.3.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Iceberg-1.21.1-neoforge-1.3.2.jar",
+      "sha256": "0d620c975619b04110b94a73d5b42d252563ff59c1eae9d21ab2ee7e38460a3c",
+      "bytes": 213853
+    },
+    {
+      "name": "IllagerInvasion-v21.1.6-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\IllagerInvasion-v21.1.6-1.21.1-NeoForge.jar",
+      "sha256": "5adfdd0df0c5dbe81e4458da50442b58863f9db9f22abc182f81e487eef0e6db",
+      "bytes": 2361701
+    },
+    {
+      "name": "Jade-1.21.1-NeoForge-15.10.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Jade-1.21.1-NeoForge-15.10.6.jar",
+      "sha256": "276f1f65a20d04f536989c4f311949d770b52c440c23c2b904a08860f3c93810",
+      "bytes": 726853
+    },
+    {
+      "name": "JadeAddons-1.21.1-NeoForge-6.1.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\JadeAddons-1.21.1-NeoForge-6.1.1.jar",
+      "sha256": "ebf500331c07a4c67147f61ad8a5e3b186afa49f70028904a639229fdf40f372",
+      "bytes": 75431
+    },
+    {
+      "name": "JustEnoughProfessions-neoforge-1.21.1-4.0.5.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\JustEnoughProfessions-neoforge-1.21.1-4.0.5.jar",
+      "sha256": "b34d6bb434d507874a6ebe49d40169c26f7cad8f51c9ffea615eedb153746696",
+      "bytes": 24879
+    },
+    {
+      "name": "Kiwi-1.21.1-NeoForge-15.8.7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Kiwi-1.21.1-NeoForge-15.8.7.jar",
+      "sha256": "f1222ac3773b2814d40ee6e77129bb27a29d82ec76d7a878ba23d3f5f9f8a392",
+      "bytes": 1539578
+    },
+    {
+      "name": "L_Ender's Cataclysm 1.21.1-3.33.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\L_Ender's Cataclysm 1.21.1-3.33.jar",
+      "sha256": "23921a268acc8b695291f12e89c5e4c261ee5f59a3b6d763793461efb3e7e1d6",
+      "bytes": 73375661
+    },
+    {
+      "name": "LeavesBeGone-v21.1.1-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\LeavesBeGone-v21.1.1-1.21.1-NeoForge.jar",
+      "sha256": "ea85ad07672f7c2199c28fe58a80c354ef2f2c60bfb0315e3730c344068526e0",
+      "bytes": 55937
+    },
+    {
+      "name": "LesRaisins-Tactical-Equipements-1.21.1-0.4.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\.local-operations\\release-20261008-takeover\\production-clean-r2\\server\\mods\\LesRaisins-Tactical-Equipements-1.21.1-0.4.3.jar",
+      "sha256": "b492f2d37a993d76a8ffd6b79bea89a64de91d4710b1b4841f63d65982f610ac",
+      "bytes": 6612829
+    },
+    {
+      "name": "LetMeSleep-v21.1.0-mc1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\LetMeSleep-v21.1.0-mc1.21.1-NeoForge.jar",
+      "sha256": "0e2cce98ecc43aeb953c7ad1a645bf63778cdfde1c893306fa453cff434e3d68",
+      "bytes": 86435
+    },
+    {
+      "name": "LongNBTKiller-NeoForge-1.21.3-1.0.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\LongNBTKiller-NeoForge-1.21.3-1.0.0.jar",
+      "sha256": "8ae0d8def2d53d80d636b2450432f564c79e45696ef669b9fbd09f7df94ebd83",
+      "bytes": 6247
+    },
+    {
+      "name": "MagnumTorch-v21.1.1-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\MagnumTorch-v21.1.1-1.21.1-NeoForge.jar",
+      "sha256": "0ba72d91b8f701bd7908934d120a4ab15f0ecd3d428ad1cf4792c89050c54f17",
+      "bytes": 124523
+    },
+    {
+      "name": "MoogsEndStructures-1.21-2.0.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\MoogsEndStructures-1.21-2.0.3.jar",
+      "sha256": "6dd403739a473c38aa2a6660dc4891be1525743f5e7be0cf4c25b93b4491b4ea",
+      "bytes": 1210283
+    },
+    {
+      "name": "MoogsGlowUp-neoforge-1.21.1-1.2.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\MoogsGlowUp-neoforge-1.21.1-1.2.2.jar",
+      "sha256": "6906b734814b1df402898548a15ae20f3d5d59731b882351e380473beb1f507a",
+      "bytes": 295686
+    },
+    {
+      "name": "MoogsMissingVillages-1.21-2.1.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\MoogsMissingVillages-1.21-2.1.2.jar",
+      "sha256": "971966a8ad9721b9a8393d362e5f323bc63e61d9596f34183d6186b3b4c2b610",
+      "bytes": 599142
+    },
+    {
+      "name": "MoogsNetherStructures-1.21-3.0.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\MoogsNetherStructures-1.21-3.0.0.jar",
+      "sha256": "024bce3098fcba6b7eb55f3526708cbf9dfdf3b074da057ce72b896a2567a6af",
+      "bytes": 3794509
+    },
+    {
+      "name": "MoogsStructureLib-neoforge-1.21.1-3.1.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\MoogsStructureLib-neoforge-1.21.1-3.1.2.jar",
+      "sha256": "5d1e212d11b3a2b2a881f8fdd9d58fe529a73c2e7f3266d73e4970492049a48d",
+      "bytes": 413682
+    },
+    {
+      "name": "MoogsVoyagerStructures-universal-1.21-5.1.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\MoogsVoyagerStructures-universal-1.21-5.1.1.jar",
+      "sha256": "6f887235a0d97e9eb3a63ef3bf3dada5ab4ad706d8f42c2df64cc556321b3e4a",
+      "bytes": 2244261
+    },
+    {
+      "name": "MoreVillagers-Re-1.21.1-neoforge-1.25.12.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\MoreVillagers-Re-1.21.1-neoforge-1.25.12.4.jar",
+      "sha256": "9431dd00b893edbdb7366558d488a004e9f1f72aadae61d57ff945d98ae16e09",
+      "bytes": 376197
+    },
+    {
+      "name": "MyNethersDelight-1.21.1-1.10.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\MyNethersDelight-1.21.1-1.10.4.jar",
+      "sha256": "fe246d086dcb87c7d2163fbbff09fd7e164f206238e52700fe0b3e34fb343432",
+      "bytes": 904388
+    },
+    {
+      "name": "NaNny-1.21.1-1.0.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\NaNny-1.21.1-1.0.1.jar",
+      "sha256": "e9667ea0a7f43bf79b166dfd741ba35365056befc6663d9f21000216c101fd90",
+      "bytes": 4729
+    },
+    {
+      "name": "NaturesCompass-1.21.1-3.4.0-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\NaturesCompass-1.21.1-3.4.0-neoforge.jar",
+      "sha256": "0e249ac11b2f916c5570d9679e188da652fa5664ba9cdb7be5dc9ff69497539c",
+      "bytes": 224657
+    },
+    {
+      "name": "NetherChested-v21.1.1-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\NetherChested-v21.1.1-1.21.1-NeoForge.jar",
+      "sha256": "a1bf829366a4d6f489c5fa40ddefe8bc65d2f267f81a5bf18fc91d1f0e7aab80",
+      "bytes": 168584
+    },
+    {
+      "name": "NoChatReports-NEOFORGE-1.21.1-v2.9.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\NoChatReports-NEOFORGE-1.21.1-v2.9.1.jar",
+      "sha256": "866ac9a47afcd829bdb03890b5d8f80bb4c6f47332c64717b6e909bee51337b6",
+      "bytes": 306668
+    },
+    {
+      "name": "Oh-The-Biomes-Weve-Gone-NeoForge-2.6.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Oh-The-Biomes-Weve-Gone-NeoForge-2.6.0.jar",
+      "sha256": "d63c45e82bb88d533119d9c814fa43738fd0cca5506c04daad774a1bf8946f93",
+      "bytes": 20484967
+    },
+    {
+      "name": "Oh-The-Trees-Youll-Grow-neoforge-1.21.1-5.3.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Oh-The-Trees-Youll-Grow-neoforge-1.21.1-5.3.2.jar",
+      "sha256": "571feb4d223ee2b5661ed3450ea5c68db18627badcef4d59095a329fc03a7685",
+      "bytes": 167431
+    },
+    {
+      "name": "Patchouli-1.21.1-93-NEOFORGE.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Patchouli-1.21.1-93-NEOFORGE.jar",
+      "sha256": "959af52ed6640c316c3a8469203420be4aeea11ad6603890ba83bf48f5d9f993",
+      "bytes": 646777
+    },
+    {
+      "name": "Paxi-1.21.1-NeoForge-5.1.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Paxi-1.21.1-NeoForge-5.1.3.jar",
+      "sha256": "4b60f8eb3b8b8880eff7c3ac825cde84394848eac3915ed61ade607cdd331ce7",
+      "bytes": 102980
+    },
+    {
+      "name": "Ping-Wheel-1.12.2-neoforge-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Ping-Wheel-1.12.2-neoforge-1.21.1.jar",
+      "sha256": "fcff3528dfc644dd510e702c51af477c11ddbee07895b9ba906e3f0dbc9c4077",
+      "bytes": 153528
+    },
+    {
+      "name": "Platform-neoforge-1.21.1-1.3.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Platform-neoforge-1.21.1-1.3.3.jar",
+      "sha256": "2d7175e43943d22cbb4f8d4533f0ad620f87a3ac12c77a4f15c3a35d965c4f18",
+      "bytes": 489341
+    },
+    {
+      "name": "PuzzlesLib-v21.1.59-mc1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\PuzzlesLib-v21.1.59-mc1.21.1-NeoForge.jar",
+      "sha256": "a0cec5aada45c4e8a4ba46cd159f9db8e468bc30a49d8cb45b39b2269447c72f",
+      "bytes": 1429272
+    },
+    {
+      "name": "Quest-Kill-Task-neoforge-0.3.1+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Quest-Kill-Task-neoforge-0.3.1+1.21.1.jar",
+      "sha256": "605d944282f275e3fb92deb731d023b6207f249e875cec587704b1a374a50c0f",
+      "bytes": 18558
+    },
+    {
+      "name": "Raided-1.21.1-0.1.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Raided-1.21.1-0.1.6.jar",
+      "sha256": "e0d1517416c1b01b1076066cb36c9b55d9bcbef04ebe783abc45604b8a579d03",
+      "bytes": 135536
+    },
+    {
+      "name": "ScalableLux-0.1.0.1+neoforge.1cb1e91-all.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ScalableLux-0.1.0.1+neoforge.1cb1e91-all.jar",
+      "sha256": "74340a37af858014ecf66068054bed3ab778b22d24956d348a2ec2bc3c585cb5",
+      "bytes": 176443
+    },
+    {
+      "name": "Seasonal Integration-v1.6.2-Mc1.21.1+.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Seasonal Integration-v1.6.2-Mc1.21.1+.jar",
+      "sha256": "df4c033ae6e1cdec5d6aedd5ae4a94eac7aad61bde2bb8ce2db462e0ea6c56c8",
+      "bytes": 263108
+    },
+    {
+      "name": "SereneSeasons-neoforge-1.21.1-10.1.0.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\SereneSeasons-neoforge-1.21.1-10.1.0.3.jar",
+      "sha256": "86d89fce593f868cb6b542943c0f82850ca56970fe0327e401966d8d0420861d",
+      "bytes": 159205
+    },
+    {
+      "name": "SkeletonAIFix-v21.1.1-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\SkeletonAIFix-v21.1.1-1.21.1-NeoForge.jar",
+      "sha256": "aa4a0a5c30bf623950956e41c6cf4f17bc3fb0857336de3a7cda9784034ea872",
+      "bytes": 45576
+    },
+    {
+      "name": "SnowRealMagic-1.21.1-NeoForge-12.2.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\SnowRealMagic-1.21.1-NeoForge-12.2.2.jar",
+      "sha256": "b82fb35b7389d472e074fbc560eb7fbdf9522733f9d11a34036b176fec95a76c",
+      "bytes": 3895550
+    },
+    {
+      "name": "Stoneworks-v21.1.0-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Stoneworks-v21.1.0-1.21.1-NeoForge.jar",
+      "sha256": "3fa6b2347bdf536e953162dc1e3cfc7cc47597c5132fba59e2d46c977a7e086f",
+      "bytes": 1996861
+    },
+    {
+      "name": "Stony Cliffs FML v1.1.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Stony Cliffs FML v1.1.2.jar",
+      "sha256": "f07a2db60d1e3dea51bd640fae23277df64239a09b45e919be0a47a31bec72c3",
+      "bytes": 43941
+    },
+    {
+      "name": "Structory_26.2_v1.3.7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Structory_26.2_v1.3.7.jar",
+      "sha256": "e9079b2bb9bc2efb9b0f1244376488e41f8b50f25415094d8f03dc753cdfb131",
+      "bytes": 1261346
+    },
+    {
+      "name": "Structory_Towers_26.1_v1.0.16.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Structory_Towers_26.1_v1.0.16.jar",
+      "sha256": "a9c1715219642c87d105bd944a0316c9a22cd3caf83836e21bcaaee3fd4f04e2",
+      "bytes": 491545
+    },
+    {
+      "name": "SubtleEffects-neoforge-1.21.1-1.14.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\SubtleEffects-neoforge-1.21.1-1.14.3.jar",
+      "sha256": "78fd24ecaadee01746ecc4cf598284923e762e25964311e86a67aa30cd3c2b67",
+      "bytes": 3306773
+    },
+    {
+      "name": "TerraBlender-neoforge-1.21.1-4.1.0.8.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\TerraBlender-neoforge-1.21.1-4.1.0.8.jar",
+      "sha256": "edb34c388fe17ea88d0a7fd11174bbf8ae8f28a4c8ce886f1bf9a5cf0ebc36b8",
+      "bytes": 120364
+    },
+    {
+      "name": "TradingPost-v21.1.1-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\TradingPost-v21.1.1-1.21.1-NeoForge.jar",
+      "sha256": "655e6d187ac592caeac02e37a0325d5d5cfeee48a043c4e4a9d0e02366afc1b6",
+      "bytes": 121731
+    },
+    {
+      "name": "VanillaBackport-neoforge-1.21.1-1.1.7.10.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\VanillaBackport-neoforge-1.21.1-1.1.7.10.jar",
+      "sha256": "ecd807ac358e243ede17819455788c7b7a0ce5e0af4aecee82c1c62c586d818d",
+      "bytes": 54902084
+    },
+    {
+      "name": "Villager-API-1.21.1-neoforge-1.26.1.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\Villager-API-1.21.1-neoforge-1.26.1.3.jar",
+      "sha256": "e1ff94f426000b60797ae9a3cc5b7725c721fedc0fc5d6df2b79d7507cc49f10",
+      "bytes": 132892
+    },
+    {
+      "name": "VisualWorkbench-v21.1.2-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\VisualWorkbench-v21.1.2-1.21.1-NeoForge.jar",
+      "sha256": "f9bea7865d57c0f32075fc1e8b760d048cf77513c8d93fa41c181ad190eb4449",
+      "bytes": 76670
+    },
+    {
+      "name": "YungsApi-1.21.1-NeoForge-5.1.8.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\YungsApi-1.21.1-NeoForge-5.1.8.jar",
+      "sha256": "bacd2385965bcfa4adcc0841656110b8e21ee024407a5ee706d30929f7c240cc",
+      "bytes": 389834
+    },
+    {
+      "name": "YungsBetterDungeons-1.21.1-NeoForge-5.1.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\YungsBetterDungeons-1.21.1-NeoForge-5.1.4.jar",
+      "sha256": "61816c3b7c9d92c6b44f93dce87ceb0a22827f20285d5d9c4d10d519d734de04",
+      "bytes": 782160
+    },
+    {
+      "name": "YungsBetterEndIsland-1.21.1-NeoForge-3.1.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\YungsBetterEndIsland-1.21.1-NeoForge-3.1.2.jar",
+      "sha256": "8005f1ea798d09fc05dad07a21ed1f393a523a718197cdbd37b1ce6d9a17e4a4",
+      "bytes": 398130
+    },
+    {
+      "name": "YungsBetterJungleTemples-1.21.1-NeoForge-3.1.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\YungsBetterJungleTemples-1.21.1-NeoForge-3.1.2.jar",
+      "sha256": "a0d57b78c7a1891796f342b1f09c214bc27bedf0a3a894f029dfdb2db9f813d0",
+      "bytes": 795839
+    },
+    {
+      "name": "YungsBetterMineshafts-1.21.1-NeoForge-5.1.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\YungsBetterMineshafts-1.21.1-NeoForge-5.1.1.jar",
+      "sha256": "5625930dfb3240820d6e4ecf55fff0c39f70ce782fad117a4d418251184c7be0",
+      "bytes": 493967
+    },
+    {
+      "name": "YungsBetterNetherFortresses-1.21.1-NeoForge-3.1.5.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\YungsBetterNetherFortresses-1.21.1-NeoForge-3.1.5.jar",
+      "sha256": "5450a64a7036237f449496837e08f3e5b3aa1d7974a10df43944172def75d8ff",
+      "bytes": 609639
+    },
+    {
+      "name": "YungsBetterOceanMonuments-1.21.1-NeoForge-4.1.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\YungsBetterOceanMonuments-1.21.1-NeoForge-4.1.2.jar",
+      "sha256": "cdcf8fe0e08c75261048d43c6ed4898972d23e096dd04a2524c136f06416ab02",
+      "bytes": 1025571
+    },
+    {
+      "name": "YungsBetterStrongholds-1.21.1-NeoForge-5.1.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\YungsBetterStrongholds-1.21.1-NeoForge-5.1.3.jar",
+      "sha256": "a9cab2fc01538368862365691f7d215309801aed0b390351681b6b60a1db7b58",
+      "bytes": 461244
+    },
+    {
+      "name": "YungsBetterWitchHuts-1.21.1-NeoForge-4.1.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\YungsBetterWitchHuts-1.21.1-NeoForge-4.1.1.jar",
+      "sha256": "888b1e6d1ada21982a75abfb4afb040c9bc2cc68777ec5fcd1199b978e3d4f8d",
+      "bytes": 174789
+    },
+    {
+      "name": "[L2 Library 前置]l2library-3.0.8.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[L2 Library 前置]l2library-3.0.8.jar",
+      "sha256": "26038e30873cf505bc289e28f9dcf084561b8a4929b294dd0552ba5e52505dd6",
+      "bytes": 973882
+    },
+    {
+      "name": "[一直吃]AlwaysEat-neoforge-1.0.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[一直吃]AlwaysEat-neoforge-1.0.0.jar",
+      "sha256": "ed6b9bfedaddb5c15c592a83af9a4c76815d94fd70718718be1722a34e5f93ed",
+      "bytes": 5036
+    },
+    {
+      "name": "[万法皆通]touhou_little_maid_spell-1.21.1-1.8.4-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[万法皆通]touhou_little_maid_spell-1.21.1-1.8.4-neoforge.jar",
+      "sha256": "a6dc1563f3ef9fe4c24598e7e16386ff18feaaee5c7c3c341dda38dae841228e",
+      "bytes": 2534810
+    },
+    {
+      "name": "[傀儡装配]modulargolems-3.1.43.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[傀儡装配]modulargolems-3.1.43.jar",
+      "sha256": "aa46efba62595ad11daf41cae68ef9af91f79a7cc66e5046d96a32d052479971",
+      "bytes": 3468785
+    },
+    {
+      "name": "[内置网页浏览器]WebDisplays-REMASTER-2.1.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[内置网页浏览器]WebDisplays-REMASTER-2.1.0.jar",
+      "sha256": "2c61926eb8049a098679c5d3710714d49e831152d8b017b822e99eb00849c85e",
+      "bytes": 940465
+    },
+    {
+      "name": "[冠军强敌再续]champions-neoforge-21.1.1.7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[冠军强敌再续]champions-neoforge-21.1.1.7.jar",
+      "sha256": "a618cc8743f6b4f695bdaf00d9dea67afe92f1895c827c2d46d82c560ca7bc49",
+      "bytes": 589466
+    },
+    {
+      "name": "[区块预生成]Chunky-NeoForge-1.4.23.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[区块预生成]Chunky-NeoForge-1.4.23.jar",
+      "sha256": "d72f235cf1f56f2c374f52c00bdda5034524b28142305a84cfc123a3f92ad274",
+      "bytes": 340572
+    },
+    {
+      "name": "[坚毅地牢]stalwart_dungeons-1.0.0-1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[坚毅地牢]stalwart_dungeons-1.0.0-1.21.1-neoforge.jar",
+      "sha256": "0158d41abb227b76d075521cfc03d9c92e1503de1058529d960e4a842c1eeffc",
+      "bytes": 983184
+    },
+    {
+      "name": "[女仆仓管]1.21.1-maid_storage_manager-1.15.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[女仆仓管]1.21.1-maid_storage_manager-1.15.6.jar",
+      "sha256": "15241ca71f6620f8b4b21189b1c092d470968afca55003a02fba6cf798f9f837",
+      "bytes": 2503273
+    },
+    {
+      "name": "[女仆摇曲柄]MaidUseHandCrank_1.6.2-neoforge_21.1.219-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[女仆摇曲柄]MaidUseHandCrank_1.6.2-neoforge_21.1.219-1.21.1.jar",
+      "sha256": "7b24ce1007c57aefd9e444c4470c5064feaf4e16e7198ae5049e98f103fb5049",
+      "bytes": 157169
+    },
+    {
+      "name": "[小动物与伙伴]crittersandcompanions-neoforge-1.21.1-2.7.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[小动物与伙伴]crittersandcompanions-neoforge-1.21.1-2.7.0.jar",
+      "sha256": "bc09d4e9996fae2c17092b3f58e2cc6ffe49d176e7cdf06495eeb4ac9a85b5dd",
+      "bytes": 2098079
+    },
+    {
+      "name": "[屠宰工艺]butchercraft-2.6.5.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[屠宰工艺]butchercraft-2.6.5.jar",
+      "sha256": "04012924618c2321355de5c4ffb2fe40870a3bc31148ca83329a8705cbcb3f29",
+      "bytes": 1981194
+    },
+    {
+      "name": "[嵌入式框架]mcef-neoforge-2.1.6-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\better-mc-remake\\build\\local-mc-debug\\131-held-20261003-170814\\server\\mods\\[嵌入式框架]mcef-neoforge-2.1.6-1.21.1.jar",
+      "sha256": "0c7696216fa5cfee659d687475873c847a9a17cc8ce3a56119a69c946eeb8772",
+      "bytes": 215373
+    },
+    {
+      "name": "[新帕斯特之梦]pasterdream-0.9.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[新帕斯特之梦]pasterdream-0.9.6.jar",
+      "sha256": "5ed9deb8963eb998f5fd8aac465f6644c5f26b5e4ef8c96638331671ed0b37f8",
+      "bytes": 78466816
+    },
+    {
+      "name": "[是，史蒂夫模型]ysm-2.6.5-neoforge+mc1.21.1-release.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[是，史蒂夫模型]ysm-2.6.5-neoforge+mc1.21.1-release.jar",
+      "sha256": "b285c73d4ec010d9a9be3c53c1bee890cf269645be5f1bcf1c27a2e8e82807cb",
+      "bytes": 63463229
+    },
+    {
+      "name": "[机械动力]create-1.21.1-6.0.10.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[机械动力]create-1.21.1-6.0.10.jar",
+      "sha256": "ef87fe5709f1ba1f5b8bb20a2925b5afb4669e178fd6d8bf10c167759eefe37a",
+      "bytes": 19123767
+    },
+    {
+      "name": "[机械动力航空学]create-aeronautics-bundled-1.21.1-1.3.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[机械动力航空学]create-aeronautics-bundled-1.21.1-1.3.2.jar",
+      "sha256": "a3f330d4757640f8715d991a43eedb826e4d0e51558d859c843ae6693bd35f1e",
+      "bytes": 33123131
+    },
+    {
+      "name": "[果园乐事]fruitsdelight-1.2.14.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[果园乐事]fruitsdelight-1.2.14.jar",
+      "sha256": "2f20bc7a9726940d1a91902f006e28b08fafcb021c512f0c7265cb2383bfa2e5",
+      "bytes": 1910595
+    },
+    {
+      "name": "[沉浸农艺]letsdo-farm_and_charm-neoforge-1.1.24.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[沉浸农艺]letsdo-farm_and_charm-neoforge-1.1.24.jar",
+      "sha256": "41c7a8ee86c503b596bbe49656e7448a57692dc3d5078a9b1890a677be61e280",
+      "bytes": 2592618
+    },
+    {
+      "name": "[沉浸农艺农夫乐事兼容补丁]letsdocompat-neoforge-2.3.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[沉浸农艺农夫乐事兼容补丁]letsdocompat-neoforge-2.3.1.jar",
+      "sha256": "443f2f9084e36ef322d4561d67185fb0989351c6d8cae1a188a98c7544c43bcd",
+      "bytes": 28635
+    },
+    {
+      "name": "[沉浸式奏乐]immersive_melodies-neoforge-0.8.0+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[沉浸式奏乐]immersive_melodies-neoforge-0.8.0+1.21.1.jar",
+      "sha256": "343e0fa92224e7c9697f2494265dcb5cc627a077b3fc2382142a8d04985bac0e",
+      "bytes": 5565133
+    },
+    {
+      "name": "[洗浴核心]showercore-1.21.1-1.2.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[洗浴核心]showercore-1.21.1-1.2.0.jar",
+      "sha256": "f8d09aee888de4b53302ca27ebe97dc891bb180a2ce427a015e933a7bab39337",
+      "bytes": 827656
+    },
+    {
+      "name": "[热水澡]hotbath-1.21.1-4.1.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[热水澡]hotbath-1.21.1-4.1.0.jar",
+      "sha256": "8f94e4d34736a83895fdc1494ea49289b353b6bda10486514e98b3b459e74e48",
+      "bytes": 1349075
+    },
+    {
+      "name": "[玩家动作]player-animation-lib-forge-2.0.4+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[玩家动作]player-animation-lib-forge-2.0.4+1.21.1.jar",
+      "sha256": "dbe5de45f5cd60c0e5e47af14e6d564534a98456e973cf670cb881f6938eee92",
+      "bytes": 203149
+    },
+    {
+      "name": "[精妙背包]sophisticatedbackpacks-1.21.1-3.26.3.2158.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[精妙背包]sophisticatedbackpacks-1.21.1-3.26.3.2158.jar",
+      "sha256": "3690359cc3bb2aa43e40db6ca047ca7d5feda5141c8b9fd647c4355678e971e2",
+      "bytes": 1251706
+    },
+    {
+      "name": "[精妙背包前置]sophisticatedcore-1.21.1-1.5.1.2341.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[精妙背包前置]sophisticatedcore-1.21.1-1.5.1.2341.jar",
+      "sha256": "f627b497fc0a2b50da9f20b77e13073df9245718660259d8f559aa184c4418a1",
+      "bytes": 1785221
+    },
+    {
+      "name": "[系牵引绳]player_collar_mod_versiontres-1.0.0-neoforge-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[系牵引绳]player_collar_mod_versiontres-1.0.0-neoforge-1.21.1.jar",
+      "sha256": "6f8d4c1dee2930aabb54e39c2b95d29e03d3ab377112f66cda3649625355610e",
+      "bytes": 457359
+    },
+    {
+      "name": "[经验计数器前置]deimos-1.21.1-neoforge-2.7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[经验计数器前置]deimos-1.21.1-neoforge-2.7.jar",
+      "sha256": "ee35d4e8967ccb23dee3c1a05b55c8d4ac0e0045bf8d324e215b397869af0573",
+      "bytes": 49576
+    },
+    {
+      "name": "[网络音乐机]netmusic-1.5.2-neoforge+mc1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[网络音乐机]netmusic-1.5.2-neoforge+mc1.21.1.jar",
+      "sha256": "731fba4b4d47256d5f44f8392b093b53c7d1c650b66111eda75b820f7f89a14b",
+      "bytes": 1472596
+    },
+    {
+      "name": "[网络音乐机：播放列表]net_music_list-4.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[网络音乐机：播放列表]net_music_list-4.3.jar",
+      "sha256": "caed1efa1b49f3489d2beee0a82369f8a1029df5cac9e9655c57fd2d9887c2db",
+      "bytes": 7163388
+    },
+    {
+      "name": "[聊天栏图片显示]ChatImage-1.4.7+1.21.0+neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[聊天栏图片显示]ChatImage-1.4.7+1.21.0+neoforge.jar",
+      "sha256": "baa65370bb0ae489a758e8fc85772181de0485ee76e044542a4d5b8f34357336",
+      "bytes": 702438
+    },
+    {
+      "name": "[自然环境]environmental-1.21.1-5.0.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[自然环境]environmental-1.21.1-5.0.1.jar",
+      "sha256": "d0578ab961461bc25ee59d86c44f3b90565e4782cab431dfd897f50080d5988b",
+      "bytes": 7834244
+    },
+    {
+      "name": "[苹果皮]appleskin-neoforge-mc1.21-3.0.9.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[苹果皮]appleskin-neoforge-mc1.21-3.0.9.jar",
+      "sha256": "38b48dd6231341c9f964ce6e42c57ec866c6cc8f72bec938390a59bafb3922df",
+      "bytes": 75804
+    },
+    {
+      "name": "[葡萄酒香]letsdo-vinery-neoforge-1.5.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[葡萄酒香]letsdo-vinery-neoforge-1.5.4.jar",
+      "sha256": "5525814d6fb0c3b42e85107de2f87963e18da05da273e415d02c4a5b1a9e6853",
+      "bytes": 2018257
+    },
+    {
+      "name": "[蓝图前置]blueprint-1.21.1-8.2.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[蓝图前置]blueprint-1.21.1-8.2.0.jar",
+      "sha256": "698b2e901e371202a583c1057fa50bb7b2415a359263b37dc8e62d3b73ea8a74",
+      "bytes": 1214507
+    },
+    {
+      "name": "[让你的朋友吃]LetYourFriendEating_1.1.4_1.21.1_NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[让你的朋友吃]LetYourFriendEating_1.1.4_1.21.1_NeoForge.jar",
+      "sha256": "f0f43b1efb7138643274d3df9a7b6ce74cb8af5cbf5f7a61f728af0aee66bbbd",
+      "bytes": 136649
+    },
+    {
+      "name": "[调色方块]RGB Blocks-1.21.1-1.1.9.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[调色方块]RGB Blocks-1.21.1-1.1.9.2.jar",
+      "sha256": "a16ed8c78b500e4c94d110600fc690637a73717807d1457d350566de2eaef2ef",
+      "bytes": 288639
+    },
+    {
+      "name": "[车万女仆]touhoulittlemaid-1.5.3-neoforge+mc1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[车万女仆]touhoulittlemaid-1.5.3-neoforge+mc1.21.1.jar",
+      "sha256": "f6db04195820c8508704277ea76d63723804ff236a7b780369ba59ebe5cd9c27",
+      "bytes": 24408776
+    },
+    {
+      "name": "[铁魔法]irons_spellbooks-1.21.1-3.16.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[铁魔法]irons_spellbooks-1.21.1-3.16.3.jar",
+      "sha256": "55a290db9b966e0c5d2f5c051d50775f3db6375cdb52730c4da528bcf5d5daa0",
+      "bytes": 13890045
+    },
+    {
+      "name": "[音量控制前置]mcpitanlib-4.0.7-1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[音量控制前置]mcpitanlib-4.0.7-1.21.1-neoforge.jar",
+      "sha256": "60f0c35530d5adafd5d82d26911203118fa0a3b8c0260968a880a05ad96219e5",
+      "bytes": 2952390
+    },
+    {
+      "name": "[额外乐事]extradelight-2.6.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[额外乐事]extradelight-2.6.6.jar",
+      "sha256": "656bcd42f3dee8b6d961f7c11804f105f05f88d60824d38a29d3c81f609fa6be",
+      "bytes": 10959956
+    },
+    {
+      "name": "[马人]horseman-neoforge-1.21.1-1.5.13.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[马人]horseman-neoforge-1.21.1-1.5.13.jar",
+      "sha256": "6796004ed983691a502fb7686828d840adc79110ad8c582a68787a108a7ed355",
+      "bytes": 453902
+    },
+    {
+      "name": "[马铠附魔]shinyhorsesreborn-1.2.0-1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\[马铠附魔]shinyhorsesreborn-1.2.0-1.21.1-neoforge.jar",
+      "sha256": "7fa81e6fbf1e446a9942c68b577d26eaa25606621ca0adf097c8bd5def3646b5",
+      "bytes": 17550
+    },
+    {
+      "name": "abridged-2.0.2-neoforge-21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\abridged-2.0.2-neoforge-21.1.jar",
+      "sha256": "e346909876d72c9f14b5b9dcd4a3653fa850cac5b45be8a94fc222079fe2710d",
+      "bytes": 217186
+    },
+    {
+      "name": "accessories-neoforge-1.1.0-beta.53+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\accessories-neoforge-1.1.0-beta.53+1.21.1.jar",
+      "sha256": "10017a3da78ea63e9ece27a1ca32f8cf490362f348778cf8cb759e7282f3beb0",
+      "bytes": 1078697
+    },
+    {
+      "name": "accessories_compat_layer-neoforge-0.1.12+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\accessories_compat_layer-neoforge-0.1.12+1.21.1.jar",
+      "sha256": "d9b673ebc4766a59663e4cc73d50e0ff3a371334e599c7890941e6e0bdd286ae",
+      "bytes": 405416
+    },
+    {
+      "name": "accessorify-2.4.0-beta.5+1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\accessorify-2.4.0-beta.5+1.21.1-neoforge.jar",
+      "sha256": "69da8640b4e4c165fef85678a8f0fe9afcc9b88dcf070117b43986e1bc87463b",
+      "bytes": 406211
+    },
+    {
+      "name": "adorabuild-structures-2.11.0-neoforge-1.21.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\adorabuild-structures-2.11.0-neoforge-1.21.3.jar",
+      "sha256": "6f399680da36dbb95b9a0dbf8b600f173e650be4d6bc25f50fcac792dcce081e",
+      "bytes": 657734
+    },
+    {
+      "name": "advancednetherite-neoforge-2.3.1-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\advancednetherite-neoforge-2.3.1-1.21.1.jar",
+      "sha256": "ae0ec0a574d4ebd0644b37913c65a6f92ea20a0fe7e3d3799fd872cfe01a278a",
+      "bytes": 520611
+    },
+    {
+      "name": "adventuredungeons-neoforge-1.21-1.3.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\adventuredungeons-neoforge-1.21-1.3.1.jar",
+      "sha256": "a5ae9687c37ab5a383d1b3a5a6f46a0b8bdeb3aca643745323c3b78c6ca6c347",
+      "bytes": 1518470
+    },
+    {
+      "name": "aeroblender-1.21.1-1.0.0-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\aeroblender-1.21.1-1.0.0-neoforge.jar",
+      "sha256": "169212309cee2e543c9217d6f379f5f203bdf7237f156561ddaa166300489a28",
+      "bytes": 25451
+    },
+    {
+      "name": "aether-1.21.1-1.5.10-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\aether-1.21.1-1.5.10-neoforge.jar",
+      "sha256": "b19386301560a017a458e9790a7b59999e270f93010def0b61e7cbe4c8630dbf",
+      "bytes": 40223909
+    },
+    {
+      "name": "aether_enhanced_extinguishing-1.21.1-1.0.0-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\aether_enhanced_extinguishing-1.21.1-1.0.0-neoforge.jar",
+      "sha256": "2c413f4338aebb4341b0d3e83a6acf9c3a5433bc2d2af1b0467c008d8042761d",
+      "bytes": 119818
+    },
+    {
+      "name": "aether_protect_your_moa-1.21.1-1.0.0-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\aether_protect_your_moa-1.21.1-1.0.0-neoforge.jar",
+      "sha256": "375f7869419a784c82db2a0d5c6ec1147ce9f3fecb648d6707c9893dac86de5b",
+      "bytes": 1142472
+    },
+    {
+      "name": "aether_treasure_reforging-1.21.1-1.0.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\aether_treasure_reforging-1.21.1-1.0.1-neoforge.jar",
+      "sha256": "025ed8a3f22ec50e112e9a2d422f7d25394b313949f78cb535290345217c0533",
+      "bytes": 155424
+    },
+    {
+      "name": "alexsmobs-1.22.17.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\alexsmobs-1.22.17.jar",
+      "sha256": "6e502855f79e4c9f2a11d560a9b88a3ab295aa378c44b0f0a0dd95f95d0301a6",
+      "bytes": 26620546
+    },
+    {
+      "name": "alltheleaks-1.1.12+1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\alltheleaks-1.1.12+1.21.1-neoforge.jar",
+      "sha256": "ca64ec07c29cadb0e7703e993fbaad26029ebc4203626d2638aefe989e5be74f",
+      "bytes": 562895
+    },
+    {
+      "name": "alternate_current-mc1.21-1.9.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\alternate_current-mc1.21-1.9.0.jar",
+      "sha256": "d23731fcb31cf561544fd7a97b0076b3abb42a0ece0631f86de9a1425fe046f5",
+      "bytes": 50425
+    },
+    {
+      "name": "amendments-neoforge-1.21-2.1.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\amendments-neoforge-1.21-2.1.3.jar",
+      "sha256": "8119ba573bb47f0c69d894895286e790ed9c87f596bb93463b96077aff83560c",
+      "bytes": 1156947
+    },
+    {
+      "name": "another_furniture-neoforge-4.0.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\another_furniture-neoforge-4.0.2.jar",
+      "sha256": "c61a66c73bcc5147d9983dc72c485493a612d2dbc078fcb86e2024155e34b7dd",
+      "bytes": 2417424
+    },
+    {
+      "name": "architectury-13.0.11-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\architectury-13.0.11-neoforge.jar",
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb",
+      "bytes": 584734
+    },
+    {
+      "name": "azurelib-neo-1.21.1-3.1.11.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\azurelib-neo-1.21.1-3.1.11.jar",
+      "sha256": "54c3a272716344e214d00ba4c338ce153ef997fe4e70aec3d80ef92037dbd1b1",
+      "bytes": 877948
+    },
+    {
+      "name": "balm-neoforge-1.21.1-21.0.65.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\balm-neoforge-1.21.1-21.0.65.jar",
+      "sha256": "490fa5fcb7ca83a9b5a84e33c2832298db99d189131001b9277a1de7fdc0bf91",
+      "bytes": 783793
+    },
+    {
+      "name": "bedrockoid-0.1.5.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\bedrockoid-0.1.5.jar",
+      "sha256": "3af6af9cff8e52259a24e41680e5f451ee1d6e821470b00dd6dfb4c4521e14f6",
+      "bytes": 358365
+    },
+    {
+      "name": "better-advanced-tooltips-2101.1.0-build.5.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\better-advanced-tooltips-2101.1.0-build.5.jar",
+      "sha256": "0f76d46f2f18eb67e67c7974170d7b27deb66473396461c8dc50d6949de1449b",
+      "bytes": 37653
+    },
+    {
+      "name": "better-compatability-checker-neoforge-21.1.8.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\better-compatability-checker-neoforge-21.1.8.jar",
+      "sha256": "1ed1373aa54a486f19a0c68c7446fe39c227628e7f5048bff97917189307e7e8",
+      "bytes": 25085
+    },
+    {
+      "name": "biolith-neoforge-3.0.14.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\biolith-neoforge-3.0.14.jar",
+      "sha256": "ded9169efb903198046cf44cf91a290ec836ed83a28e29179087eb860e0e6ce9",
+      "bytes": 218062
+    },
+    {
+      "name": "biomemusic-1.21.1-4.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\biomemusic-1.21.1-4.1.jar",
+      "sha256": "ecdc9066ae9800ed2da0373fef73b4f24f0db664e357b05bdbbb8ec63e3af368",
+      "bytes": 45162
+    },
+    {
+      "name": "blended-compat-1.1.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\blended-compat-1.1.2.jar",
+      "sha256": "33d71a2b1ddfa7cffc7c1d5a683b8f73d5e7ef6f665c0937dc1ee97992e81ab9",
+      "bytes": 155918
+    },
+    {
+      "name": "bmcpalegardenpatcher-0.3.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\bmcpalegardenpatcher-0.3.0.jar",
+      "sha256": "817586294e8190f177e56dfb06107d539d5fe184ce3b93fc6211ec790e528467",
+      "bytes": 7998
+    },
+    {
+      "name": "bookshelf-neoforge-1.21.1-21.1.81.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\bookshelf-neoforge-1.21.1-21.1.81.jar",
+      "sha256": "19e88d40da2b6a114c2b808f7fb469d96e66a5379df0a8a43fcb7834498b3e76",
+      "bytes": 328813
+    },
+    {
+      "name": "caelus-neoforge-7.0.1+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\caelus-neoforge-7.0.1+1.21.1.jar",
+      "sha256": "432a645557f29de159d9edde2fd109f8e3b32ff30895b4fede04ee5f1a1a682f",
+      "bytes": 50235
+    },
+    {
+      "name": "carryon-neoforge-1.21.1-2.2.6.13.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\carryon-neoforge-1.21.1-2.2.6.13.jar",
+      "sha256": "d4f9576b6593db9486a89d35c1d84c31ee89141d99dbae2aa470350ab53c4e09",
+      "bytes": 361486
+    },
+    {
+      "name": "cataclysmfortresses-1.21.1-NeoForge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\cataclysmfortresses-1.21.1-NeoForge.jar",
+      "sha256": "a6f4812a9735a55cb1bc2e669a1fa6dc016a162434ada347514aea9a4e39d840",
+      "bytes": 19893
+    },
+    {
+      "name": "cerulean-neoforge-1.0.0-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\cerulean-neoforge-1.0.0-1.21.1.jar",
+      "sha256": "932e88b73ad3ed4c5092b095c6da1cf416ea9d667096c5ed4e0685d7a6db1b9e",
+      "bytes": 340526
+    },
+    {
+      "name": "chipped-neoforge-1.21.1-4.0.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\chipped-neoforge-1.21.1-4.0.2.jar",
+      "sha256": "18ac6fd6b30db4922ccc6ee8bea5b113f69587505b7529834f37ace506427291",
+      "bytes": 15020578
+    },
+    {
+      "name": "chunkactivitytracker-neoforge-1.0.1-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\chunkactivitytracker-neoforge-1.0.1-1.21.1.jar",
+      "sha256": "4b0dc7252b626c80be0fb9e3e72ea3b461f33cdc66d6c08bad320a4ed4b864e3",
+      "bytes": 385815
+    },
+    {
+      "name": "chunksending-1.21-3.9.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\chunksending-1.21-3.9.jar",
+      "sha256": "b3154f9d2f531cbc21d5add8b050d75f6605907a19294d5d4ecccc9ff3dd9982",
+      "bytes": 26277
+    },
+    {
+      "name": "citadel-1.21.1-2.7.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\citadel-1.21.1-2.7.6.jar",
+      "sha256": "9e12468c49e5a95b7adbf22b3b4d05bc55565989b89c40b985cd73bdfe63c3c2",
+      "bytes": 3028943
+    },
+    {
+      "name": "clientcrafting-1.21-2.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\clientcrafting-1.21-2.1.jar",
+      "sha256": "318a7a7c28b9d5cbeecb69f8e27eb8d1b638d991108316364c64dc8bc5f013c0",
+      "bytes": 7144
+    },
+    {
+      "name": "clientsort-neoforge-3.89.0+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\clientsort-neoforge-3.89.0+1.21.1.jar",
+      "sha256": "f481d0aff89652b499f9f4540711693a8e3ce0524445c332ad19938ea6935d3a",
+      "bytes": 351564
+    },
+    {
+      "name": "cloth-config-15.0.140-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\cloth-config-15.0.140-neoforge.jar",
+      "sha256": "65e722e0d98431a07c45f8bdd8d529a217cc8c175fde1740248bd5c1b4f3c0d4",
+      "bytes": 1163890
+    },
+    {
+      "name": "collective-1.21.1-8.39.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\collective-1.21.1-8.39.jar",
+      "sha256": "ae59b63790c3097fb01e7801c21f3e7feed13b151c2ad993895196c74381a8fe",
+      "bytes": 1061931
+    },
+    {
+      "name": "comforts-neoforge-9.0.5+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\comforts-neoforge-9.0.5+1.21.1.jar",
+      "sha256": "6b0fd35a1349107e08a45539adbde9683bb203febc43a3305f6fc4ac73e59615",
+      "bytes": 422658
+    },
+    {
+      "name": "configurable-3.5.2+1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\configurable-3.5.2+1.21.1-neoforge.jar",
+      "sha256": "735076ab03947c0fc8a588ddfbe1cce5fa94b361fbaf8cc71f2325cb747e27b0",
+      "bytes": 159182
+    },
+    {
+      "name": "configured-neoforge-1.21.1-2.6.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\configured-neoforge-1.21.1-2.6.3.jar",
+      "sha256": "421ffd2604b5487cbdb284d1eb5d1cb8a7d28f3ff84d5b4bda25e0a579282a15",
+      "bytes": 428793
+    },
+    {
+      "name": "connectiblechains-neoforge-1.21.1-2.3.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\connectiblechains-neoforge-1.21.1-2.3.3.jar",
+      "sha256": "66bf9e7cea0b7c8f4136a2fa663ce03326644525a8bc744981c21830516e37f8",
+      "bytes": 230176
+    },
+    {
+      "name": "connectivity-1.21.1-7.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\connectivity-1.21.1-7.6.jar",
+      "sha256": "2366973ddae5ba00b9ba15a26e5b610a6648038b9f2549bf81b9ae61342b281a",
+      "bytes": 114165
+    },
+    {
+      "name": "connector-2.0.0-beta.17+1.21.1-full.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\connector-2.0.0-beta.17+1.21.1-full.jar",
+      "sha256": "5a4ad10e57b8b1690832d9b77fc488fbe5e7cf41ac5a90d9f569bd78fbea25be",
+      "bytes": 4573244
+    },
+    {
+      "name": "coroutil-neoforge-1.21.0-1.3.9.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\coroutil-neoforge-1.21.0-1.3.9.jar",
+      "sha256": "097434e256a428335cc4e9b718ad7bb9c6804c2c775aa3dd7149a6904adca2bc",
+      "bytes": 65716
+    },
+    {
+      "name": "crawlondemand-1.21-1.21.5-1.2.0+neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\crawlondemand-1.21-1.21.5-1.2.0+neoforge.jar",
+      "sha256": "ef5452a9c567c666c4e9af5e0dab8af9d0fb06387b3aadc9da5602d1b11ff25e",
+      "bytes": 26478
+    },
+    {
+      "name": "cristellib-neoforge-1.21.1-3.1.7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\cristellib-neoforge-1.21.1-3.1.7.jar",
+      "sha256": "11e05dbc97bd3fe1790bd6361747240e314c1dbf40b590ea20cc691dc8396c38",
+      "bytes": 583525
+    },
+    {
+      "name": "cupboard-1.21.1-4.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\cupboard-1.21.1-4.1.jar",
+      "sha256": "7d3f1bcca3acf2e7b1f3d359d5e0691cbb5a0f95869064752e7612b2d13e5b9e",
+      "bytes": 30206
+    },
+    {
+      "name": "curios-neoforge-9.5.1+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\curios-neoforge-9.5.1+1.21.1.jar",
+      "sha256": "a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde",
+      "bytes": 410690
+    },
+    {
+      "name": "deep_aether-1.21.1-1.1.5.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\deep_aether-1.21.1-1.1.5.1.jar",
+      "sha256": "0f55ad970715bb933344e785b2c35a7354dfba25ffd426c0b68921d08bbe0ce5",
+      "bytes": 46236011
+    },
+    {
+      "name": "deeperdarker-neoforge-1.21.1-1.4.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\deeperdarker-neoforge-1.21.1-1.4.1.jar",
+      "sha256": "eee3f51222b0bcc714def002ff089ac9e131d3cae4575b542fd0a7dd101fe0af",
+      "bytes": 3906057
+    },
+    {
+      "name": "despawntweaks-neoforge-1.0.0-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\despawntweaks-neoforge-1.0.0-1.21.1.jar",
+      "sha256": "c3c65c7c58657b2b73db2a25d5c9acccb0115a2d64af40426db5d43c32028981",
+      "bytes": 458075
+    },
+    {
+      "name": "disconnect-packet-fix-neoforge-2.0.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\disconnect-packet-fix-neoforge-2.0.1.jar",
+      "sha256": "6254f47c73249108706860505f8261b0273aafdc53fe8008aadfca162f0cfd3b",
+      "bytes": 8231
+    },
+    {
+      "name": "does_it_tick-neoforge-1.1.4-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\does_it_tick-neoforge-1.1.4-1.21.1.jar",
+      "sha256": "414b3fb33c695d463f0ea138753457fc4d38cdd2d3788b457545bbda3dbf882b",
+      "bytes": 93269
+    },
+    {
+      "name": "dolphin_fix-1.1.1-1.21.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\dolphin_fix-1.1.1-1.21.jar",
+      "sha256": "cc12b38f8f6953138ef15b10601ef822d8b9ebbcebd422302a91c7bbc5c94bf4",
+      "bytes": 4053
+    },
+    {
+      "name": "doubledoors-1.21.1-7.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\doubledoors-1.21.1-7.2.jar",
+      "sha256": "947cc425dba61a003fc6cfc9ce6bb87dbef1f2d4561701235eb2fed6073b72ff",
+      "bytes": 75041
+    },
+    {
+      "name": "dragonloot-1.1.15-1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\dragonloot-1.1.15-1.21.1-neoforge.jar",
+      "sha256": "69725ce4b5b0bd9907e56ec32d2949aeac68321f7dc0f54b21e0035c7fefbf8e",
+      "bytes": 200834
+    },
+    {
+      "name": "dummmmmmy-neoforge-1.21-2.1.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\dummmmmmy-neoforge-1.21-2.1.0.jar",
+      "sha256": "0b9aebae5437545681aa9931223f987f6b8c3019dd0157ec0a1b6cee227b46af",
+      "bytes": 214030
+    },
+    {
+      "name": "earlybedtime-neoforge-1.0.0-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\earlybedtime-neoforge-1.0.0-1.21.1.jar",
+      "sha256": "580e71832bb1fdb8dd743fe0ce57907a18a80d14b444d41db7e286aefe95ac1a",
+      "bytes": 405017
+    },
+    {
+      "name": "easy_npc-neoforge-1.21.1-7.12.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\easy_npc-neoforge-1.21.1-7.12.1.jar",
+      "sha256": "36ec8ab25dbba63fa3165097160962e21fe463d566697237eb8333bdbeef208e",
+      "bytes": 3036825
+    },
+    {
+      "name": "easy_npc_config_ui-neoforge-1.21.1-7.12.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\easy_npc_config_ui-neoforge-1.21.1-7.12.1.jar",
+      "sha256": "9eb298ba5c865d00a3b8f03c70032556c9d0e40f338ff6b831ad6fdce29a9d85",
+      "bytes": 1136359
+    },
+    {
+      "name": "easydisenchanting-neoforge-1.0.1-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\easydisenchanting-neoforge-1.0.1-1.21.1.jar",
+      "sha256": "5797e2c12274ff5d35ec04dab44311f45386415f4be8714a325db3caadc64f83",
+      "bytes": 381454
+    },
+    {
+      "name": "endersdelight-1.3.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\endersdelight-1.3.1.jar",
+      "sha256": "dbc7622fa6e3a7168e222ccd70eb1c37dfb71bf935efb5bae4dd60b06978ad48",
+      "bytes": 152797
+    },
+    {
+      "name": "eternalstarlight-0.9.0+1.21.1+neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\eternalstarlight-0.9.0+1.21.1+neoforge.jar",
+      "sha256": "73e1b5e0f07c4e7962351250c2e597e735930df6e9161cd366469f8603146f38",
+      "bytes": 53135932
+    },
+    {
+      "name": "explorations-neoforge-1.21.1-1.6.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\explorations-neoforge-1.21.1-1.6.2.jar",
+      "sha256": "420d0373711877a5e1a86b7f9b4f54848f3debb2f116c2509a5cc4eb496c979e",
+      "bytes": 219665
+    },
+    {
+      "name": "farmers-cutting-oh-the-biomes-weve-gone-1.21.1-2.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\farmers-cutting-oh-the-biomes-weve-gone-1.21.1-2.1-neoforge.jar",
+      "sha256": "f4eb4a48b26c633ef5d3198d6a981564e971e52dbf1a553f4d81817f025ed9a2",
+      "bytes": 100636
+    },
+    {
+      "name": "fastasyncworldsave-1.21-2.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\fastasyncworldsave-1.21-2.6.jar",
+      "sha256": "099316ee212ff44bcd7aea853f0153cd28432e0297676d21f61e8b000089714f",
+      "bytes": 11050
+    },
+    {
+      "name": "fastpaintings-1.21-1.3.0-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\fastpaintings-1.21-1.3.0-neoforge.jar",
+      "sha256": "782afb6f4c631c9d3313b6442d304b36336f794273dfa5c381485142020ca05a",
+      "bytes": 155810
+    },
+    {
+      "name": "ferritecore-7.0.3-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ferritecore-7.0.3-neoforge.jar",
+      "sha256": "d87ea28262715ebff45b8a82d493e6b468e7a4521bc021df5d88302196d030a8",
+      "bytes": 121559
+    },
+    {
+      "name": "foolproof-neoforge-1.0.4-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\foolproof-neoforge-1.0.4-1.21.1.jar",
+      "sha256": "ae2b44428471177cb00696e46c99899a2671e50c6497f6999d767d8df1fe7772",
+      "bytes": 441182
+    },
+    {
+      "name": "forgified-fabric-api-0.116.15+2.3.5+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\forgified-fabric-api-0.116.15+2.3.5+1.21.1.jar",
+      "sha256": "56cb524bcbb2430113f586d4d58ba79bfd66f73684c019aacb528690c3d8d07d",
+      "bytes": 5613421
+    },
+    {
+      "name": "formations-1.0.4-neoforge-mc1.21.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\formations-1.0.4-neoforge-mc1.21.jar",
+      "sha256": "2d9b50575fdf42e59d5dacda23ce5d01fc5cb19db02a1278329e3ad40893848e",
+      "bytes": 287525
+    },
+    {
+      "name": "formationsnether-1.0.5a-mc1.21+.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\formationsnether-1.0.5a-mc1.21+.jar",
+      "sha256": "a9f196053c2a7706d7ce938cfa27b80299755898c58e585c2d8a25050ad98808",
+      "bytes": 941764
+    },
+    {
+      "name": "formationsoverworld-1.0.5a-mc1.21+.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\formationsoverworld-1.0.5a-mc1.21+.jar",
+      "sha256": "bfc0369c5a5d341420712017bc5a1abf91091b517c0026be8c615d625a346bc6",
+      "bytes": 873168
+    },
+    {
+      "name": "framework-neoforge-1.21.1-0.13.11.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\framework-neoforge-1.21.1-0.13.11.jar",
+      "sha256": "429ea90a162d7c25c1463ee60979e4d7b1ddb525d9384a3a2a2f45d70bda03f5",
+      "bytes": 387334
+    },
+    {
+      "name": "friendsandfoes-neoforge-4.0.27+mc1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\friendsandfoes-neoforge-4.0.27+mc1.21.1.jar",
+      "sha256": "40f6129d9124bcd0052a348813425fc223b7b6ef16b81928f5edcb89ea62cfd1",
+      "bytes": 5096836
+    },
+    {
+      "name": "ftb-filter-system-neoforge-21.1.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ftb-filter-system-neoforge-21.1.4.jar",
+      "sha256": "b8700e8bfd9c78b09bc7819cb28a6318b20d2bf68969bc6894a0bfa39581a99b",
+      "bytes": 211671
+    },
+    {
+      "name": "ftb-library-neoforge-2101.1.35.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ftb-library-neoforge-2101.1.35.jar",
+      "sha256": "be7b2bd0b5370a9951624a1d84fd802efecae88d5a0cd24552731f887430599d",
+      "bytes": 1439018
+    },
+    {
+      "name": "ftb-quests-neoforge-2101.1.34.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ftb-quests-neoforge-2101.1.34.jar",
+      "sha256": "ea09118f399f24640ccbe5b4171b59a4d7becba789a8c36783dbb2a04c00bf24",
+      "bytes": 1609252
+    },
+    {
+      "name": "ftb-teams-neoforge-2101.1.11.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ftb-teams-neoforge-2101.1.11.jar",
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655",
+      "bytes": 308236
+    },
+    {
+      "name": "ftb-xmod-compat-neoforge-21.1.11.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\ftb-xmod-compat-neoforge-21.1.11.jar",
+      "sha256": "0bfa6513c51b697a81ab2afc1b25983d3e39fe4a33ec334b57e6384b25a17450",
+      "bytes": 153045
+    },
+    {
+      "name": "fzzy_config-0.7.6+1.21+neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\fzzy_config-0.7.6+1.21+neoforge.jar",
+      "sha256": "4e5cc1438087b0bc0276969e88b9ad0bdf2bcc60d6caf5fe79e18947d7a29050",
+      "bytes": 2369895
+    },
+    {
+      "name": "gardens-of-the-dead-neoforge-5.0.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\gardens-of-the-dead-neoforge-5.0.2.jar",
+      "sha256": "c01e40d219ac1ed9fd9f94a54766a6b4e0d0e38592f33f8d1d4dc4b8120b3c2b",
+      "bytes": 11891302
+    },
+    {
+      "name": "geckolib-neoforge-1.21.1-4.9.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\geckolib-neoforge-1.21.1-4.9.2.jar",
+      "sha256": "5e548466af9ab6aca7a91a7c7d4dc0dc8bc385e22958aed5da0e7bebd0fa3fba",
+      "bytes": 630584
+    },
+    {
+      "name": "goblintraders-neoforge-1.21.1-1.11.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\goblintraders-neoforge-1.21.1-1.11.2.jar",
+      "sha256": "523aebc80baab377072fe26c5ff9d1c3649764f185131e7849acd99833d406dd",
+      "bytes": 462245
+    },
+    {
+      "name": "golem_spawn_fix-1.0.2-neoforge-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\golem_spawn_fix-1.0.2-neoforge-1.21.1.jar",
+      "sha256": "bbb4e5c89d85b1191a917098afc32e2b668aaa2eca72b81db902c9e11585935b",
+      "bytes": 152847
+    },
+    {
+      "name": "handcrafted-neoforge-1.21.1-4.0.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\handcrafted-neoforge-1.21.1-4.0.3.jar",
+      "sha256": "6f2a776fb28ed07d370899814e5e711fbeebe31396097d78a3b550439b364948",
+      "bytes": 7132842
+    },
+    {
+      "name": "hapi-neoforge-1.21.1-1.0.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\hapi-neoforge-1.21.1-1.0.0.jar",
+      "sha256": "d0ebbd5baf1600c3dc17350edd71326a81d1362ef99090b684f4898648fc284a",
+      "bytes": 691178
+    },
+    {
+      "name": "horse-breeding-fix-neoforge-1.21.x-1.1.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\horse-breeding-fix-neoforge-1.21.x-1.1.1.jar",
+      "sha256": "e07c73047b2f02301710499f7700da0f4c4a1c6e24460cc29dafed224a8cb2ca",
+      "bytes": 6152
+    },
+    {
+      "name": "hybrid_aquatic-neoforge-1.21.1-1.7.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\hybrid_aquatic-neoforge-1.21.1-1.7.0.jar",
+      "sha256": "e16d32dd3cbb39356916801632df7ae31c86e84cc0324f4044fbe85d5d669e6e",
+      "bytes": 7369359
+    },
+    {
+      "name": "iceandfire-2.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\iceandfire-2.0.jar",
+      "sha256": "43503392166e90df89a35d3ed2c86b022aeca6bad931c17c52074bb840990b40",
+      "bytes": 20774271
+    },
+    {
+      "name": "immersive_aircraft-1.5.2+1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\immersive_aircraft-1.5.2+1.21.1-neoforge.jar",
+      "sha256": "ef5b68c04171d1eadb3bb70e600eb766534ef7588a5b4737f9d55a4f38550ae9",
+      "bytes": 2469769
+    },
+    {
+      "name": "immersivelanterns-neoforge-1.0.6-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\immersivelanterns-neoforge-1.0.6-1.21.1.jar",
+      "sha256": "e045f2447b8dec9229931269172a7e4291ed798e2b87c374ba744c3d232898b9",
+      "bytes": 207004
+    },
+    {
+      "name": "immersivemessages-neoforge-1.0.18-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\immersivemessages-neoforge-1.0.18-1.21.1.jar",
+      "sha256": "5623387decbc35a61cece8fd58f39c5b956d341f0c5f3688f7e0fdf25255248a",
+      "bytes": 1278637
+    },
+    {
+      "name": "improved-village-placement-1.2.0-neoforge-21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\improved-village-placement-1.2.0-neoforge-21.1.jar",
+      "sha256": "b5ebdeccf9dbc66a2a3361a60f6e979389dd36dc97de83a9f825839850e5ae98",
+      "bytes": 141569
+    },
+    {
+      "name": "irons_lib-1.21.1-2.1.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\irons_lib-1.21.1-2.1.1.jar",
+      "sha256": "2c5f9abc3f785d90d870b64b9d3c5020cedacaf8f26d3a92784ceef32b8677f8",
+      "bytes": 406262
+    },
+    {
+      "name": "jamlib-neoforge-1.3.6+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\jamlib-neoforge-1.3.6+1.21.1.jar",
+      "sha256": "911afdfe717a2375a651253e282ac9e769f8bead381d33c2167955c25eefe514",
+      "bytes": 188553
+    },
+    {
+      "name": "jei-1.21.1-neoforge-19.32.0.359.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\jei-1.21.1-neoforge-19.32.0.359.jar",
+      "sha256": "0169e38d4771b1a0a6bd9fc92734297105fff2f6ad8a4ed73ad38139b824ea54",
+      "bytes": 1616910
+    },
+    {
+      "name": "jupiter-2.3.7-1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\jupiter-2.3.7-1.21.1-neoforge.jar",
+      "sha256": "95af332af250f97fe2d9d288fe6b2057c266673a388348bf33756b0b693ace15",
+      "bytes": 278988
+    },
+    {
+      "name": "kleeslabs-neoforge-1.21.1-21.1.11.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\kleeslabs-neoforge-1.21.1-21.1.11.jar",
+      "sha256": "b11876740df221138de51905aa1b90e811e784c47bf24cb16e3f4f0ff6409fa3",
+      "bytes": 310304
+    },
+    {
+      "name": "konkrete_neoforge_1.9.9_MC_1.21.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\konkrete_neoforge_1.9.9_MC_1.21.jar",
+      "sha256": "791c5538751dd3015ef3a2ce92d98719e1a28a48ebbd817b78506771256654cd",
+      "bytes": 618842
+    },
+    {
+      "name": "kotlinforforge-5.12.0-all.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\kotlinforforge-5.12.0-all.jar",
+      "sha256": "095aed94f21b4e55895b21ea957750ae3ab829fbcfc6d3c66a3489f5f1128d46",
+      "bytes": 7279276
+    },
+    {
+      "name": "krypton_fnp-neoforge-1.21.1-0.2.28.1-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\krypton_fnp-neoforge-1.21.1-0.2.28.1-1.21.1.jar",
+      "sha256": "05ebe849611daafe533fc57ed9b5156edfa9157ced04d38a7860b1e2075984b9",
+      "bytes": 1015871
+    },
+    {
+      "name": "kubejs-neoforge-2101.7.2-build.377.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\kubejs-neoforge-2101.7.2-build.377.jar",
+      "sha256": "df9a8458b1f83fed06ba54684977911795a5153a462b81a610895f5b1f2f0cbf",
+      "bytes": 2294111
+    },
+    {
+      "name": "leaderboards-1.21.1-NeoForge-2.0.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\leaderboards-1.21.1-NeoForge-2.0.4.jar",
+      "sha256": "aee1067c55da56aa9b00befbe4fffad786cd3721716fe3edfff53c15d163d7c4",
+      "bytes": 97320
+    },
+    {
+      "name": "lionfishapi-3.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lionfishapi-3.1.jar",
+      "sha256": "aeebf0692650afbbc78259c0d4e3d5b7edf037707e8ae5d56045066d83a19cf6",
+      "bytes": 91596
+    },
+    {
+      "name": "lithium-neoforge-0.15.4+mc1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lithium-neoforge-0.15.4+mc1.21.1.jar",
+      "sha256": "488f33216030c1cb0baa33e59de3d657d08d5795a6c2080c8c8bbbc133fc8757",
+      "bytes": 774220
+    },
+    {
+      "name": "lithostitched-1.8.0+beta6-neoforge-21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lithostitched-1.8.0+beta6-neoforge-21.1.jar",
+      "sha256": "df6ad6f061435fd1795bfe3af627e4cebb25b977b7cbbc088bbad0174109d571",
+      "bytes": 978169
+    },
+    {
+      "name": "lmft-1.1.1+1.21.9-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lmft-1.1.1+1.21.9-neoforge.jar",
+      "sha256": "932765aae037197e8acfe7a90d9e473b143e3e785655c24c02b30c7013cd4458",
+      "bytes": 78624
+    },
+    {
+      "name": "loadingprotection-1.0.2-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\loadingprotection-1.0.2-1.21.1.jar",
+      "sha256": "a98a180dc5d68d7a332374d12c1b2742bf7d7beda51d01aafd761f0d2bfc2933",
+      "bytes": 16853
+    },
+    {
+      "name": "logbegone-neoforge-1.21.1-1.0.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\logbegone-neoforge-1.21.1-1.0.3.jar",
+      "sha256": "0ee3005ffa553aed37a313ad43dd5947080c45bcbaa8ed8cd4e00342321ff6a9",
+      "bytes": 73237
+    },
+    {
+      "name": "lootintegration_wda-1.8.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lootintegration_wda-1.8.jar",
+      "sha256": "8645bc1926c231c715beb2393141c97079f9a84798039734479d69753ddd42bb",
+      "bytes": 8134
+    },
+    {
+      "name": "lootintegrations-1.21.1-4.7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lootintegrations-1.21.1-4.7.jar",
+      "sha256": "1de9e6352f643f2850dce3e6b7aa8274902798a2243ea9e494fe13aabaa90d2c",
+      "bytes": 36966
+    },
+    {
+      "name": "lootintegrations_formations-1.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lootintegrations_formations-1.3.jar",
+      "sha256": "2619b9195a2448ef83107273be159e21ce6476511e09948c3d69e1b85f797fc7",
+      "bytes": 5950
+    },
+    {
+      "name": "lootintegrations_lootintegrations_bygonepillage-1.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lootintegrations_lootintegrations_bygonepillage-1.2.jar",
+      "sha256": "e95a32103813cf91c1c500d587059f973a217b7031788d75cee7e59c9418b100",
+      "bytes": 5036
+    },
+    {
+      "name": "lootintegrations_moog-2.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lootintegrations_moog-2.1.jar",
+      "sha256": "3c05d252948fd5133c5d89274a0c1c2f661ff8c0383994324def510596bbe5f6",
+      "bytes": 7137
+    },
+    {
+      "name": "lootintegrations_yungs-1.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lootintegrations_yungs-1.6.jar",
+      "sha256": "15e0b2b1a6e538e2e4f14c1fa9fd272e3ea45d74b0e95d50d3f707a7cef9b9be",
+      "bytes": 5991
+    },
+    {
+      "name": "lootjs-neoforge-1.21.1-3.7.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lootjs-neoforge-1.21.1-3.7.0.jar",
+      "sha256": "d168fd80f45e5f23dced8a54fdee87347a4c7fc6ccd9c76d30ae4d067ba9c60a",
+      "bytes": 247689
+    },
+    {
+      "name": "lukis-crazy-chambers-1.0.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\lukis-crazy-chambers-1.0.3.jar",
+      "sha256": "3f6b99ba679cb7710cced4cab405597b5692dea345026d3f722a0a7c77566444",
+      "bytes": 2185425
+    },
+    {
+      "name": "melody_neoforge_1.0.10_MC_1.21.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\melody_neoforge_1.0.10_MC_1.21.jar",
+      "sha256": "6b973a4564703c531fc0eae09db08b07a38091e0a743c687b8d2049457e84871",
+      "bytes": 36096
+    },
+    {
+      "name": "memorysettings-1.21-6.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\memorysettings-1.21-6.0.jar",
+      "sha256": "83721e70a8702b4389ca5d83daa5b30f55797561ee30d788cec2987b7ce3e042",
+      "bytes": 22329
+    },
+    {
+      "name": "midnightlib-neoforge-1.9.3+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\midnightlib-neoforge-1.9.3+1.21.1.jar",
+      "sha256": "76775d3a3f3a6a0304330cdd6a810944babc9bd7ebbdefa24ec3346a7c62a703",
+      "bytes": 61217
+    },
+    {
+      "name": "misctweaks-1.3.0+1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\misctweaks-1.3.0+1.21.1-neoforge.jar",
+      "sha256": "3a34f4e70374f448730a62a5c1a330704b05e48f07e401bb9c2079afdf06a7b1",
+      "bytes": 185785
+    },
+    {
+      "name": "mixintracereforged-neoforge-1.0.0-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\mixintracereforged-neoforge-1.0.0-1.21.1.jar",
+      "sha256": "49aff73595a4bfea8bd4f586657330a223e1c820fe86d5c67d3871aad60ff403",
+      "bytes": 91404
+    },
+    {
+      "name": "modernfix-neoforge-5.27.24+mc1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\modernfix-neoforge-5.27.24+mc1.21.1.jar",
+      "sha256": "e6e9446890f0feb3aab3f6e73ae18cb17575c370f232179fef7baa30e61538fe",
+      "bytes": 604333
+    },
+    {
+      "name": "modpack-update-checker-1.21.1-neoforge-0.15.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\modpack-update-checker-1.21.1-neoforge-0.15.6.jar",
+      "sha256": "6585d963568de9fc396faa713b3922ff02b2223f581f53d808df9988b06df360",
+      "bytes": 431318
+    },
+    {
+      "name": "moonlight-1.21.1-3.6.3-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\moonlight-1.21.1-3.6.3-neoforge.jar",
+      "sha256": "1b0e1c5ed5774d8e1e80b294e3f63953f962aba74f6df4ea8422d65007c64201",
+      "bytes": 2226437
+    },
+    {
+      "name": "mowziesmobs-1.21.1-1.8.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\mowziesmobs-1.21.1-1.8.2.jar",
+      "sha256": "b8e7e39fb6430326de7fbb193db56588ee8bd04d0054527924fe588f37131e4f",
+      "bytes": 36042925
+    },
+    {
+      "name": "muxi-champion-companions-1.0.5.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\.local-operations\\release-20261008-takeover\\production-clean-r2\\server\\mods\\muxi-champion-companions-1.0.5.jar",
+      "sha256": "8a60586141326e6d61450ccd0e291a1f75414bab4a8b3eb45f11dd9eacce7d3e",
+      "bytes": 26637
+    },
+    {
+      "name": "muxi-flight-0.1.2-iwo-half.5-recovery.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\better-mc-remake\\build\\local-mc-debug\\music043-r1-20261014-0236\\server\\mods\\muxi-flight-0.1.2-iwo-half.5-recovery.2.jar",
+      "sha256": "0f0598ef2ef8e7123f867653221604e631446f54134a78bf05aa70323822ff03",
+      "bytes": 965491
+    },
+    {
+      "name": "muxi-game-core-1.12.3-task14-qa.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\muxi-game-core\\build\\home-spawning-20261013\\production-core.jar",
+      "sha256": "46acc0ad4bd4b3cd0ff3ed812f649cfbbe6fc825820b3c9bca9267b8e0547d59",
+      "bytes": 475126
+    },
+    {
+      "name": "muxi-horse-racing-0.2.2-race.5-shop-ui-qa.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\better-mc-remake\\build\\local-mc-debug\\music043-r1-20261014-0236\\server\\mods\\muxi-horse-racing-0.2.2-race.5-shop-ui-qa.4.jar",
+      "sha256": "2152b223f09f591b9d66ce4c297e532f391decb75e4fca8bb5d3a16f6b7748d0",
+      "bytes": 1792159
+    },
+    {
+      "name": "muxi-minigames-0.2.1-equipment.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\.local-operations\\release-20261008-takeover\\production-clean-r2\\server\\mods\\muxi-minigames-0.2.1-equipment.1.jar",
+      "sha256": "c8818fece84986ddeb3878befb7edeafb2e69b432970bbf2b0c4c911182eb3b6",
+      "bytes": 137236
+    },
+    {
+      "name": "muxi-music-compat-0.4.1-repair-candidate.2.jar",
+      "path": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-11\\task-3\\release1438-joint\\server-overlay\\mods\\muxi-music-compat-0.4.1-repair-candidate.2.jar",
+      "sha256": "a54c8f96346865134fdf32ecfb986be45b97a0e9f9bc2565e928652258a82a38",
+      "bytes": 144378
+    },
+    {
+      "name": "muxi-outbreak-0.4.5-school.4-candidate.11.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\better-mc-remake\\build\\local-mc-debug\\music043-r1-20261014-0236\\server\\mods\\muxi-outbreak-0.4.5-school.4-candidate.11.jar",
+      "sha256": "bca8254f29f60bd8eaeca77f1360ff47378fc2be476809312e1e7679e8d418e8",
+      "bytes": 2287023
+    },
+    {
+      "name": "muxi-performance-0.1.0-qa.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\muxi-performance\\build\\libs\\muxi-performance-0.1.0-qa.4.jar",
+      "sha256": "81d9dd3d6f4209ad91051db8e544ac5330ee1a4d935af62fbba6f902af194a1b",
+      "bytes": 78108
+    },
+    {
+      "name": "muxi-terminal-0.2.4-window-ui.3.jar",
+      "path": "C:\\Users\\ranzh\\Documents\\Codex\\2026-10-11\\task-3\\release1438-joint\\server-overlay\\mods\\muxi-terminal-0.2.4-window-ui.3.jar",
+      "sha256": "a32649a2b90665337de0b260fcd5b2957d6a136c95f89f26fa183d14601512fc",
+      "bytes": 636110
+    },
+    {
+      "name": "muxi-tower-defense-0.3.0-compact.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\muxi-tower-defense\\build\\libs\\muxi-tower-defense-0.3.0-compact.2.jar",
+      "sha256": "fdcd6d9114f626d18ac623ab31a88fd2345e00bbbf58f365308c78e2ee07cc63",
+      "bytes": 74157
+    },
+    {
+      "name": "muxi-zombie-challenge-0.1.3-task14-social-qa.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\muxi-zombie-challenge\\build\\libs\\muxi-zombie-challenge-0.1.3-task14-social-qa.4.jar",
+      "sha256": "74ef7fb6a7ae1ba6977e6b0c10ce0784aeb6ebbf551661c283b098e94d397368",
+      "bytes": 191120
+    },
+    {
+      "name": "neobeefix-1.21.1-2.0.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\neobeefix-1.21.1-2.0.1.jar",
+      "sha256": "b89e14e18a572c69596cdefdd4a680426e8fb5dbfebbfe9153656c101e4449f1",
+      "bytes": 34003
+    },
+    {
+      "name": "neruina-3.3.3+1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\neruina-3.3.3+1.21.1-neoforge.jar",
+      "sha256": "6afd49ea130feaf337a39b12a936c61950da77ca59061d286b3dae67e5a2728e",
+      "bytes": 852705
+    },
+    {
+      "name": "netherite_tweaks_luna-1.2.2-neoforge-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\netherite_tweaks_luna-1.2.2-neoforge-1.21.1.jar",
+      "sha256": "909442cf81b7a677b1e5d9637f05dd6101889046420ab421ae2349940fcddbbc",
+      "bytes": 123252
+    },
+    {
+      "name": "netherportalfix-neoforge-1.21.1-21.1.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\netherportalfix-neoforge-1.21.1-21.1.1.jar",
+      "sha256": "c1077de0c7f1ff5289d1852e0674d9c477247d4318c9809b21c60e56a31ae31a",
+      "bytes": 211972
+    },
+    {
+      "name": "nmbl-1.0.4-neoforge-mc1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\better-mc-remake\\build\\local-mc-debug\\better-login-20261009-task2\\server\\mods\\nmbl-1.0.4-neoforge-mc1.21.1.jar",
+      "sha256": "33fa8bbad36e5d951b07791a26179ef795651238d868cd732a67d93f52559647",
+      "bytes": 717330
+    },
+    {
+      "name": "oceansdelight-neoforge-1.0.4-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\oceansdelight-neoforge-1.0.4-1.21.1.jar",
+      "sha256": "30fec2263f77bcd4002995d9fc127a911c964317dbd0e3c54e348954d1722d38",
+      "bytes": 117108
+    },
+    {
+      "name": "open-parties-and-claims-neoforge-1.21.1-0.30.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\open-parties-and-claims-neoforge-1.21.1-0.30.3.jar",
+      "sha256": "588e0053178386d6cd02b331e60e34c70696e6ca6aae2b3643739d6c1c460468",
+      "bytes": 1821784
+    },
+    {
+      "name": "owo-lib-neoforge-0.12.15.5-beta.1+1.21.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\owo-lib-neoforge-0.12.15.5-beta.1+1.21.jar",
+      "sha256": "de6ed336bd80154b7241a7b3276694befc1c94550add8bcdfe7f82e5172fd13d",
+      "bytes": 1221583
+    },
+    {
+      "name": "packetfixer-3.3.1-1.20.5-1.21.X-merged.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\packetfixer-3.3.1-1.20.5-1.21.X-merged.jar",
+      "sha256": "2979a8a3f44e5d5df4f9f6315d18c220f3debf736bb8a2c2740acdfb13bd820f",
+      "bytes": 46623
+    },
+    {
+      "name": "piglinproliferation-1.21.1-2.0.15.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\piglinproliferation-1.21.1-2.0.15.jar",
+      "sha256": "82a76af2f9fda447dcbd0aa152cea9ef4aa540bf076c2be9e24a868ec2937a30",
+      "bytes": 2504303
+    },
+    {
+      "name": "polymorph-neoforge-1.1.0+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\polymorph-neoforge-1.1.0+1.21.1.jar",
+      "sha256": "bec8118978adeb052de9c4eaf9a595830621d82515a764f32f9c8a4dd52ab94b",
+      "bytes": 174972
+    },
+    {
+      "name": "prickle-neoforge-1.21.1-21.1.11.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\prickle-neoforge-1.21.1-21.1.11.jar",
+      "sha256": "ccf46c442ed3c7fe41ad056f0940560829ec4dd88360985dfacd78f4614eb167",
+      "bytes": 84812
+    },
+    {
+      "name": "puffish_biome_dither-1.0.0-1.21-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\puffish_biome_dither-1.0.0-1.21-neoforge.jar",
+      "sha256": "6c58141b92f0af964cbf9cca0a7c41eab8e53ed3ed907c45857f562c53d91dee",
+      "bytes": 4400
+    },
+    {
+      "name": "randomenchantfix-neoforge-1.0.1-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\randomenchantfix-neoforge-1.0.1-1.21.1.jar",
+      "sha256": "7a892188cee754463453f4c2fa6d4ceb0c8b506b53806d779d252cf80a285dd4",
+      "bytes": 325185
+    },
+    {
+      "name": "recipeessentials-1.21.1-4.7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\recipeessentials-1.21.1-4.7.jar",
+      "sha256": "d2ab36a95424654bede6fd7aedceefd05912fc12f6de3f8bb0db8b8b245b6f85",
+      "bytes": 43983
+    },
+    {
+      "name": "redirected-neoforge-1.0.0-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\redirected-neoforge-1.0.0-1.21.1.jar",
+      "sha256": "bdaf4c3399b7436d3be7d79729d87ed707a964420dc58720e13fb2f4960c8b9e",
+      "bytes": 217587
+    },
+    {
+      "name": "refinedstorage-jei-integration-neoforge-1.0.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\refinedstorage-jei-integration-neoforge-1.0.0.jar",
+      "sha256": "18d858a9309f2cacfa1b32c43142d543b5cfc4e2cb542b66203dd5c81f974c27",
+      "bytes": 58343
+    },
+    {
+      "name": "refinedstorage-neoforge-2.0.9.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\refinedstorage-neoforge-2.0.9.jar",
+      "sha256": "e9c758dddcdfa9c02a7370ca3f4f972a285a1e38ca434bd1fc15cb223ffa06ab",
+      "bytes": 4360871
+    },
+    {
+      "name": "repurposed_structures-7.5.22+1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\repurposed_structures-7.5.22+1.21.1-neoforge.jar",
+      "sha256": "64e64109acf7673b969aca9b3cca0bb555777cd7038aa16aa32a1548d753f257",
+      "bytes": 8246760
+    },
+    {
+      "name": "repurposed_structures_farmers_delight_compat_v7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\repurposed_structures_farmers_delight_compat_v7.jar",
+      "sha256": "32868db0c8dbd116ec550347e3d402c7925c5c0c021cde785f56d6f0e6bd95e3",
+      "bytes": 57233
+    },
+    {
+      "name": "reset_controls_confirmation-neoforge-1.0.0-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\reset_controls_confirmation-neoforge-1.0.0-1.21.1.jar",
+      "sha256": "54ae3bb6945d739b87a9a1c3cc9570f7358031e72fe8b25bc42c95a6e015199c",
+      "bytes": 8625
+    },
+    {
+      "name": "resourcefulconfig-neoforge-1.21-3.0.11.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\resourcefulconfig-neoforge-1.21-3.0.11.jar",
+      "sha256": "25b4f3502d25c535004acd4a9420272fff01d2f1e2df352239fec93fdab005d4",
+      "bytes": 341009
+    },
+    {
+      "name": "resourcefullib-neoforge-1.21-3.0.12.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\resourcefullib-neoforge-1.21-3.0.12.jar",
+      "sha256": "5e36f2c69de008dc5795f730c84ab767688f15c810944b585485349a0c911261",
+      "bytes": 484332
+    },
+    {
+      "name": "revampedwolf-1.21.1-13.1.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\revampedwolf-1.21.1-13.1.0.jar",
+      "sha256": "1faf6421653e354e06b0624af0d6a53cf9006c21d4cb57919704a7b1f0967225",
+      "bytes": 58142
+    },
+    {
+      "name": "rewithered-neoforge-1.0.14+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\rewithered-neoforge-1.0.14+1.21.1.jar",
+      "sha256": "bcd763429bc8178e265e6bead0b4657e6c6bbd1d79b7eaa8280a2add69ac96d9",
+      "bytes": 90370
+    },
+    {
+      "name": "rhino-2101.2.8-build.91.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\rhino-2101.2.8-build.91.jar",
+      "sha256": "1d53d962aa4dac54bcbb4f998c1845980cf194318f1d6b1580ea6ac15cce5ef3",
+      "bytes": 980936
+    },
+    {
+      "name": "rightclickharvest-neoforge-4.6.1+1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\rightclickharvest-neoforge-4.6.1+1.21.1.jar",
+      "sha256": "b5d597ed361964ba9530a848fe8987715f40af2390dfa1a6adb70a2a74076d52",
+      "bytes": 287634
+    },
+    {
+      "name": "sable-neoforge-1.21.1-2.0.5.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\sable-neoforge-1.21.1-2.0.5.jar",
+      "sha256": "c8710f85bc780bbf523e6726ceaaf76dd0b8c61479db497b382c6bb34317e7ab",
+      "bytes": 12986136
+    },
+    {
+      "name": "sawmill-1.21-1.8.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\sawmill-1.21-1.8.1-neoforge.jar",
+      "sha256": "081ed7b7811ccee556c7a475f770dc894b1845e6cbfe3181057c010894fea648",
+      "bytes": 455580
+    },
+    {
+      "name": "serverbrowser-neoforge-1.4.2-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\serverbrowser-neoforge-1.4.2-1.21.1.jar",
+      "sha256": "02d92c1d60cb03844ec0b46f2c56c71439a60a511280638579470b39c2f8a49d",
+      "bytes": 64763
+    },
+    {
+      "name": "simple_snowy_fix-1.21.1-1.21.11-2.2.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\simple_snowy_fix-1.21.1-1.21.11-2.2.1-neoforge.jar",
+      "sha256": "2d43c17f4cf3d6fa4db4ac26a29af169b5225b22110e75df2ad4fe28c60f42ad",
+      "bytes": 133380
+    },
+    {
+      "name": "simplenicknames-1.21.1-neoforge-0.8.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\simplenicknames-1.21.1-neoforge-0.8.0.jar",
+      "sha256": "1aa51914c3808505b971e46ab0a5821191543c96d8279eb2965954a96754da26",
+      "bytes": 1412655
+    },
+    {
+      "name": "smarterfarmers-1.21-2.2.4-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\smarterfarmers-1.21-2.2.4-neoforge.jar",
+      "sha256": "96cd9c5cb6e358798de09c5de13a1201a01da680cad8ec5a0d5a309106293d13",
+      "bytes": 65924
+    },
+    {
+      "name": "smoothchunk-1.21-4.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\smoothchunk-1.21-4.1.jar",
+      "sha256": "a79f06eaffe7e5b834620da3c2cdad782aeaf4f1f207d03f8b0228a20bab65e3",
+      "bytes": 12852
+    },
+    {
+      "name": "smoothmovement-1.21.1-2.7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\smoothmovement-1.21.1-2.7.jar",
+      "sha256": "af912c4992eb9cb47628cd112021937b4d7d11cdd5a89051bdf126742e2c1c57",
+      "bytes": 41517
+    },
+    {
+      "name": "snowundertrees-1.21.1-1.5.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\snowundertrees-1.21.1-1.5.1.jar",
+      "sha256": "b146501cafd389d3fe1e8b3945b22bef5dcef7ff8345a2aa027c170c3cfbaf1d",
+      "bytes": 30512
+    },
+    {
+      "name": "sound-physics-remastered-neoforge-1.21.1-1.5.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\sound-physics-remastered-neoforge-1.21.1-1.5.1.jar",
+      "sha256": "65372ad64422a20f03ad6e39aabaa827c191abbe9be5c35631acc3a8105fe177",
+      "bytes": 202454
+    },
+    {
+      "name": "spark-1.10.124-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\spark-1.10.124-neoforge.jar",
+      "sha256": "647e8a81afbe414dba1df4ba15fd06c5d32d4cb544e68828405e8e074c2e16db",
+      "bytes": 3642581
+    },
+    {
+      "name": "sparsestructures-neoforge-1.21.1-3.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\sparsestructures-neoforge-1.21.1-3.0.jar",
+      "sha256": "5aca0b33c0c83154810bbdd8ddc0d3e6a3e4591577274e2d27c10de0b45f2a45",
+      "bytes": 117743
+    },
+    {
+      "name": "starcatcher-3.1.3-NEOFORGE-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\starcatcher-3.1.3-NEOFORGE-1.21.1.jar",
+      "sha256": "6f44f14ffe4e426c5c4dcdddc462e303cd2dd8962851d00f998ed73ad6e2b807",
+      "bytes": 4317752
+    },
+    {
+      "name": "starcatcher_delight-3.0.1-NEOFORGE-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\starcatcher_delight-3.0.1-NEOFORGE-1.21.1.jar",
+      "sha256": "3cae4552bc1a97c41eea5cb073ebc187b4453afa7934ec6d015b88ccebd4b4e1",
+      "bytes": 840452
+    },
+    {
+      "name": "structure_layout_optimizer-neoforge-1.0.12.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\structure_layout_optimizer-neoforge-1.0.12.jar",
+      "sha256": "ef8eb29c5c4f111c74a49d379843e4c2f51d11b28c8116a49be13636c83f4385",
+      "bytes": 61777
+    },
+    {
+      "name": "structureessentials-1.21.1-5.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\structureessentials-1.21.1-5.0.jar",
+      "sha256": "7ecb6c9d04e20a6803ba6e51dd226eaa289ba2c2c095248f3645222a8bfc1c8d",
+      "bytes": 60833
+    },
+    {
+      "name": "supplementaries-1.21.1-3.9.8-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\supplementaries-1.21.1-3.9.8-neoforge.jar",
+      "sha256": "748ec03afcbcf394539db1cdde6dd9d214667a18d10bedaca2df1bc3aaf9a299",
+      "bytes": 13549986
+    },
+    {
+      "name": "tacz-neoforge-1.21.1-1.1.8-hotfix-r6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\tacz-neoforge-1.21.1-1.1.8-hotfix-r6.jar",
+      "sha256": "58f6ab47c59218bdb10bb9eee1905b6cd27f3bc98d4af13982a6002a99b1d3e7",
+      "bytes": 57242132
+    },
+    {
+      "name": "tacz-pack-upgrader-2.1.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\tacz-pack-upgrader-2.1.3.jar",
+      "sha256": "58d326d6c4924f4a1e8e16341b0973c9d361276adb4f2ca522d87c0b0a0f5473",
+      "bytes": 1704774
+    },
+    {
+      "name": "takesapillage-neoforge-1.0.12+mc1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\takesapillage-neoforge-1.0.12+mc1.21.1.jar",
+      "sha256": "4b44199db0a965d6cdb420025544e18d35d81fa70ee75f564f3b705ff550cf98",
+      "bytes": 2795307
+    },
+    {
+      "name": "tfthreadsafetyaddon-0.1.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\tfthreadsafetyaddon-0.1.3.jar",
+      "sha256": "d018633cf4076918bdfc605dd0438b3026ee68cf4d862a55e248bfa76d4e189a",
+      "bytes": 18722
+    },
+    {
+      "name": "toms_storage-1.21-2.4.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\toms_storage-1.21-2.4.2.jar",
+      "sha256": "a703e28391b914298223a515238c8729007606f2f967a83b65b8d5cb39e0789d",
+      "bytes": 856803
+    },
+    {
+      "name": "toofast-1.21.0-0.4.3.6.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\toofast-1.21.0-0.4.3.6.jar",
+      "sha256": "54852c9d395b4dc870d1c8a587e4fade9fb05474540ae4d3dd196663dd6a6114",
+      "bytes": 3372
+    },
+    {
+      "name": "twilightdelight-3.2.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\twilightdelight-3.2.2.jar",
+      "sha256": "511893674e5cf13fd7702adf6b4fbb326fe3cfd61641753ce0d81c4820ea181d",
+      "bytes": 1340378
+    },
+    {
+      "name": "twilightforest-1.21.1-4.8.3345-universal.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\twilightforest-1.21.1-4.8.3345-universal.jar",
+      "sha256": "493da16d10210f9f53a3c33b3d8fcb4ae9b14016ee420d753c894562bd9aba35",
+      "bytes": 27154121
+    },
+    {
+      "name": "txnilib-neoforge-1.0.24-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\txnilib-neoforge-1.0.24-1.21.1.jar",
+      "sha256": "411e811a6a53a63c2716dbf71cd1167e3a98d000b884458759d6192720be3e18",
+      "bytes": 6276522
+    },
+    {
+      "name": "underlay-1.0.4-hotfix.1-neoforge-mc1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\underlay-1.0.4-hotfix.1-neoforge-mc1.21.1.jar",
+      "sha256": "2bc5268e441fa83279418906f41c94788a4f0df109d1ccbdb577a310fd0692fa",
+      "bytes": 287098
+    },
+    {
+      "name": "uranus-2.4.1-1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\uranus-2.4.1-1.21.1-neoforge.jar",
+      "sha256": "2156a9b353bccfb1f0bf703561a74146ea8803323c48e9b8aef5fab8d58e1d1e",
+      "bytes": 847732
+    },
+    {
+      "name": "variantsandventures-neoforge-1.0.26+mc1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\variantsandventures-neoforge-1.0.26+mc1.21.1.jar",
+      "sha256": "7cdbd2a4503142c5900066bbbf4c06a813b06322fbb3088e41d059e22d8dfc19",
+      "bytes": 1082397
+    },
+    {
+      "name": "vb-compat-2.2-1.21.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\vb-compat-2.2-1.21.1.jar",
+      "sha256": "a46aa2610a75ff50490daaf8d168d252682e23fe835f283ad5e32ffde42fd222",
+      "bytes": 58671
+    },
+    {
+      "name": "veinmining-neoforge-5.0.0-beta.2+1.21.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\veinmining-neoforge-5.0.0-beta.2+1.21.jar",
+      "sha256": "f4678fcf057e3c1fae464403969fd217e7d413f044cd59d63ef287cdf0278713",
+      "bytes": 221494
+    },
+    {
+      "name": "villagernames-1.21.1-8.5.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\villagernames-1.21.1-8.5.jar",
+      "sha256": "d254360090c0409b2b85b4af8168012c40745af846140cf760a35a8589504f31",
+      "bytes": 76999
+    },
+    {
+      "name": "villagesandpillages-neoforge-mc1.21.1-1.0.3.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\villagesandpillages-neoforge-mc1.21.1-1.0.3.jar",
+      "sha256": "c87f37893eaa173dea7d80193da547dd3c282a0c6471265206bc2e669fdad2f6",
+      "bytes": 241257
+    },
+    {
+      "name": "wakes-1.21.1-NeoForge-1.4.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\wakes-1.21.1-NeoForge-1.4.1.jar",
+      "sha256": "120b95470ed306fe8681ad0df732034ac80d3a5ee426d7f9dfb1af1ef2fc3dcd",
+      "bytes": 222430
+    },
+    {
+      "name": "warfare_wings-1.1.4-1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\warfare_wings-1.1.4-1.21.1-neoforge.jar",
+      "sha256": "c56d05cc254b6dbce4c375be0be6a727c788663e295b458172bbdad8f97f8276",
+      "bytes": 29565939
+    },
+    {
+      "name": "watut-neoforge-1.21.0-1.2.7.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\watut-neoforge-1.21.0-1.2.7.jar",
+      "sha256": "b1aac4b9832e16439ee86f27814f7b6a42f2f6bea0ea6949dfffffcd0599d88c",
+      "bytes": 432269
+    },
+    {
+      "name": "waystones-neoforge-1.21.1-21.1.42.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\waystones-neoforge-1.21.1-21.1.42.jar",
+      "sha256": "d21662ac840f42d66ce7d4c41c6efebc4abc911f8c6337383c43ac61aea64e07",
+      "bytes": 1219457
+    },
+    {
+      "name": "worldplaytime-1.2.2-1.21-NEOFORGE.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\worldplaytime-1.2.2-1.21-NEOFORGE.jar",
+      "sha256": "6c8a98a6d9183afa4e96900dc6f91b79f6bb01ffddb19155b37081d26fa4e365",
+      "bytes": 80646
+    },
+    {
+      "name": "xaerominimap-neoforge-1.21.1-26.4.2.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\xaerominimap-neoforge-1.21.1-26.4.2.jar",
+      "sha256": "b722bcf794288f0ed51165cd1f057fc4505e20abbc723b2e17e900426e443603",
+      "bytes": 2185409
+    },
+    {
+      "name": "xaeroworldmap-neoforge-1.21.1-1.45.0.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\xaeroworldmap-neoforge-1.21.1-1.45.0.jar",
+      "sha256": "d60899112e84616ba52a993c1722fd891872acc4779bfac34d9b170001451c6f",
+      "bytes": 1422531
+    },
+    {
+      "name": "xptome-1.21.1-2.4.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\xptome-1.21.1-2.4.jar",
+      "sha256": "9cc3fb2352f7024faacd081f4efe437bdb3e3af09ea4f2c0b2f8ca845de1125e",
+      "bytes": 28123
+    },
+    {
+      "name": "yet_another_config_lib_v3-3.8.2+1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\yet_another_config_lib_v3-3.8.2+1.21.1-neoforge.jar",
+      "sha256": "b5c30321b46cfaa521645a04aff89d2804d8167a25bb23ad4b1ae8da73093a2f",
+      "bytes": 1118651
+    },
+    {
+      "name": "youre-in-grave-danger-neoforge-2.0.13.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\youre-in-grave-danger-neoforge-2.0.13.jar",
+      "sha256": "dd2142a3c6a9d5b990ab36220be482f7aa9f528755f93b8fef8996f509ddcda2",
+      "bytes": 448888
+    },
+    {
+      "name": "zipline-neoforge-1.21.1-1.5.1.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\zipline-neoforge-1.21.1-1.5.1.jar",
+      "sha256": "6cd6f07469f6590973962875c54838dc4ad0c2d9ab31c4cd12f67bb80f2ed56a",
+      "bytes": 63756
+    },
+    {
+      "name": "zombieimprovements-1.2.0+1.21.1-neoforge.jar",
+      "path": "C:\\Users\\ranzh\\workspace\\dev\\muxigame\\bmc5server\\mods\\zombieimprovements-1.2.0+1.21.1-neoforge.jar",
+      "sha256": "4687f96bd02ff46e6d82bbf68c724a943af3d18e9dfd25d943d55c14f2b76386",
+      "bytes": 145990
+    }
+  ],
+  "qaExtraModsExcludedFrom350": [
+    "world-roles-full-lifecycle-QA-ONLY.jar or muxi-home-spawn-native-QA-ONLY.jar (one per stage)",
+    "generated local_mc_debug_qa agent"
+  ],
+  "testRuntimeDelta": {
+    "onlyReplacedModId": "muxi_game_core",
+    "baselineSha256": "46acc0ad4bd4b3cd0ff3ed812f649cfbbe6fc825820b3c9bca9267b8e0547d59",
+    "candidateSha256": "5e47f57e36ae145914d7732f61533ed8002c68252f76c22ab6dc530a2dbe1a88"
+  },
+  "excludedUnpublished": [
+    "muxi-parkour-0.1.0-qa.4.jar",
+    "muxi-endless-runner-0.1.0-candidate.5.jar",
+    "Create addons",
+    "music0.4.2",
+    "YSM upstream"
+  ],
+  "productionAccessed": false,
+  "minecraftStarted": false,
+  "scope": "All 350 JAR bytes match registered completed 1.4.38 inventory; current live files/configuration/other mods added since release are not re-inspected"
+}

@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'build/world-role-migration-20
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
  baseline=OLD/'production-core.jar';assert sha(baseline)=='46acc0ad4bd4b3cd0ff3ed812f649cfbbe6fc825820b3c9bca9267b8e0547d59'
- roles=json.loads((OUT/'owned-files.json').read_text())['files'];home=json.loads((OLD/'own-source-files.json').read_text())['files'];owned=list(dict.fromkeys([*roles,*home]));files=[ROOT/r for r in owned if r.endswith('.java')];before={str(f.relative_to(ROOT)):sha(f) for f in files}
+ roles=json.loads((ROOT/'tests/world-role-migration/owned-files.json').read_text())['files'];home=json.loads((ROOT/'tests/home-spawning/own-source-files.json').read_text())['files'];owned=list(dict.fromkeys([*roles,*home]));files=[ROOT/r for r in owned if r.endswith('.java')];before={str(f.relative_to(ROOT)):sha(f) for f in files}
  j=Path(os.environ['HOME_GUARD_JAVA_HOME']);classes=OUT/'classes';classes.mkdir(exist_ok=True);framework=ROOT.parent/'muxi-minigames/build/libs/muxi-minigames-0.2.1-equipment.1.jar';assert framework.is_file();cp=str(framework)+';'+(OLD/'guard-classpath.txt').read_text()+';'+ ';'.join(str(f) for f in (ROOT.parent/'bmc5server/mods').glob('*.jar'))
  (OUT/'classpath.txt').write_text(cp,encoding='utf-8')
  args=['--release','21','-encoding','UTF-8','-proc:none','-cp',cp,'-d',str(classes),*map(str,files)];af=OUT/'compile.args';af.write_text('\n'.join('"'+x.replace('\\','/')+'"' for x in args),encoding='utf-8');run=subprocess.run([str(j/'bin/javac.exe'),'@'+str(af)],capture_output=True);(OUT/'compile-result.txt').write_bytes(run.stdout+run.stderr)

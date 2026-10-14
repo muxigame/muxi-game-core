@@ -7,7 +7,7 @@ ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'build/home-spawning-20261013'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
  baseline=OUT/'production-core.jar';assert sha(baseline)=='46acc0ad4bd4b3cd0ff3ed812f649cfbbe6fc825820b3c9bca9267b8e0547d59'
- owned=json.loads((OUT/'own-source-files.json').read_text())['files'];files=[ROOT/p for p in owned if p.endswith('.java')];before={str(p.relative_to(ROOT)):sha(p) for p in files}
+ owned=json.loads((ROOT/'tests/home-spawning/own-source-files.json').read_text())['files'];files=[ROOT/p for p in owned if p.endswith('.java')];before={str(p.relative_to(ROOT)):sha(p) for p in files}
  classes=OUT/'guard-only-classes';classes.mkdir(exist_ok=True);cp=(OUT/'guard-classpath.txt').read_text();args=['--release','21','-encoding','UTF-8','-proc:none','-cp',cp,'-d',str(classes)]+list(map(str,files));af=OUT/'guard-only.args';af.write_text('\n'.join('"'+x.replace('\\','/')+'"' for x in args),encoding='utf-8')
  j=Path(os.environ['HOME_GUARD_JAVA_HOME']);subprocess.run([str(j/'bin/javac.exe'),'@'+str(af)],check=True)
  if before!={str(p.relative_to(ROOT)):sha(p) for p in files}:raise RuntimeError('Owned source changed during compilation')

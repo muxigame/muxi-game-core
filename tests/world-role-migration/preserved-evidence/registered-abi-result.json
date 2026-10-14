@@ -1,0 +1,7 @@
+{
+  "success": true,
+  "ownedSources": 44,
+  "frameworkSha256": "c8818fece84986ddeb3878befb7edeafb2e69b432970bbf2b0c4c911182eb3b6",
+  "scope": "owned runtime source compiles with exact registered framework ABI first; no Minecraft execution, no new runtime artifact",
+  "minecraftStarted": false
+}
