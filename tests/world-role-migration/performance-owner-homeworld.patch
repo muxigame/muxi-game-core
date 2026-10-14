@@ -1,0 +1,22 @@
+--- a/src/main/java/net/muxigame/performance/compat/shaders/DimensionShaderSwap.java
++++ b/src/main/java/net/muxigame/performance/compat/shaders/DimensionShaderSwap.java
+@@ -15,7 +15,7 @@
+  */
+ public final class DimensionShaderSwap {
+     private static final Logger LOG=LogUtils.getLogger();
+-    private static final Set<String> DIMENSIONS=Set.of("minecraft:overworld","muxi_game_core:overworld","muxi_game_core:adventure");
++    private static final Set<String> DIMENSIONS=Set.of("minecraft:overworld","muxi_game_core:homeworld","muxi_game_core:adventure");
+     private static final LinkedHashMap<String,Object> PACKS=new LinkedHashMap<>(4,.75f,true);
+     private static Path root;
+     private static Map<String,String> options=Map.of();
+--- a/src/main/java/net/muxigame/performance/compat/shaders/ShaderProgramBinary.java
++++ b/src/main/java/net/muxigame/performance/compat/shaders/ShaderProgramBinary.java
+@@ -17,7 +17,7 @@
+ public final class ShaderProgramBinary {
+  private record Scope(String pack,String options,String macros,long epoch){}
+  private record Request(String key,int[] formats,long epoch){}
+- private static final Set<String> CORE=Set.of("minecraft:overworld","muxi_game_core:overworld","muxi_game_core:adventure");
++ private static final Set<String> CORE=Set.of("minecraft:overworld","muxi_game_core:homeworld","muxi_game_core:adventure");
+  private static final AtomicLong EPOCH=new AtomicLong();
+  private static final Map<ShaderPackSourceCarrier,Scope> SCOPES=new WeakHashMap<>();
+  private static final Map<Integer,SortedMap<String,Integer>> ATTRIBUTES=new HashMap<>();

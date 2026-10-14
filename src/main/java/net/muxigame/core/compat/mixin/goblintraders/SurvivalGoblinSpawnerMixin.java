@@ -26,6 +26,7 @@ public abstract class SurvivalGoblinSpawnerMixin {
         if(!level.dimension().equals(Level.OVERWORLD))return;
         if(muxi$explorationSpawners==null)muxi$explorationSpawners=new HashMap<>();
         for(var dimension:WorldDimensions.EXPLORATION) {
+            if(dimension.equals(Level.OVERWORLD))continue;
             ServerLevel survival=level.getServer().getLevel(dimension);
             if(survival==null)continue;
             GoblinTraderSpawner spawner=muxi$explorationSpawners.get(dimension);

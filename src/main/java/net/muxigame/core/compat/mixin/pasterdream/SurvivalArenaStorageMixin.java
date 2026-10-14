@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.*;
 public abstract class SurvivalArenaStorageMixin {
     @Redirect(method="findGenerationPoint",at=@At(value="INVOKE",target="Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
     private ServerLevel muxi$ownArenaClaim(MinecraftServer server,ResourceKey<Level> key,Structure.GenerationContext context) {
-        if(key.equals(Level.OVERWORLD)) for(var dimension:WorldDimensions.EXPLORATION) {
+        if(key.equals(Level.OVERWORLD)) for(var dimension:WorldDimensions.GENERATION) {
             ServerLevel survival=server.getLevel(dimension);
             if(survival!=null&&survival.getChunkSource().getGenerator()==context.chunkGenerator())return survival;
         }

@@ -14,8 +14,8 @@ public abstract class SurvivalBiomeSlicesMixin {
     @Inject(method="levels",at=@At("RETURN"),cancellable=true)
     private void muxi$survivalSlices(CallbackInfoReturnable<HashSet<ResourceKey<Level>>> result) {
         var levels=result.getReturnValue();
-        if(levels.contains(Level.OVERWORLD)&&!levels.containsAll(WorldDimensions.EXPLORATION)) {
-            var extended=new HashSet<>(levels);extended.addAll(WorldDimensions.EXPLORATION);result.setReturnValue(extended);
+        if(levels.contains(Level.OVERWORLD)&&!levels.containsAll(WorldDimensions.GENERATION)) {
+            var extended=new HashSet<>(levels);extended.addAll(WorldDimensions.GENERATION);result.setReturnValue(extended);
         }
     }
 }

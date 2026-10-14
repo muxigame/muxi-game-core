@@ -34,14 +34,14 @@ public final class WorldPortals {
         bus.addListener(WorldPortals::adventureTravel);
     }
     private static void endEye(PlayerInteractEvent.RightClickBlock event) {
-        if(WorldDimensions.exploration(event.getLevel().dimension()) && event.getItemStack().is(Items.ENDER_EYE)
+        if((event.getLevel().dimension().equals(WorldDimensions.ADVENTURE) || (event.getLevel() instanceof ServerLevel level && WorldRoleState.get(level.getServer()).homeHub() && WorldDimensions.exploration(level.dimension()))) && event.getItemStack().is(Items.ENDER_EYE)
             && event.getLevel().getBlockState(event.getPos()).is(Blocks.END_PORTAL_FRAME)) {
             event.setCanceled(true);event.setCancellationResult(InteractionResult.FAIL);
             if(event.getEntity() instanceof ServerPlayer player)message(player,"请回家园建造暮色、下界和末地传送门");
         }
     }
     private static void adventureTravel(net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent event) {
-        if(WorldDimensions.exploration(event.getEntity().level().dimension()) && !event.getDimension().equals(Level.OVERWORLD)) {
+        if((event.getEntity().level().dimension().equals(WorldDimensions.ADVENTURE) || (event.getEntity().level() instanceof ServerLevel level && WorldRoleState.get(level.getServer()).homeHub() && WorldDimensions.exploration(level.dimension()))) && !event.getDimension().equals(WorldDimensions.HOME)) {
             if(minigameTravel(event))return;
             event.setCanceled(true);
             if(event.getEntity() instanceof ServerPlayer player && player.tickCount%40==0)
@@ -94,7 +94,7 @@ public final class WorldPortals {
         if(!(event.getEntity() instanceof ServerPlayer player)||!event.getItemStack().is(Items.FLINT_AND_STEEL))return;
         Block material=event.getLevel().getBlockState(event.getPos()).getBlock();
         if(!FRAMES.contains(material)||!WorldDimensions.managed(player.level().dimension()))return;
-        int destination=player.level().dimension().equals(Level.OVERWORLD)?1:0;
+        int destination=WorldDimensions.home(player.level().dimension())?1:0;
         Frame frame=find(player.serverLevel(),event.getPos(),destination,false);
         if(frame==null)return;
         event.setCanceled(true);event.setCancellationResult(InteractionResult.SUCCESS);

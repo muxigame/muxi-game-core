@@ -10,6 +10,6 @@ import org.spongepowered.asm.mixin.injection.*;
 public abstract class SurvivalOriginStructureMixin {
     @Redirect(method="onLevelLoad",at=@At(value="INVOKE",target="Lnet/minecraft/server/level/ServerLevel;dimension()Lnet/minecraft/resources/ResourceKey;"))
     private static ResourceKey<Level> muxi$originEligibility(ServerLevel level) {
-        return WorldDimensions.exploration(level.dimension())?Level.OVERWORLD:level.dimension();
+        return WorldDimensions.overworldGeneration(level.dimension().location())?Level.OVERWORLD:level.dimension();
     }
 }
